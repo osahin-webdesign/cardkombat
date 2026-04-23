@@ -129,6 +129,8 @@ button,input{font-family:inherit}
 .hcs{font-size:22px}.hcv{font-size:10px}.hct{font-size:8px;text-align:center}.hccost{position:absolute;top:3px;right:4px;font-size:8px;border:1px solid #6a5a39;padding:1px 3px;background:#efe0b9}.hcrare{position:absolute;bottom:4px;left:4px;font-size:7px}.suit-red .hcs,.suit-red .hcv,.suit-red .hctop,.suit-red .hcbot{color:var(--red)}
 #controls{background:#0b0906;padding:10px 12px} #hint{font-size:10px;color:var(--faded);text-align:center;letter-spacing:2px;min-height:14px;margin-bottom:8px}
 #btns{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+/* logout button in menu */
+#logoutBtn{font-size:10px;padding:5px 10px;border-color:#4a3820}
 @media (max-width:880px){.menu-shell,.builder-shell{grid-template-columns:1fr}.fireplace-wrap{min-height:340px}}
 </style>
 </head>
@@ -140,7 +142,7 @@ button,input{font-family:inherit}
     <div class="subbrand">DUELIST LOGIN</div>
     <div class="cardbox">
       <div class="section-title">Enter your duelist name</div>
-      <input class="input" id="loginName" maxlength="16" placeholder="DUELIST NAME">
+      <input class="input" id="loginName" maxlength="16" placeholder="DUELIST NAME" autocomplete="off">
       <div class="panel-note" style="margin-top:10px">Stats are tied to this exact name and saved in Firebase. Use the same name to keep your wins, losses, and ELO.</div>
       <div style="display:flex;gap:8px;margin-top:14px">
         <button class="btn primary" id="loginBtn">Enter</button>
@@ -155,10 +157,14 @@ button,input{font-family:inherit}
     <div class="fireplace-wrap">
       <div class="parlor"></div><div class="frame">CARD<br>KOMBAT</div><div class="mantel"></div>
       <div class="hearth"><div class="fire-bricks"></div><div class="log l1"></div><div class="log l2"></div><div class="flame f1"></div><div class="flame f2"></div><div class="flame f3"></div><div class="ember e1"></div><div class="ember e2"></div><div class="ember e3"></div><div class="ember e4"></div></div>
-      <div class="rug"></div><div class="fire-note">This build hardens multiplayer first: atomic room joins, max two players, seat-token turn validation, profile stats, and consistent state transitions.</div>
+      <div class="rug"></div><div class="fire-note">Room joins use Firebase transactions — max two players, seat-token turn validation, profile stats, consistent state transitions. Bot matches only can be left mid-game.</div>
     </div>
     <div class="menu-panel">
-      <div class="brand">CARD KOMBAT</div><div class="subbrand">MULTIPLAYER HARDENED BUILD</div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="brand" style="font-size:22px;letter-spacing:4px">CARD KOMBAT</div>
+        <button class="btn" id="logoutBtn">Sign Out</button>
+      </div>
+      <div class="subbrand" style="text-align:left;margin:0">MULTIPLAYER HARDENED BUILD</div>
       <div class="cardbox">
         <div class="section-title">Profile</div>
         <div class="rating-box"><span>Name</span><strong id="homeName">-</strong></div>
@@ -175,13 +181,13 @@ button,input{font-family:inherit}
           <button class="btn" id="joinRoomMenuBtn">Join Room</button>
         </div>
         <div style="margin-top:10px;display:grid;gap:8px">
-          <input class="input" id="joinCodeHome" maxlength="6" placeholder="ROOM CODE">
+          <input class="input" id="joinCodeHome" maxlength="6" placeholder="ROOM CODE" autocomplete="off">
           <button class="btn" id="openBuilderBtn">Deck Builder</button>
         </div>
         <div id="home-message" style="margin-top:10px"></div>
       </div>
       <div class="cardbox"><div class="section-title">Current Deck</div><div class="panel-note" id="deckSummary">24 cards loaded.</div></div>
-      <div class="cardbox"><div class="section-title">Networking Notes</div><div class="panel-note">- Room joins use Firebase transactions and stop at two seats.<br>- All actions are applied through a state reducer guarded by actor seat token + turn checks.<br>- Profiles are loaded from Firebase by name and updated on ranked results.</div></div>
+      <div class="cardbox"><div class="section-title">Networking Notes</div><div class="panel-note">- Room joins use Firebase transactions and stop at two seats.<br>- All actions are applied through a state reducer guarded by actor seat token + turn checks.<br>- Profiles are loaded from Firebase by name and updated on ranked results.<br>- Online/ranked matches cannot be left — resign is not available mid-game.</div></div>
     </div>
   </div>
 </section>
@@ -209,7 +215,7 @@ button,input{font-family:inherit}
 </section>
 
 <section id="screen-game" class="hidden">
-  <div id="game-topbar"><div id="title-text">CARD KOMBAT</div><div style="display:flex;gap:8px;align-items:center"><button class="btn small" id="leaveMatchBtn">Leave Match</button><div id="net-status">● OFFLINE</div></div></div>
+  <div id="game-topbar"><div id="title-text">CARD KOMBAT</div><div style="display:flex;gap:8px;align-items:center"><button class="btn small danger" id="leaveMatchBtn">Leave Match</button><div id="net-status">● OFFLINE</div></div></div>
   <div id="game-info">
     <div class="hw"><div class="hlbl" id="p1label">YOU</div><div class="ho"><div class="hi" id="p1h" style="width:100%"></div></div><div class="meta-row"><span>DECK <b id="p1DeckCount">0</b></span><span>HAND <b id="p1HandCount">0</b></span><span>ELO <b id="p1Rating">-</b></span></div><div class="energy-row" id="p1Energy"></div></div>
     <div id="tmr-wrap"><div id="tmr-label">TURN</div><div id="tmr">18</div><div id="tmr-bar-wrap"><div id="tmr-bar"></div></div></div>
@@ -220,7 +226,7 @@ button,input{font-family:inherit}
     <div id="waiting-room-code">------</div>
     <div style="font-size:11px;color:#8e7a53;letter-spacing:2px">Share this code with your opponent</div>
     <div id="waiting-pulse">WAITING FOR PLAYER 2<span id="waiting-dots"><span>.</span><span>.</span><span>.</span></span></div>
-    <button class="btn danger" id="cancelWaitBtn" style="margin-top:8px">Cancel</button>
+    <button class="btn danger" id="cancelWaitBtn" style="margin-top:8px">Cancel & Delete Room</button>
   </div>
   <div id="arena"><div id="arena-grid"></div><canvas id="fx-canvas"></canvas><div id="p1z"><div class="fcard" id="fc1"><div class="fp">1</div><div class="fsuit">♠</div><div class="fcard-name">YOU</div><div class="fpb">1</div></div><div class="fname-tag">P1</div></div><div id="p2z"><div class="fcard" id="fc2" style="transform:scaleX(-1)"><div class="fp">2</div><div class="fsuit">♦</div><div class="fcard-name">FOE</div><div class="fpb">2</div></div><div class="fname-tag" style="transform:scaleX(-1)">P2</div></div><div id="floor"></div><div id="bnr"></div><div id="combo-flash"></div><div id="opp-indicator">OPPONENT IS THINKING...</div></div>
   <div id="status-bar"><span>ATK <b id="s-atk">0</b></span><span>DEF <b id="s-def">0</b></span><span>SPD <b id="s-spd">0</b></span><span>BLEED <b id="s-bld">0</b></span><span>CURSE <b id="s-crs">0</b></span><span>ENERGY <b id="s-eng">0</b></span><span>COMBO <b id="s-cmb">0</b></span><span>SEQ <b id="s-seq">0</b></span></div>
@@ -231,7 +237,6 @@ button,input{font-family:inherit}
 
 <script type="module">
 
-// FIX 1: Corrected Firebase SDK version from non-existent 12.12.1 to stable 10.12.2
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getDatabase, ref, set, get, onValue, push, remove, runTransaction, update, off } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
@@ -261,19 +266,25 @@ const CARD_LIBRARY=[
   {id:'spade_K', suit:'spade', val:'K', rarity:'rare'},
   {id:'drain_J', suit:'drain', val:'J', rarity:'rare'},
   {id:'wound_A', suit:'wound', val:'A', rarity:'legendary'},
-  {id:'mirror_A', suit:'mirror', val:'A', rarity:'legendary'} // FIX 2: Added missing mirror_A card to CARD_LIBRARY
+  {id:'mirror_A', suit:'mirror', val:'A', rarity:'legendary'}
 ];
 
-const LS={name:'ck_name_secure',deck:'ck_deck_secure',seatToken:'ck_seat_token',session:'ck_session_token'};
+// ── Session-only storage: no auto sign-in between page loads ─────────────────
+// We deliberately do NOT persist the logged-in name across sessions.
+// seatToken and session token persist (they are device identifiers, not login state).
+const LS={deck:'ck_deck_secure',seatToken:'ck_seat_token',session:'ck_session_token'};
 const $=s=>document.querySelector(s), mf=Math.floor, rr=()=>Math.random();
+
 let mode='menu', onlineType=null, roomId=null, myRole='p1', gameState=null, selectedIndex=null, gameOver=false, timerInt=null, particles=[], canvas=null, ctx=null, stateUnsubscribe=null, aiTimeout=null, queuePoll=null;
 let currentProfile={name:'',wins:0,losses:0,elo:1000};
+
+// Seat token and session token persist across page loads (device identity)
+// but profile/name is NOT persisted — user must always sign in
 let seatToken = localStorage.getItem(LS.seatToken) || crypto.randomUUID();
 localStorage.setItem(LS.seatToken, seatToken);
 let sessionToken = localStorage.getItem(LS.session) || crypto.randomUUID();
 localStorage.setItem(LS.session, sessionToken);
 
-// FIX 3: Added missing roomCode() function
 function roomCode(){
   const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let code='';
@@ -285,8 +296,6 @@ function profileKey(name){ return name.trim().toUpperCase().replace(/[^A-Z0-9_ -
 function msg(t){$('#home-message').textContent=t}
 function loginMsg(t){$('#loginMsg').textContent=t}
 function gSuit(s){return SUITS[s]||SUITS.spade}
-function getStoredName(){return localStorage.getItem(LS.name)||''}
-function setStoredName(name){localStorage.setItem(LS.name,name)}
 function getDeck(){const raw=localStorage.getItem(LS.deck); if(!raw) return getDefaultDeck(); try{const parsed=JSON.parse(raw); return Array.isArray(parsed)&&parsed.length===DECK_SIZE?parsed:getDefaultDeck()}catch{return getDefaultDeck()}}
 function saveDeck(deck){localStorage.setItem(LS.deck,JSON.stringify(deck)); renderHome()}
 function getDefaultDeck(){return ['spade_5','spade_5','spade_7','spade_7','spade_9','heart_4','heart_4','heart_7','heart_7','heart_Q','club_5','club_5','club_8','club_8','diamond_5','diamond_5','diamond_8','diamond_8','drain_6','drain_J','wound_6','wound_A','void_8','mirror_9']}
@@ -295,7 +304,6 @@ function makeDeckFromList(list){return shuffle(list.map(id=>{const base=CARD_LIB
 function deepClone(v){return JSON.parse(JSON.stringify(v))}
 function setScreen(which){$('#screen-login').classList.toggle('hidden',which!=='login'); $('#screen-menu').classList.toggle('hidden',which!=='menu'); $('#screen-builder').classList.toggle('hidden',which!=='builder'); $('#screen-game').classList.toggle('hidden',which!=='game')}
 
-// FIX 4: clearOnlineListeners now also cleans up the Firebase onValue ref properly
 function clearOnlineListeners(){
   if(stateUnsubscribe){stateUnsubscribe(); stateUnsubscribe=null}
   if(queuePoll){clearInterval(queuePoll); queuePoll=null}
@@ -309,6 +317,7 @@ function canPlayCard(player, card){return !!card && player.energy >= (card.cost|
 
 async function ensureProfile(name){
   const key=profileKey(name);
+  if(!key || key.length < 2){ throw new Error('Invalid name'); }
   const profileRef=ref(db,`profiles/${key}`);
   const res = await runTransaction(profileRef, cur=>{
     if(cur===null){
@@ -317,9 +326,9 @@ async function ensureProfile(name){
     return cur
   });
   currentProfile = res.snapshot.val();
-  setStoredName(currentProfile.name);
   renderHome();
 }
+
 async function updateProfileAfterRanked(win, oppElo=1000){
   const name=currentProfile.name;
   if(!name) return;
@@ -345,6 +354,7 @@ function renderHome(){
   });
   $('#deckSummary').textContent=`${deck.length} cards ready. Common ${rareCounts.common}, Uncommon ${rareCounts.uncommon}, Rare ${rareCounts.rare}, Legendary ${rareCounts.legendary}.`
 }
+
 function renderBuilder(){
   const deck=getDeck(), counts={}, rarityTotals={common:0,uncommon:0,rare:0,legendary:0};
   deck.forEach(id=>{
@@ -450,6 +460,12 @@ function renderGame(){
   $('#fc1 .fcard-name').textContent=gameState.p1.name; $('#fc2 .fcard-name').textContent=gameState.p2.name||'OPEN';
   if(me){$('#s-atk').textContent=me.atk; $('#s-def').textContent=me.def; $('#s-spd').textContent=me.spd; $('#s-bld').textContent=me.bleed; $('#s-crs').textContent=me.curse; $('#s-eng').textContent=me.energy; $('#s-cmb').textContent=me.combo||0}
   $('#s-seq').textContent=gameState.seq||0;
+
+  // Leave button: only enabled for local/bot matches
+  const canLeave = (mode === 'local');
+  $('#leaveMatchBtn').disabled = !canLeave;
+  $('#leaveMatchBtn').title = canLeave ? 'Leave bot match' : 'Cannot leave online matches';
+
   renderHand(); updateButtons()
 }
 function renderHand(){
@@ -474,33 +490,30 @@ function beginTurnIfNeeded(){
   updateButtons()
 }
 
-// FIX 5: Added the missing listenToRoom() function — this was the core online multiplayer bug
 function listenToRoom(rid){
   clearOnlineListeners();
   const roomRef = ref(db, `rooms/${rid}`);
   let prevStatus = null;
   stateUnsubscribe = onValue(roomRef, snap => {
     if(!snap.exists()){
-      msg('Room was closed.'); leaveMatch(); return;
+      msg('Room was closed.'); leaveMatch(false); return;
     }
     const data = snap.val();
     const wasWaiting = prevStatus === 'waiting' || prevStatus === null;
     prevStatus = data.status;
-    // Hide overlay once game moves from waiting -> playing
     if(data.status === 'playing' && wasWaiting){
       hideWaitingOverlay();
+      gameState = data;
       renderGame();
       logText('Opponent joined! Duel begins...');
     } else {
       gameState = data;
       renderGame();
     }
-    gameState = data;
     if(data.status === 'gameover' && !gameOver){
       finishGame(data.winner);
     } else if(data.status === 'playing'){
       beginTurnIfNeeded();
-      // Trigger FX for opponent's last action
       if(data.lastAction && !data.lastAction._seen && data.lastAction.by !== myRole && data.lastAction.type==='play'){
         const a=data.lastAction;
         const oppRole=myRole==='p1'?'p2':'p1';
@@ -517,7 +530,6 @@ async function applyOnlineAction(actionType){
   if(!roomId) return;
   const roomRef=ref(db,`rooms/${roomId}`);
   let newLog = '';
-  // FIX 6: Capture selectedIndex before the transaction (it's cleared after)
   const actionIndex = selectedIndex;
   const result = await runTransaction(roomRef, cur=>{
     if(!cur) return cur;
@@ -546,14 +558,16 @@ async function applyOnlineAction(actionType){
     return state;
   });
   if(result.committed){
-    selectedIndex=null; // FIX 6 continued: reset after transaction completes
+    selectedIndex=null;
     if(newLog) logText(newLog);
   }
 }
+
 function handleAction(type){
   if(mode==='local') return performLocalAction(type);
   if(mode==='online') return applyOnlineAction(type);
 }
+
 function performLocalAction(type){
   if(!gameState || gameOver || gameState.turn!==myRole || gameState.status!=='playing') return;
   const state=deepClone(gameState); let logParts=[];
@@ -567,7 +581,6 @@ function performLocalAction(type){
     logParts.push(res.text); logParts.push(...res.passed);
     if(card){
       const oppRole=myRole==='p1'?'p2':'p1';
-      // parse damage/heal from result text
       const dmgM=res.text.match(/(?:deals|strikes?|crashes?|steals?\s+\d+\s+life from)\s+(\d+)/i);
       const healM=res.text.match(/(?:restores?|heals?|grants?.*?and\s+)(\d+)/i);
       setTimeout(()=>triggerCardFX(card.suit,card.val,myRole,oppRole,dmgM?parseInt(dmgM[1]):0,healM?parseInt(healM[1]):0),80);
@@ -617,6 +630,7 @@ async function createRoom(){
   await set(ref(db,`rooms/${roomId}`),state);
   enterGame(); showWaitingOverlay(roomId); listenToRoom(roomId); logText(`Room ${roomId} created. Waiting for player 2.`)
 }
+
 async function joinRoom(code){
   clearInterval(timerInt); clearOnlineListeners();
   mode='online'; onlineType='casual'; myRole='p2'; gameOver=false; selectedIndex=null;
@@ -639,6 +653,7 @@ async function joinRoom(code){
   roomId=code;
   enterGame(); listenToRoom(code)
 }
+
 async function joinRankedQueue(){
   msg('Searching ranked queue...');
   clearOnlineListeners();
@@ -654,7 +669,6 @@ async function joinRankedQueue(){
   if(others.length){
     const opp = others[0];
     roomId = roomCode();
-    // FIX 7: AI deck in offline mode referenced mirror_A which wasn't in CARD_LIBRARY; now it is (see FIX 2). Ranked opponent uses their actual stored deck.
     const base={mode:'online',ranked:true,maxPlayers:2,turn:'p1',round:1,status:'playing',created:Date.now(),lastSuit:null,lastLog:'',lastAction:null,p1:newFighter(currentProfile.name,getDeck(),currentProfile.elo,seatToken),p2:newFighter(opp.name,opp.deck,opp.elo,opp.seatToken),presence:{p1:sessionToken,p2:'ranked'}};
     const state=initializeMatchState(base);
     await set(ref(db,`rooms/${roomId}`), state);
@@ -675,13 +689,36 @@ async function joinRankedQueue(){
     }
   },1400);
 }
+
 function enterGame(){setScreen('game'); initCanvas()}
-function leaveMatch(){
+
+// ── Leave match — only allowed for local/bot mode ────────────────────────────
+// deleteMatchData: if true, delete the Firebase room (cancel waiting room case)
+// applyEloLoss: if true, this is a ranked forfeit — penalise ELO
+async function leaveMatch(deleteMatchData=true, applyEloLoss=false){
   clearInterval(timerInt); clearAITimeout(); clearOnlineListeners();
   hideWaitingOverlay();
+
+  // Apply ELO loss for ranked forfeit before clearing state
+  if(applyEloLoss && gameState){
+    const oppRole = myRole==='p1'?'p2':'p1';
+    const oppElo = gameState[oppRole]?.elo || 1000;
+    await updateProfileAfterRanked(false, oppElo);
+  }
+
+  // Delete Firebase room data if requested (e.g. cancelling a waiting room)
+  if(deleteMatchData && roomId && mode==='online'){
+    try{ await remove(ref(db,`rooms/${roomId}`)); }catch(e){ console.warn('Room cleanup failed:', e); }
+  }
+
+  // Fully wipe all match state
   mode='menu'; onlineType=null; roomId=null; gameState=null; gameOver=false; selectedIndex=null;
-  $('#opp-indicator').style.display='none'; setScreen('menu'); renderHome(); msg('')
+  $('#opp-indicator').style.display='none';
+  logText('Awaiting duel...');
+  $('#hand').innerHTML='';
+  setScreen('menu'); renderHome(); msg('')
 }
+
 async function finishGame(winner){
   if(gameOver) return;
   gameOver=true;
@@ -692,6 +729,10 @@ async function finishGame(winner){
   if(gameState?.ranked){
     const oppRole=myRole==='p1'?'p2':'p1';
     await updateProfileAfterRanked(won, gameState[oppRole].elo||1000);
+  }
+  // Delete the room after a completed match so no stale data lingers
+  if(roomId && mode==='online'){
+    try{ await remove(ref(db,`rooms/${roomId}`)); }catch(e){ console.warn('Room cleanup failed:', e); }
   }
 }
 
@@ -735,7 +776,6 @@ function animLoop(){
   requestAnimationFrame(animLoop);
 }
 
-// returns canvas-relative center of a fighter zone element
 function fzCenter(role){
   const el=$(`#${role==='p1'?'p1z':'p2z'}`), cv=canvas;
   if(!el||!cv) return {x:cv?.width/2||200,y:cv?.height/2||150};
@@ -743,7 +783,6 @@ function fzCenter(role){
   return {x:er.left-cr.left+er.width/2, y:er.top-cr.top+er.height/2};
 }
 
-// Floating damage/heal numbers
 function floatNumber(text, role, color='#fff'){
   const arena=$('#arena'); if(!arena) return;
   const el=document.createElement('div'); el.className='floatxt';
@@ -759,110 +798,66 @@ function floatNumber(text, role, color='#fff'){
   requestAnimationFrame(tick);
 }
 
-// ── Per-suit card effect animations ─────────────────────────────────────────
 function spawnParticles(suit, attackerRole, defenderRole, value){
   if(!canvas||!ctx) return;
   const ac=fzCenter(attackerRole), dc=fzCenter(defenderRole);
   const n=Math.min(value*2+10, 60);
-
-  if(suit==='spade'||suit==='void'){ // Dark slash sparks
+  if(suit==='spade'||suit==='void'){
     const clrs=['#d0d0d0','#888','#c8c8c8','#505050'];
-    for(let i=0;i<n;i++){
-      const ang=-Math.PI/2+(-0.5+Math.random())*1.2, spd=2+Math.random()*5;
-      particles.push({x:dc.x,y:dc.y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,size:2+Math.random()*4,color:clrs[mf(Math.random()*clrs.length)],life:1,decay:.04+Math.random()*.03,drag:.91,gravity:.12,shrink:.96,shape:'circle'});
-    }
-    // big ring burst
+    for(let i=0;i<n;i++){const ang=-Math.PI/2+(-0.5+Math.random())*1.2, spd=2+Math.random()*5; particles.push({x:dc.x,y:dc.y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,size:2+Math.random()*4,color:clrs[mf(Math.random()*clrs.length)],life:1,decay:.04+Math.random()*.03,drag:.91,gravity:.12,shrink:.96,shape:'circle'})}
     particles.push({x:dc.x,y:dc.y,vx:0,vy:0,size:4,color:'rgba(200,200,210,.7)',life:.8,decay:.04,shape:'ring',lw:3,expand:6});
     particles.push({x:dc.x,y:dc.y,vx:0,vy:0,size:2,color:'rgba(255,255,255,.5)',life:.6,decay:.05,shape:'ring',lw:1.5,expand:9});
-    // slash lines
-    for(let i=0;i<5;i++){
-      const a=Math.random()*Math.PI*2, l=20+Math.random()*30;
-      particles.push({x:dc.x,y:dc.y,vx:0,vy:0,size:l,color:'rgba(220,220,230,.6)',life:.7,decay:.07,shape:'line',dx:Math.cos(a),dy:Math.sin(a),lw:1.5});
-    }
+    for(let i=0;i<5;i++){const a=Math.random()*Math.PI*2, l=20+Math.random()*30; particles.push({x:dc.x,y:dc.y,vx:0,vy:0,size:l,color:'rgba(220,220,230,.6)',life:.7,decay:.07,shape:'line',dx:Math.cos(a),dy:Math.sin(a),lw:1.5})}
   }
-  else if(suit==='heart'){ // Green/gold heal motes
+  else if(suit==='heart'){
     const clrs=['#7be87b','#a8f5a8','#c8f5c8','#e5ffe5','#d4e870'];
-    for(let i=0;i<n;i++){
-      const ang=Math.random()*Math.PI*2, spd=.5+Math.random()*2.5;
-      particles.push({x:ac.x+(-30+Math.random()*60),y:ac.y+20,vx:Math.cos(ang)*spd,vy:-1.5-Math.random()*2,size:3+Math.random()*5,color:clrs[mf(Math.random()*clrs.length)],life:1,decay:.022+Math.random()*.015,drag:.96,gravity:-.02,shrink:.98,shape:Math.random()>.5?'circle':'star',rot:Math.random()*Math.PI*2,rotSpeed:(.05+Math.random()*.05)*(Math.random()>.5?1:-1)});
-    }
+    for(let i=0;i<n;i++){const ang=Math.random()*Math.PI*2, spd=.5+Math.random()*2.5; particles.push({x:ac.x+(-30+Math.random()*60),y:ac.y+20,vx:Math.cos(ang)*spd,vy:-1.5-Math.random()*2,size:3+Math.random()*5,color:clrs[mf(Math.random()*clrs.length)],life:1,decay:.022+Math.random()*.015,drag:.96,gravity:-.02,shrink:.98,shape:Math.random()>.5?'circle':'star',rot:Math.random()*Math.PI*2,rotSpeed:(.05+Math.random()*.05)*(Math.random()>.5?1:-1)})}
     particles.push({x:ac.x,y:ac.y,vx:0,vy:0,size:5,color:'rgba(100,240,130,.5)',life:.9,decay:.05,shape:'ring',lw:4,expand:5});
   }
-  else if(suit==='club'){ // Blue/silver brace shield sparks
+  else if(suit==='club'){
     const clrs=['#8ab4f8','#c0d8ff','#6090e0','#d0e8ff'];
-    for(let i=0;i<n;i++){
-      const ang=Math.random()*Math.PI*2, spd=1.5+Math.random()*3;
-      particles.push({x:ac.x+(-20+Math.random()*40),y:ac.y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,size:2+Math.random()*4,color:clrs[mf(Math.random()*clrs.length)],life:1,decay:.035,drag:.93,gravity:.05,shrink:.97,shape:'circle'});
-    }
-    // shield ring
+    for(let i=0;i<n;i++){const ang=Math.random()*Math.PI*2, spd=1.5+Math.random()*3; particles.push({x:ac.x+(-20+Math.random()*40),y:ac.y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,size:2+Math.random()*4,color:clrs[mf(Math.random()*clrs.length)],life:1,decay:.035,drag:.93,gravity:.05,shrink:.97,shape:'circle'})}
     particles.push({x:ac.x,y:ac.y,vx:0,vy:0,size:10,color:'rgba(130,180,255,.6)',life:.9,decay:.04,shape:'ring',lw:5,expand:4});
     particles.push({x:ac.x,y:ac.y,vx:0,vy:0,size:20,color:'rgba(160,200,255,.35)',life:.7,decay:.04,shape:'ring',lw:2,expand:3});
   }
-  else if(suit==='diamond'||suit==='curse'){ // Purple curse wisps
+  else if(suit==='diamond'||suit==='curse'){
     const clrs=['#c080ff','#9050e0','#e0a0ff','#7020c0'];
-    for(let i=0;i<n;i++){
-      const ang=Math.random()*Math.PI*2, spd=.8+Math.random()*2;
-      particles.push({x:dc.x+(-25+Math.random()*50),y:dc.y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd-.8,size:3+Math.random()*5,color:clrs[mf(Math.random()*clrs.length)],life:1,decay:.025,drag:.95,gravity:-.05,shrink:.97,shape:Math.random()>.4?'circle':'star',rot:Math.random()*Math.PI*2,rotSpeed:.04});
-    }
+    for(let i=0;i<n;i++){const ang=Math.random()*Math.PI*2, spd=.8+Math.random()*2; particles.push({x:dc.x+(-25+Math.random()*50),y:dc.y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd-.8,size:3+Math.random()*5,color:clrs[mf(Math.random()*clrs.length)],life:1,decay:.025,drag:.95,gravity:-.05,shrink:.97,shape:Math.random()>.4?'circle':'star',rot:Math.random()*Math.PI*2,rotSpeed:.04})}
     particles.push({x:dc.x,y:dc.y,vx:0,vy:0,size:5,color:'rgba(160,60,255,.5)',life:.85,decay:.05,shape:'ring',lw:4,expand:5});
   }
-  else if(suit==='drain'){ // Orange/red life-steal tendrils
+  else if(suit==='drain'){
     const clrs=['#ff6020','#ff9040','#ffb060','#cc3010'];
-    // tendrils moving from defender to attacker
-    for(let i=0;i<n;i++){
-      const t=Math.random(), x=dc.x+(ac.x-dc.x)*t, y=dc.y+(ac.y-dc.y)*t;
-      const perp=(-0.3+Math.random()*.6);
-      particles.push({x:x+perp*30,y:y+perp*30,vx:(ac.x-dc.x)*.012+(-1+Math.random()*2)*.5,vy:(ac.y-dc.y)*.012+(-1+Math.random()*2)*.5,size:3+Math.random()*4,color:clrs[mf(Math.random()*clrs.length)],life:1,decay:.03,drag:.94,shrink:.97,shape:'circle'});
-    }
+    for(let i=0;i<n;i++){const t=Math.random(), x=dc.x+(ac.x-dc.x)*t, y=dc.y+(ac.y-dc.y)*t; const perp=(-0.3+Math.random()*.6); particles.push({x:x+perp*30,y:y+perp*30,vx:(ac.x-dc.x)*.012+(-1+Math.random()*2)*.5,vy:(ac.y-dc.y)*.012+(-1+Math.random()*2)*.5,size:3+Math.random()*4,color:clrs[mf(Math.random()*clrs.length)],life:1,decay:.03,drag:.94,shrink:.97,shape:'circle'})}
     particles.push({x:dc.x,y:dc.y,vx:0,vy:0,size:3,color:'rgba(255,80,20,.5)',life:.7,decay:.05,shape:'ring',lw:3,expand:5});
   }
-  else if(suit==='wound'){ // Deep red blood splatter
+  else if(suit==='wound'){
     const clrs=['#c01010','#8b0000','#ff2020','#801010'];
-    for(let i=0;i<n;i++){
-      const ang=-Math.PI/2+(-1+Math.random()*2)*1.5, spd=2+Math.random()*5;
-      particles.push({x:dc.x,y:dc.y,vx:Math.cos(ang)*spd*(Math.random()>.5?1:-1),vy:Math.sin(ang)*spd,size:3+Math.random()*5,color:clrs[mf(Math.random()*clrs.length)],life:1,decay:.03,drag:.90,gravity:.2,shrink:.97,shape:'circle'});
-    }
-    // drip ring
+    for(let i=0;i<n;i++){const ang=-Math.PI/2+(-1+Math.random()*2)*1.5, spd=2+Math.random()*5; particles.push({x:dc.x,y:dc.y,vx:Math.cos(ang)*spd*(Math.random()>.5?1:-1),vy:Math.sin(ang)*spd,size:3+Math.random()*5,color:clrs[mf(Math.random()*clrs.length)],life:1,decay:.03,drag:.90,gravity:.2,shrink:.97,shape:'circle'})}
     particles.push({x:dc.x,y:dc.y,vx:0,vy:0,size:4,color:'rgba(200,10,10,.6)',life:.7,decay:.05,shape:'ring',lw:5,expand:5});
   }
-  else if(suit==='mirror'){ // Prismatic refraction stars
+  else if(suit==='mirror'){
     const clrs=['#aae8ff','#ffeebb','#c8aaff','#aaffcc','#ffffaa'];
-    for(let i=0;i<n;i++){
-      const ang=(i/n)*Math.PI*2, spd=1.5+Math.random()*3;
-      particles.push({x:ac.x,y:ac.y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,size:3+Math.random()*5,color:clrs[i%clrs.length],life:1,decay:.025,drag:.95,shrink:.96,gravity:0,shape:'star',rot:Math.random()*Math.PI*2,rotSpeed:.08});
-    }
+    for(let i=0;i<n;i++){const ang=(i/n)*Math.PI*2, spd=1.5+Math.random()*3; particles.push({x:ac.x,y:ac.y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,size:3+Math.random()*5,color:clrs[i%clrs.length],life:1,decay:.025,drag:.95,shrink:.96,gravity:0,shape:'star',rot:Math.random()*Math.PI*2,rotSpeed:.08})}
     particles.push({x:ac.x,y:ac.y,vx:0,vy:0,size:8,color:'rgba(180,230,255,.5)',life:.9,decay:.04,shape:'ring',lw:4,expand:5});
     particles.push({x:ac.x,y:ac.y,vx:0,vy:0,size:16,color:'rgba(200,200,255,.3)',life:.7,decay:.04,shape:'ring',lw:2,expand:6});
   }
-  // Golden burst for high-value cards (J,Q,K,A)
   if(['J','Q','K','A'].includes(String(value))){
-    for(let i=0;i<14;i++){
-      const ang=(i/14)*Math.PI*2, spd=3+Math.random()*4;
-      particles.push({x:ac.x,y:ac.y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,size:4+Math.random()*4,color:i%2===0?'#e5c45f':'#fff5c0',life:1,decay:.03,drag:.93,gravity:.06,shrink:.97,shape:'star',rot:Math.random()*Math.PI*2,rotSpeed:.1});
-    }
+    for(let i=0;i<14;i++){const ang=(i/14)*Math.PI*2, spd=3+Math.random()*4; particles.push({x:ac.x,y:ac.y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,size:4+Math.random()*4,color:i%2===0?'#e5c45f':'#fff5c0',life:1,decay:.03,drag:.93,gravity:.06,shrink:.97,shape:'star',rot:Math.random()*Math.PI*2,rotSpeed:.1})}
   }
 }
 
-// Trigger all visual effects for a card played
 function triggerCardFX(suit, val, attackerRole, defenderRole, dmg, heal){
   const numVal = VAL_POWER[val]||5;
-  // Particle burst
   spawnParticles(suit, attackerRole, defenderRole, numVal);
-  // Float numbers
   if(dmg>0) floatNumber(`-${dmg}`, defenderRole, suit==='wound'?'#ff4040':suit==='curse'?'#c080ff':suit==='drain'?'#ff8040':'#fff');
   if(heal>0) floatNumber(`+${heal}`, attackerRole, '#7be87b');
-  // HP bar flash
   if(dmg>0){const bar=$('#'+(defenderRole==='p1'?'p1h':'p2h')); if(bar){bar.classList.remove('flash-dmg'); void bar.offsetWidth; bar.classList.add('flash-dmg'); setTimeout(()=>bar.classList.remove('flash-dmg'),500)}}
   if(heal>0){const bar=$('#'+(attackerRole==='p1'?'p1h':'p2h')); if(bar){bar.classList.remove('flash-heal'); void bar.offsetWidth; bar.classList.add('flash-heal'); setTimeout(()=>bar.classList.remove('flash-heal'),500)}}
-  // Fighter card shake (defender)
   if(dmg>0){const fc=$('#'+(defenderRole==='p1'?'fc1':'fc2')); if(fc){fc.classList.remove('shake'); void fc.offsetWidth; fc.classList.add('shake'); setTimeout(()=>fc.classList.remove('shake'),500)}}
-  // Mirror shimmer (attacker)
   if(suit==='mirror'){const fc=$('#'+(attackerRole==='p1'?'fc1':'fc2')); if(fc){fc.classList.add('mirrored'); setTimeout(()=>fc.classList.remove('mirrored'),3000)}}
-  // Bleed glow (defender)
   if(suit==='wound'){const fc=$('#'+(defenderRole==='p1'?'fc1':'fc2')); if(fc){fc.classList.add('bleeding'); setTimeout(()=>fc.classList.remove('bleeding'),4000)}}
 }
 
-// ── Waiting overlay for online rooms ────────────────────────────────────────
 function showWaitingOverlay(code){
   const ov=$('#waiting-overlay'); if(!ov) return;
   $('#waiting-room-code').textContent=code;
@@ -872,20 +867,45 @@ function hideWaitingOverlay(){
   const ov=$('#waiting-overlay'); if(ov) ov.classList.add('hidden');
 }
 
-function bootFromStoredName(){
-  const saved=getStoredName();
-  if(saved){ ensureProfile(saved).then(()=>setScreen('menu')).catch(()=>setScreen('login')) }
-  else setScreen('login')
+// ── Sign-out ─────────────────────────────────────────────────────────────────
+function signOut(){
+  // Reset in-memory profile; do NOT persist name to localStorage
+  currentProfile = {name:'', wins:0, losses:0, elo:1000};
+  setScreen('login');
+  $('#loginName').value='';
+  loginMsg('');
 }
 
-$('#loginBtn').onclick=async()=>{const name=($('#loginName').value||'').trim().toUpperCase(); if(name.length<2){loginMsg('Use at least 2 characters.'); return} loginMsg('Loading profile...'); await ensureProfile(name); setScreen('menu')};
+// ── Boot: always go to login — no auto sign-in ───────────────────────────────
+setScreen('login');
+
+// ── Event wiring ─────────────────────────────────────────────────────────────
+$('#loginBtn').onclick=async()=>{
+  const name=($('#loginName').value||'').trim().toUpperCase();
+  if(name.length<2){loginMsg('Use at least 2 characters.'); return}
+  loginMsg('Loading profile...');
+  try{
+    await ensureProfile(name);
+    loginMsg('');
+    setScreen('menu');
+  }catch(e){
+    loginMsg(`Error: ${e.message}`);
+  }
+};
+
+$('#loginName').addEventListener('keydown', e=>{
+  if(e.key==='Enter') $('#loginBtn').click();
+});
+
+$('#logoutBtn').onclick=()=>signOut();
+
 $('#offlineBtn').onclick=()=>{
   mode='local'; onlineType=null; myRole='p1'; gameOver=false; selectedIndex=null;
-  // FIX 9: AI deck no longer references mirror_A (now in library), but kept consistent
   const aiDeck=['spade_7','spade_7','spade_9','spade_K','heart_4','heart_7','heart_Q','club_5','club_8','club_8','diamond_5','diamond_8','diamond_8','drain_6','drain_6','drain_J','wound_6','wound_6','wound_A','void_8','mirror_9','mirror_A','heart_4','spade_5'];
   const base={mode:'local',ranked:false,maxPlayers:2,turn:'p1',round:1,status:'playing',created:Date.now(),lastSuit:null,lastLog:'',lastAction:null,p1:newFighter(currentProfile.name,getDeck(),currentProfile.elo,seatToken),p2:newFighter('EMBER AI',aiDeck,1200,'AI')};
   gameState=initializeMatchState(base); enterGame(); renderGame(); logText('The AI studies your opening hand.'); beginTurnIfNeeded()
 };
+
 $('#createRoomBtn').onclick=()=>createRoom().catch(e=>msg(`Create failed: ${e.message}`));
 $('#joinRoomMenuBtn').onclick=()=>{const code=($('#joinCodeHome').value||'').trim().toUpperCase(); if(!code){msg('Enter a room code first.'); return} joinRoom(code).catch(e=>msg(`Join failed: ${e.message}`))};
 $('#rankedBtn').onclick=()=>joinRankedQueue().catch(e=>msg(`Ranked failed: ${e.message}`));
@@ -895,15 +915,28 @@ $('#saveDeckBtn').onclick=()=>{const deck=getDeck(); if(deck.length!==DECK_SIZE)
 $('#resetDeckBtn').onclick=()=>{saveDeck(getDefaultDeck()); renderBuilder()};
 $('#libraryGrid').onclick=e=>{const add=e.target.getAttribute('data-add'), rem=e.target.getAttribute('data-remove'); if(add) mutateDeck('add',add); if(rem) mutateDeck('remove',rem)};
 $('#deckList').onclick=e=>{const rem=e.target.getAttribute('data-remove'); if(rem) mutateDeck('remove',rem)};
-$('#leaveMatchBtn').onclick=()=>leaveMatch();
-$('#cancelWaitBtn').onclick=()=>leaveMatch();
+
+// Leave match — only enabled for local bot games
+$('#leaveMatchBtn').onclick=()=>{
+  if(mode!=='local'){
+    msg('Online matches cannot be left. Fight to the end!');
+    return;
+  }
+  leaveMatch(false, false);
+};
+
+// Cancel waiting room — deletes the room from Firebase
+$('#cancelWaitBtn').onclick=()=>{
+  // Cancelling a waiting room is treated as a loss only if it was ranked
+  // (waiting rooms can only be casual, but guard anyway)
+  const isRanked = gameState?.ranked || onlineType==='ranked';
+  leaveMatch(true, isRanked);
+};
+
 $('#playbtn').onclick=()=>handleAction('play');
 $('#drawbtn').onclick=()=>handleAction('draw');
 $('#discardBtn').onclick=()=>handleAction('discard');
 
-// FIX 8: Don't call requestAnimationFrame at boot — initCanvas handles it when game starts
-renderHome();
-bootFromStoredName();
 </script>
 </body>
 </html>
