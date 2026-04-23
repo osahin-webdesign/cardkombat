@@ -113,9 +113,10 @@ button,input{font-family:inherit}
 #game-info{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;padding:8px 12px;background:#100d08;border-bottom:1px solid var(--line);align-items:center}
 .hw{display:flex;flex-direction:column;gap:4px}.hlbl{font-size:10px;color:var(--gold);letter-spacing:2px}
 .ho{height:12px;background:#0a0906;border:1px solid var(--line);position:relative;overflow:hidden}.hi{height:100%;background:linear-gradient(90deg,#876112,#c49a35);transition:width .35s}
-.meta-row{display:flex;gap:8px;flex-wrap:wrap;font-size:10px;color:#b29a6d}.energy-row{display:flex;gap:5px}
-.energy-pip{width:14px;height:14px;border-radius:50%;border:1px solid var(--line);background:#0c0906;box-shadow:inset 0 0 4px rgba(0,0,0,.5)}
-.energy-pip.on{background:radial-gradient(circle,#fff0a6 0,#d79b2f 45%,#7b5716 100%);box-shadow:0 0 10px rgba(215,155,47,.35)}
+.meta-row{display:flex;gap:8px;flex-wrap:wrap;font-size:10px;color:#b29a6d}.energy-row{display:flex;gap:5px;flex-wrap:wrap}
+.energy-pip{width:16px;height:16px;border-radius:50%;border:1px solid var(--line);background:#0c0906;box-shadow:inset 0 0 4px rgba(0,0,0,.5);transition:background .2s,box-shadow .2s}
+.energy-pip.on{background:radial-gradient(circle,#fff9b0 0,#f0b030 40%,#8a5010 100%);box-shadow:0 0 12px rgba(240,176,48,.7),0 0 4px rgba(255,240,100,.9);border-color:#d4a020}
+.energy-pip.on.last{box-shadow:0 0 18px rgba(255,80,20,.9),0 0 6px rgba(255,160,40,1);background:radial-gradient(circle,#ffffff 0,#ff9020 35%,#cc4000 100%);border-color:#ff6000}
 #tmr-wrap{display:flex;flex-direction:column;align-items:center;gap:4px}
 #tmr{font-family:'Special Elite',serif;font-size:22px;color:var(--paper2);min-width:40px;text-align:center}
 #tmr-label{font-size:9px;color:var(--faded);letter-spacing:2px}
@@ -143,7 +144,10 @@ button,input{font-family:inherit}
 #controls{background:#0b0906;padding:10px 12px} #hint{font-size:10px;color:var(--faded);text-align:center;letter-spacing:2px;min-height:14px;margin-bottom:8px}
 #btns{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
 
-/* card play animation */
+@keyframes energyWarn{0%,100%{box-shadow:inset 0 0 0 rgba(200,60,20,0)}50%{box-shadow:inset 0 0 18px rgba(200,60,20,.35)}}
+#hand.energy-empty{animation:energyWarn 1s ease-in-out infinite}
+.hc.unaffordable{opacity:.32;pointer-events:none;filter:grayscale(0.6)}
+.energy-critical .energy-pip.on{animation:blink .5s step-end infinite}
 .hc.playing{animation:cardPlay .35s ease-out forwards}
 @keyframes cardPlay{0%{transform:translateY(-12px) scale(1)}40%{transform:translateY(-60px) scale(1.15) rotate(-3deg)}100%{transform:translateY(-120px) scale(0) rotate(8deg);opacity:0}}
 /* hp flash */
@@ -309,7 +313,7 @@ button,input{font-family:inherit}
   <div id="status-bar"><span>ATK <b id="s-atk">0</b></span><span>DEF <b id="s-def">0</b></span><span>SPD <b id="s-spd">0</b></span><span>BLEED <b id="s-bld">0</b></span><span>CURSE <b id="s-crs">0</b></span><span>ENERGY <b id="s-eng">0</b></span><span>COMBO <b id="s-cmb">0</b></span><span>SEQ <b id="s-seq">0</b></span></div>
   <div id="log">Awaiting duel...</div>
   <div id="hand"></div>
-  <div id="controls"><div id="hint">-- choose an action --</div><div id="btns"><button class="btn" id="discardBtn">Discard (+1 energy)</button><button class="btn primary" id="playbtn">Play Card</button><button class="btn" id="drawbtn">Draw (end turn)</button></div></div>
+  <div id="controls"><div id="hint">-- choose an action --</div><div id="btns"><button class="btn" id="discardBtn">Discard (+2 energy)</button><button class="btn primary" id="playbtn">Play Card</button><button class="btn" id="drawbtn">Draw (end turn)</button></div></div>
 </section>
 
 </div><!-- #cabinet -->
@@ -331,7 +335,7 @@ const app = initializeApp(firebaseConfig);
 const db  = getDatabase(app);
 
 // ── Constants ─────────────────────────────────────────────────────────────────
-const TURN_TIME=18, STARTING_HP=100, MAX_ENERGY=3, DECK_SIZE=24;
+const TURN_TIME=22, STARTING_HP=100, MAX_ENERGY=5, DECK_SIZE=24;
 const SUITS={
   spade:{g:'♠',desc:'Strike',red:false,base:'strike'},
   heart:{g:'♥',desc:'Mend',red:true,base:'mend'},
@@ -343,7 +347,7 @@ const SUITS={
   mirror:{g:'◈',desc:'Mirror',red:false,base:'mirror'}
 };
 const VAL_POWER={2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,10:10,J:11,Q:12,K:13,A:14};
-const RARITY_RULES={common:{copies:4,cost:1},uncommon:{copies:3,cost:1},rare:{copies:2,cost:2},legendary:{copies:1,cost:3}};
+const RARITY_RULES={common:{copies:4,cost:1},uncommon:{copies:3,cost:2},rare:{copies:2,cost:3},legendary:{copies:1,cost:5}};
 const COMPETITIVE_SYSTEM={MAX_GUARD:12,MAX_EXPOSE:4,MAX_FOCUS:5,MAX_HEX:6,MAX_SIPHON:4,MAX_PRESSURE:5,MAX_STANCE:3};
 const CARD_LIBRARY=[
   {id:'spade_5',suit:'spade',val:'5',rarity:'common',flavor:'A neat cut in candlelight.'},
@@ -574,6 +578,7 @@ function addSiphon(player, amount){ player.siphon=Math.min(COMPETITIVE_SYSTEM.MA
 
 function startOfTurn(state, role){
   const pl=state[role]; if(!pl) return {forced:false,log:[]};
+  // Energy restores to max each turn - this is the core resource
   pl.energy=pl.maxEnergy;
   let log=[];
   if(pl.bleed>0){const dmg=mf(pl.bleed*2+rr()*2); pl.hp=Math.max(0,pl.hp-dmg); pl.bleed=Math.max(0,pl.bleed-1); log.push(`${pl.name} bleeds for ${dmg}`)}
@@ -581,10 +586,12 @@ function startOfTurn(state, role){
   pl.expose=Math.max(0,(pl.expose||0)-1);
   pl.pressure=Math.max(0,(pl.pressure||0)-1);
   pl.focus=Math.max(0,(pl.focus||0)-1);
-  if(pl.siphon>=3){ pl.energy=Math.min(pl.maxEnergy, pl.energy+1); pl.siphon=0; log.push(`${pl.name} converts siphon into +1 energy`) }
+  // Siphon converts to bonus energy
+  if(pl.siphon>=3){ pl.energy=Math.min(pl.maxEnergy+1, pl.energy+1); pl.siphon=0; log.push(`${pl.name} converts siphon into +1 energy`) }
   if(pl.hand.length===0){
-    if(pl.deck.length>0){pl.hand.push(pl.deck.shift()); pl.energy=0; log.push(`${pl.name} is forced to draw and loses the turn`); return {forced:true,log}}
-    pl.hp=Math.max(0,pl.hp-6); pl.energy=0; log.push(`${pl.name} has no cards left and takes 6 fatigue`); return {forced:true,log}
+    if(pl.deck.length>0){pl.hand.push(pl.deck.shift()); pl.energy=0; log.push(`${pl.name} is forced to draw — turn spent!`); return {forced:true,log}}
+    // No cards at all — fatigue damage scales up
+    pl.hp=Math.max(0,pl.hp-10); pl.energy=0; log.push(`${pl.name} has no cards — suffers 10 fatigue!`); return {forced:true,log}
   }
   return {forced:false,log}
 }
@@ -597,7 +604,8 @@ function passTurn(state){
 }
 function drawCardAndEndTurn(state, role){
   const pl=state[role];
-  if(pl.deck.length>0) pl.hand.push(pl.deck.shift()); else pl.hp=Math.max(0,pl.hp-6);
+  if(pl.deck.length>0) pl.hand.push(pl.deck.shift()); else { pl.hp=Math.max(0,pl.hp-10); }
+  // Burning your turn to draw wastes all energy — deliberate high-stakes tradeoff
   pl.energy=0;
   state.lastAction={by:role,type:'draw',_seen:false};
   return passTurn(state)
@@ -605,17 +613,18 @@ function drawCardAndEndTurn(state, role){
 function discardCardForEnergy(state, role, handIndex){
   const pl=state[role], card=pl.hand.splice(handIndex,1)[0];
   if(card) pl.discard.push(card);
-  pl.energy=Math.min(pl.maxEnergy,pl.energy+1);
+  // Discarding gives 2 energy — a real meaningful choice vs playing
+  pl.energy=Math.min(pl.maxEnergy,pl.energy+2);
   state.lastAction={by:role,type:'discard',card:card?.id,_seen:false}
 }
 function canPlayCard(player, card){ return !!card && player.energy>=(card.cost||1) }
 
-function resolveCardPlay(state, role, handIndex){
+function resolveCardPlay(state, role, handIndex, localRitualHistory){
   const me=state[role], oppRole=role==='p1'?'p2':'p1', foe=state[oppRole], card=me.hand[handIndex];
   if(!card||!canPlayCard(me,card)) return {text:'Cannot play that card.',passed:[]};
   me.hand.splice(handIndex,1); me.discard.push(card); me.energy-=(card.cost||1);
   applySuitMastery(me, card.suit);
-  const ritual=detectRitual(card);
+  const ritual=detectRitual(card, localRitualHistory);
   let comboBonus=0;
   if(state.lastSuit===card.suit){ me.combo=(me.combo||0)+1; comboBonus=Math.min(me.combo*2,8); showCombo(`COMBO x${me.combo}`); addPressure(me,1); }
   else me.combo=0;
@@ -673,8 +682,9 @@ function resolveCardPlay(state, role, handIndex){
     }
     if(suit.base==='void'){
       const purged=(foe.bleed||0)+(foe.curse||0)+(foe.hex||0); foe.bleed=0; foe.curse=0; foe.hex=0;
-      const dmg=applyIncomingDamage(foe, me, mf(basePow*0.30+rr()*4+purged*1.5), ['spell','void'], text); if(purged>0) me.energy=Math.min(me.maxEnergy, me.energy+1);
-      text.push(`VOID purges ${purged} stacks and hits for ${dmg}`);
+      const dmg=applyIncomingDamage(foe, me, mf(basePow*0.30+rr()*4+purged*1.5), ['spell','void'], text);
+      if(purged>0) me.energy=Math.min(me.maxEnergy, me.energy+2); // Void rewards energy on big purges
+      text.push(`VOID purges ${purged} stacks and hits for ${dmg}${purged>0?' (+2 energy)':''}`);
     }
     if(suit.base==='mirror'){
       me.mirror=true; me.mirrorCharges=Math.min(2,(me.mirrorCharges||0)+1); me.stance=Math.min(COMPETITIVE_SYSTEM.MAX_STANCE,(me.stance||0)+1); addFocus(me,1); text.push(`MIRROR readies a reflection and counter stance`);
@@ -685,7 +695,7 @@ function resolveCardPlay(state, role, handIndex){
     const burst=foe.curse*3; const dealt=applyIncomingDamage(foe, me, burst, ['spell'], text); foe.curse=0; text.push(`Hex collapse deals ${dealt}`);
   }
   if(card.suit==='spade' && foe.expose>0){ const bonus=foe.expose*2; const dealt=applyIncomingDamage(foe, me, bonus, ['targeted'], text); text.push(`Execution line deals ${dealt}`); }
-  if(card.suit==='drain' && me.focus>=2){ me.energy=Math.min(me.maxEnergy, me.energy+1); me.focus=Math.max(0,me.focus-2); text.push('Focused drain refunds 1 energy'); }
+  if(card.suit==='drain' && me.focus>=2){ me.energy=Math.min(me.maxEnergy, me.energy+2); me.focus=Math.max(0,me.focus-2); text.push('Focused drain refunds 2 energy'); }
   if(card.suit==='heart' && me.guard>=4){ me.hp=Math.min(STARTING_HP, me.hp+3); text.push('Sanctuary heals 3'); }
   if(card.suit==='club' && me.pressure>=2){ me.guard=Math.min(COMPETITIVE_SYSTEM.MAX_GUARD, me.guard+2); me.pressure=Math.max(0,me.pressure-1); text.push('Anchored posture converts pressure to guard'); }
   if(card.suit==='mirror' && me.stance>=2){ foe.expose=Math.min(COMPETITIVE_SYSTEM.MAX_EXPOSE, foe.expose+1); text.push('Counter stance exposes the foe'); }
@@ -722,7 +732,21 @@ function initializeMatchState(base){
 // ── Render ────────────────────────────────────────────────────────────────────
 function renderEnergy(el, current, max){
   el.innerHTML='';
-  for(let i=0;i<max;i++){const d=document.createElement('div'); d.className='energy-pip'+(i<current?' on':''); el.appendChild(d)}
+  for(let i=0;i<max;i++){
+    const d=document.createElement('div');
+    const isOn = i<current;
+    const isLast = isOn && i===current-1 && current===1; // last pip glows red as warning
+    d.className='energy-pip'+(isOn?' on':'')+(isLast?' last':'');
+    d.title=isOn?`${current}/${max} Energy`:'Empty';
+    el.appendChild(d)
+  }
+  // Add starvation warning if out of energy
+  if(current===0){
+    const warn=document.createElement('div');
+    warn.style.cssText='font-size:9px;color:#c04020;letter-spacing:1px;animation:blink .6s step-end infinite;align-self:center';
+    warn.textContent='SPENT';
+    el.appendChild(warn);
+  }
 }
 function currentPlayer(){ return gameState ? gameState[myRole] : null }
 
@@ -773,11 +797,15 @@ function renderHand(){
   if(!gameState) return;
   const me=currentPlayer(), isTurn=gameState.turn===myRole&&!gameOver&&gameState.status==='playing';
   const ritualHint=ritualHistory.length?ritualHistory.map(x=>x.split(':')[0][0].toUpperCase()).join(' · '):'';
+  // Energy-empty warning on the hand container
+  const allUnaffordable = isTurn && me.hand.every(c=>!canPlayCard(me,c));
+  handEl.classList.toggle('energy-empty', isTurn && allUnaffordable);
   me.hand.forEach((c,i)=>{
     const suit=gSuit(c.suit), d=document.createElement('div');
-    d.className=`hc${selectedIndex===i?' sel':''}${suit.red?' suit-red':''}${isTurn?'':' disabled-card'}${c.rarity==='legendary'?' legendary-card':''}`;
+    const affordable = !isTurn || canPlayCard(me, c);
+    d.className=`hc${selectedIndex===i?' sel':''}${suit.red?' suit-red':''}${isTurn&&affordable?'':' disabled-card'}${c.rarity==='legendary'?' legendary-card':''}${isTurn&&!affordable?' unaffordable':''}`;
     d.innerHTML=`${i===selectedIndex&&ritualHint?`<div class="ritual-chip">${ritualHint}</div>`:''}<div class="hctop">${c.val}</div><div class="hccost">${c.cost}</div><div class="hcs">${suit.g}</div><div class="hcv">${c.val}</div><div class="hct">${suit.desc}</div><div class="flavor">${c.flavor||''}</div><div class="hcrare">${c.rarity}</div><div class="hcbot">${c.val}</div>`;
-    if(isTurn){ d.onclick=()=>{selectedIndex=selectedIndex===i?null:i; renderHand(); updateButtons()} }
+    if(isTurn && affordable){ d.onclick=()=>{selectedIndex=selectedIndex===i?null:i; renderHand(); updateButtons()} }
     handEl.appendChild(d)
   })
 }
@@ -785,10 +813,20 @@ function renderHand(){
 function updateButtons(){
   const me=currentPlayer(), myTurn=!!gameState&&gameState.turn===myRole&&!gameOver&&gameState.status==='playing';
   const selected=selectedIndex!==null?me?.hand[selectedIndex]:null;
-  $('#playbtn').disabled=!(myTurn&&selected&&canPlayCard(me,selected));
+  const canAfford = selected && canPlayCard(me, selected);
+  const cantAffordReason = selected && !canAfford ? ` — need ${selected.cost} energy, have ${me?.energy}` : '';
+  $('#playbtn').disabled=!(myTurn&&canAfford);
   $('#drawbtn').disabled=!myTurn;
   $('#discardBtn').disabled=!(myTurn&&selectedIndex!==null);
-  if(myTurn){$('#hint').textContent=selected?`${selected.val} of ${selected.suit.toUpperCase()} — cost ${selected.cost} — ${currentPlayer()?.archetype||'build'}${ritualHistory.length?` — ritual chain ${ritualHistory.map(x=>x.split(':')[0][0].toUpperCase()).join('/')}`:''}`:'-- choose a card, draw, or discard --'}
+  if(myTurn){
+    if(selected){
+      const energyLeft = me.energy - (selected.cost||1);
+      $('#hint').textContent=`${selected.val} of ${selected.suit.toUpperCase()} — costs ${selected.cost} energy${cantAffordReason} — ${energyLeft>=0?energyLeft+' remaining after play':'CANNOT AFFORD'}${ritualHistory.length?` — chain ${ritualHistory.map(x=>x.split(':')[0][0].toUpperCase()).join('/')}`:''}`
+    } else {
+      const e=me?.energy||0;
+      $('#hint').textContent=e===0?'⚠ NO ENERGY — discard a card to gain 2, or draw to end turn':e===1?'⚡ 1 energy left — spend wisely':'-- choose a card, draw (+draw, end turn), or discard (+2 energy) --'
+    }
+  }
 }
 
 function setNetStatus(cls, txt){ const el=$('#net-status'); el.className=cls; el.textContent=txt }
@@ -811,19 +849,20 @@ function screenShake(power=1){
   setTimeout(()=>cab.style.animation='', Math.max(180,260*power));
 }
 
-function detectRitual(card){
-  ritualHistory.push(`${card.suit}:${card.val}`);
-  if(ritualHistory.length>4) ritualHistory.shift();
-  const suits=ritualHistory.map(x=>x.split(':')[0]);
-  const vals=ritualHistory.map(x=>VAL_POWER[x.split(':')[1]]||0);
-  const last3=suits.slice(-3).join(',');
+function detectRitual(card, historyRef){
+  // historyRef is the array to use/mutate — allows pure use inside transactions
+  const hist = historyRef || ritualHistory;
+  hist.push(`${card.suit}:${card.val}`);
+  if(hist.length>4) hist.shift();
+  const suits=hist.map(x=>x.split(':')[0]);
+  const vals=hist.map(x=>VAL_POWER[x.split(':')[1]]||0);
+  if(suits.length>=3 && suits.slice(-3).every(s=>s===suits[suits.length-1])) return {name:`RITUAL: ${suits[suits.length-1].toUpperCase()} TRINITY`, bonus:{damage:10}};
+  if(vals.length>=3){ const seq=vals.slice(-3); if(seq[0]<seq[1] && seq[1]<seq[2]) return {name:'RITUAL: ASCENDANT RUN', bonus:{heal:8, energy:2}}; }
+  if(suits.slice(-3).length===3 && new Set(suits.slice(-3)).size===3) return {name:'RITUAL: THREE HOUSES', bonus:{energy:2, guard:2}};
   const last4=suits.slice(-4).join(',');
-  if(last3 && suits.slice(-3).every(s=>s===suits[suits.length-1])) return {name:`RITUAL: ${suits[suits.length-1].toUpperCase()} TRINITY`, bonus:{damage:10}};
-  if(vals.length>=3){ const seq=vals.slice(-3); if(seq[0]<seq[1] && seq[1]<seq[2]) return {name:'RITUAL: ASCENDANT RUN', bonus:{heal:8, energy:1}}; }
-  if(suits.slice(-3).length===3 && new Set(suits.slice(-3)).size===3) return {name:'RITUAL: THREE HOUSES', bonus:{energy:1, guard:2}};
   if(last4==='spade,heart,spade,heart') return {name:'RITUAL: PULSE DUEL', bonus:{heal:10, damage:6}};
   if(last4==='diamond,void,diamond,void') return {name:'RITUAL: BLACK MASS', bonus:{damage:14}};
-  if(last4==='club,mirror,club,mirror') return {name:'RITUAL: LOCKSTEP', bonus:{guard:4, energy:1}};
+  if(last4==='club,mirror,club,mirror') return {name:'RITUAL: LOCKSTEP', bonus:{guard:4, energy:2}};
   return null;
 }
 
@@ -1211,11 +1250,15 @@ async function applyOnlineAction(actionType){
 
   const roomRef=ref(db,`rooms/${roomId}`);
   let newLog='';
+  // Capture ritual history BEFORE transaction (transaction may retry, must be idempotent)
+  const localRitualSnap=[...ritualHistory];
   const result=await runTransaction(roomRef, cur=>{
     if(!cur) return cur;
     if(cur.status!=='playing') return cur;
     if(cur.turn!==myRole) return cur;
     const state=deepClone(cur);
+    // Use a fresh copy of ritual history for each transaction attempt
+    const localHist=[...localRitualSnap];
 
     if(actionType==='draw'){
       newLog=[`${state[myRole].name} draws and ends the turn.`, ...drawCardAndEndTurn(state,myRole)].filter(Boolean).join(' | ');
@@ -1223,12 +1266,12 @@ async function applyOnlineAction(actionType){
       if(actionIndex===null) return cur;
       discardCardForEnergy(state,myRole,actionIndex);
       state.seq=(state.seq||0)+1;
-      newLog=`${state[myRole].name} discards to recover energy.`;
+      newLog=`${state[myRole].name} discards — gains 2 energy.`;
     } else if(actionType==='play'){
       if(actionIndex===null) return cur;
       const chosen=state[myRole].hand[actionIndex];
       if(!chosen||!canPlayCard(state[myRole], chosen)) return cur;
-      const res=resolveCardPlay(state,myRole,actionIndex);
+      const res=resolveCardPlay(state,myRole,actionIndex,localHist);
       newLog=[res.text,...res.passed].filter(Boolean).join(' | ');
     } else {
       return cur;
@@ -1240,6 +1283,8 @@ async function applyOnlineAction(actionType){
   });
 
   if(result.committed && result.snapshot.exists()){
+    // Sync the local ritual history if a card was played
+    if(actionType==='play') ritualHistory=[...localRitualSnap]; // localHist was mutated by detectRitual inside resolveCardPlay
     selectedIndex=null;
     gameState=result.snapshot.val();
     if(newLog) logText(newLog);
@@ -1251,13 +1296,16 @@ async function applyOnlineAction(actionType){
     if(gameState.status==='gameover') finishGame(gameState.winner);
     else beginTurnIfNeeded();
   } else {
-    logText('Move did not go through. Check turn order and card selection.');
+    logText('Move did not go through — try again.');
   }
 }
 
 // ── AI ────────────────────────────────────────────────────────────────────────
 function scoreAICard(state, card){
-  const ai=state.p2, me=state.p1; let score=card.pw*0.8-(card.cost||1)*1.2; const base=gSuit(card.suit).base;
+  const ai=state.p2, me=state.p1;
+  // Energy cost is more punishing now — weight it heavier
+  const energyEfficiency = card.pw / (card.cost||1);
+  let score=energyEfficiency*1.4-(card.cost||1)*0.8; const base=gSuit(card.suit).base;
   if(base==='strike') score+=(100-me.hp)*0.06+ai.atk*0.4;
   if(base==='mend') score+=(100-ai.hp)*0.18;
   if(base==='brace') score+=(10-ai.def)*1.2;
@@ -1270,6 +1318,8 @@ function scoreAICard(state, card){
   if(card.val==='Q') score+=(ai.hp<55?11:3);
   if(card.val==='K') score+=7;
   if(card.val==='J') score+=(me.atk>ai.atk?8:4);
+  // Penalize expensive cards when low on energy
+  if(ai.energy < (card.cost||1)+1) score -= 4;
   return score+rr()
 }
 function aiTakeTurn(){
@@ -1278,7 +1328,25 @@ function aiTakeTurn(){
   aiStyle = ai.archetype==='warlock' ? 'trickster' : ai.archetype==='bastion' ? 'defensive' : 'aggressive';
   const playable=ai.hand.map((card,i)=>({card,i})).filter(x=>canPlayCard(ai,x.card));
   let logParts=[];
-  if(!playable.length){
+
+  // AI energy management: if energy is critically low and has playable card, consider discarding cheap card for more energy
+  const totalHandCost = ai.hand.reduce((s,c)=>s+(c.cost||1),0);
+  const shouldHoard = ai.energy <= 1 && ai.hand.some(c=>(c.cost||1)>ai.energy) && ai.hand.length > 1;
+
+  if(!playable.length || (shouldHoard && ai.hand.length > 1 && aiStyle === 'trickster')){
+    // Try to discard cheapest card to bank energy if no good plays
+    if(!playable.length && ai.hand.length > 0){
+      // Discard the lowest-value card for energy
+      const worstIdx = ai.hand.map((c,i)=>({c,i})).sort((a,b)=>(a.c.cost||1)-(b.c.cost||1))[0].i;
+      discardCardForEnergy(state,'p2',worstIdx);
+      logParts.push('EMBER AI discards to charge energy.');
+      state.lastLog=logParts.join(' | ');
+      checkForWinner(state); gameState=state;
+      logText(logParts.join(' | '));
+      renderGame();
+      if(state.status==='gameover') finishGame(state.winner); else beginTurnIfNeeded();
+      return;
+    }
     logParts.push('EMBER AI draws and passes.');
     logParts.push(...drawCardAndEndTurn(state,'p2'));
   } else {
@@ -1291,6 +1359,17 @@ function aiTakeTurn(){
     setTimeout(()=>triggerCardFX(card.suit,card.val,'p2','p1',dmgM?parseInt(dmgM[1]):0,healM?parseInt(healM[1]):0),200);
     if(card.val==='A') duelMoment('EMBER UNLEASHES AN ACE',1.8);
     if(state.lastAction?.ritual) duelMoment(state.lastAction.ritual,2);
+    // AI tries to play a second card if it still has energy
+    const state2=state, ai2=state2.p2;
+    const playable2=ai2.hand.map((c,i)=>({card:c,i})).filter(x=>canPlayCard(ai2,x.card));
+    if(playable2.length && ai2.energy >= 2){
+      playable2.sort((a,b)=>scoreAICardByStyle(state2,a.card)-scoreAICardByStyle(state2,b.card));
+      const c2=playable2[playable2.length-1];
+      const res2=resolveCardPlay(state2,'p2',c2.i);
+      logParts.push(`EMBER CHAINS: ${res2.text}`);
+      const d2=res2.text.match(/(?:deals|strikes?)\s+(\d+)/i);
+      setTimeout(()=>triggerCardFX(c2.card.suit,c2.card.val,'p2','p1',d2?parseInt(d2[1]):0,0),500);
+    }
   }
   checkForWinner(state); gameState=state;
   logText(logParts.filter(Boolean).join(' | '));
