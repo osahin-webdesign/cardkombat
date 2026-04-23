@@ -22,8 +22,24 @@ button,input{font-family:inherit}
 .btn:disabled,.btn.disabled{opacity:.35;pointer-events:none}
 .input{width:100%;background:#0c0906;color:var(--paper2);border:1px solid var(--line);padding:10px 12px;letter-spacing:1px}
 .section-title{color:var(--gold);letter-spacing:3px;font-size:11px;margin-bottom:10px;text-transform:uppercase}
-#screen-login,#screen-menu,#screen-builder,#screen-game{position:absolute;inset:0}
+#screen-login,#screen-menu,#screen-builder,#screen-game,#screen-lobby{position:absolute;inset:0}
 #screen-login{display:flex;align-items:center;justify-content:center;background:rgba(6,4,2,.98);z-index:900}
+/* ── Lobby / Waiting Room ── */
+#screen-lobby{display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 38%,#1a1007,#0a0705 70%);z-index:800}
+.lobby-card{width:min(520px,94%);border:2px solid var(--line);background:linear-gradient(180deg,#120d07,#090704);padding:32px;display:flex;flex-direction:column;align-items:center;gap:20px}
+.lobby-code-label{font-size:11px;letter-spacing:4px;color:var(--faded);text-transform:uppercase}
+.lobby-code{font-family:'Special Elite',serif;font-size:64px;letter-spacing:16px;color:var(--gold);text-shadow:0 0 40px rgba(196,154,53,.45),0 0 80px rgba(196,154,53,.18);text-align:center;padding:8px 0}
+.lobby-share{font-size:11px;color:#8e7a53;letter-spacing:2px;text-align:center}
+.lobby-pulse{font-size:12px;letter-spacing:4px;color:var(--faded);animation:blink 1.4s step-end infinite;text-align:center}
+.lobby-players{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%}
+.lobby-seat{border:1px solid var(--line);background:#0b0705;padding:14px;text-align:center;min-height:72px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.lobby-seat .seat-label{font-size:9px;letter-spacing:3px;color:var(--faded);text-transform:uppercase}
+.lobby-seat .seat-name{font-size:14px;color:var(--paper2);letter-spacing:2px;font-family:'Special Elite',serif}
+.lobby-seat .seat-elo{font-size:10px;color:var(--gold)}
+.lobby-seat.filled{border-color:var(--gold2);background:#0f0b05}
+.lobby-seat.empty .seat-name{color:var(--faded);font-size:11px}
+.lobby-divider{width:100%;height:1px;background:var(--line)}
+.lobby-note{font-size:11px;color:#6a5a3a;text-align:center;line-height:1.6;letter-spacing:1px}
 .login-card{width:min(420px,92%);border:2px solid var(--line);background:linear-gradient(180deg,#120d07,#090704);padding:24px}
 .brand{font-family:'Special Elite',serif;color:var(--gold);font-size:32px;letter-spacing:6px;text-align:center;padding:0 0 8px}
 .subbrand{text-align:center;color:#8e7a53;font-size:12px;letter-spacing:3px;margin-bottom:18px}
@@ -214,19 +230,37 @@ button,input{font-family:inherit}
   </div>
 </section>
 
+<!-- ── Lobby: shown to P1 while waiting for P2 ── -->
+<section id="screen-lobby" class="hidden">
+  <div class="lobby-card">
+    <div class="lobby-code-label">Room Code</div>
+    <div class="lobby-code" id="lobby-code-display">------</div>
+    <div class="lobby-share">Share this code with your opponent to start the duel</div>
+    <div class="lobby-players">
+      <div class="lobby-seat filled" id="lobby-seat-p1">
+        <div class="seat-label">Player 1 · Host</div>
+        <div class="seat-name" id="lobby-name-p1">—</div>
+        <div class="seat-elo" id="lobby-elo-p1">ELO —</div>
+      </div>
+      <div class="lobby-seat empty" id="lobby-seat-p2">
+        <div class="seat-label">Player 2</div>
+        <div class="seat-name" id="lobby-name-p2">Waiting...</div>
+        <div class="seat-elo" id="lobby-elo-p2"></div>
+      </div>
+    </div>
+    <div class="lobby-pulse" id="lobby-pulse">Waiting for opponent<span id="lobby-dots"><span>.</span><span>.</span><span>.</span></span></div>
+    <div class="lobby-divider"></div>
+    <div class="lobby-note">The game will begin automatically once your opponent enters the room code and joins.</div>
+    <button class="btn danger" id="cancelLobbyBtn" style="margin-top:4px;width:100%">Cancel Room</button>
+  </div>
+</section>
+
 <section id="screen-game" class="hidden">
   <div id="game-topbar"><div id="title-text">CARD KOMBAT</div><div style="display:flex;gap:8px;align-items:center"><button class="btn small danger" id="leaveMatchBtn">Leave Match</button><div id="net-status">● OFFLINE</div></div></div>
   <div id="game-info">
     <div class="hw"><div class="hlbl" id="p1label">YOU</div><div class="ho"><div class="hi" id="p1h" style="width:100%"></div></div><div class="meta-row"><span>DECK <b id="p1DeckCount">0</b></span><span>HAND <b id="p1HandCount">0</b></span><span>ELO <b id="p1Rating">-</b></span></div><div class="energy-row" id="p1Energy"></div></div>
     <div id="tmr-wrap"><div id="tmr-label">TURN</div><div id="tmr">18</div><div id="tmr-bar-wrap"><div id="tmr-bar"></div></div></div>
     <div class="hw" style="text-align:right"><div class="hlbl" id="p2label" style="text-align:right">FOE</div><div class="ho"><div class="hi" id="p2h" style="width:100%"></div></div><div class="meta-row" style="justify-content:flex-end"><span>DECK <b id="p2DeckCount">0</b></span><span>HAND <b id="p2HandCount">0</b></span><span>ELO <b id="p2Rating">-</b></span></div><div class="energy-row" id="p2Energy" style="justify-content:flex-end"></div></div>
-  </div>
-  <div id="waiting-overlay" class="hidden">
-    <div style="font-family:'Special Elite',serif;font-size:13px;letter-spacing:4px;color:var(--faded)">ROOM CODE</div>
-    <div id="waiting-room-code">------</div>
-    <div style="font-size:11px;color:#8e7a53;letter-spacing:2px">Share this code with your opponent</div>
-    <div id="waiting-pulse">WAITING FOR PLAYER 2<span id="waiting-dots"><span>.</span><span>.</span><span>.</span></span></div>
-    <button class="btn danger" id="cancelWaitBtn" style="margin-top:8px">Cancel & Delete Room</button>
   </div>
   <div id="arena"><div id="arena-grid"></div><canvas id="fx-canvas"></canvas><div id="p1z"><div class="fcard" id="fc1"><div class="fp">1</div><div class="fsuit">♠</div><div class="fcard-name">YOU</div><div class="fpb">1</div></div><div class="fname-tag">P1</div></div><div id="p2z"><div class="fcard" id="fc2" style="transform:scaleX(-1)"><div class="fp">2</div><div class="fsuit">♦</div><div class="fcard-name">FOE</div><div class="fpb">2</div></div><div class="fname-tag" style="transform:scaleX(-1)">P2</div></div><div id="floor"></div><div id="bnr"></div><div id="combo-flash"></div><div id="opp-indicator">OPPONENT IS THINKING...</div></div>
   <div id="status-bar"><span>ATK <b id="s-atk">0</b></span><span>DEF <b id="s-def">0</b></span><span>SPD <b id="s-spd">0</b></span><span>BLEED <b id="s-bld">0</b></span><span>CURSE <b id="s-crs">0</b></span><span>ENERGY <b id="s-eng">0</b></span><span>COMBO <b id="s-cmb">0</b></span><span>SEQ <b id="s-seq">0</b></span></div>
@@ -302,7 +336,11 @@ function getDefaultDeck(){return ['spade_5','spade_5','spade_7','spade_7','spade
 function shuffle(arr){const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=mf(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]} return a}
 function makeDeckFromList(list){return shuffle(list.map(id=>{const base=CARD_LIBRARY.find(c=>c.id===id); if(!base){console.warn(`Unknown card id: ${id}`); return null} return {...base,pw:VAL_POWER[base.val],cost:RARITY_RULES[base.rarity].cost}}).filter(Boolean))}
 function deepClone(v){return JSON.parse(JSON.stringify(v))}
-function setScreen(which){$('#screen-login').classList.toggle('hidden',which!=='login'); $('#screen-menu').classList.toggle('hidden',which!=='menu'); $('#screen-builder').classList.toggle('hidden',which!=='builder'); $('#screen-game').classList.toggle('hidden',which!=='game')}
+function setScreen(which){
+  ['login','menu','builder','lobby','game'].forEach(s=>
+    document.getElementById(`screen-${s}`).classList.toggle('hidden', which!==s)
+  );
+}
 
 function clearOnlineListeners(){
   if(stateUnsubscribe){stateUnsubscribe(); stateUnsubscribe=null}
@@ -496,27 +534,46 @@ function listenToRoom(rid){
   let prevStatus = null;
   stateUnsubscribe = onValue(roomRef, snap => {
     if(!snap.exists()){
-      msg('Room was closed.'); leaveMatch(false); return;
+      // Room deleted externally (e.g. P1 cancelled)
+      if(prevStatus === 'waiting' || prevStatus === null){
+        msg('Room was cancelled by the host.');
+      }
+      leaveMatch(false, false); return;
     }
     const data = snap.val();
     const wasWaiting = prevStatus === 'waiting' || prevStatus === null;
     prevStatus = data.status;
+
+    // ── Transition: waiting → playing ──────────────────────────────────────
+    // Only fire once. For P1 (host): leave lobby screen, enter game.
+    // For P2: they called enterGame() already in joinRoom, so just start.
     if(data.status === 'playing' && wasWaiting){
-      hideWaitingOverlay();
       gameState = data;
-      renderGame();
-      logText('Opponent joined! Duel begins...');
-    } else {
-      gameState = data;
-      renderGame();
+      // Update lobby P2 seat display briefly before switching (P1 sees this)
+      if($('#screen-lobby') && !$('#screen-lobby').classList.contains('hidden')){
+        $('#lobby-name-p2').textContent = data.p2?.name || '—';
+        $('#lobby-elo-p2').textContent = `ELO ${data.p2?.elo || 1000}`;
+        $('#lobby-seat-p2').classList.replace('empty','filled');
+        $('#lobby-pulse').textContent = 'Opponent found! Entering arena...';
+        // Short delay so P1 sees the seat fill before game starts
+        setTimeout(()=>{ enterGame(); renderGame(); logText(`${data.p2.name} entered the room. Duel begins!`); beginTurnIfNeeded(); }, 900);
+      } else {
+        // P2 path — already on game screen
+        renderGame(); logText(`Duel begins! You are challenging ${data.p1.name}.`); beginTurnIfNeeded();
+      }
+      return;
     }
+
+    // ── Ongoing game updates ────────────────────────────────────────────────
     if(data.status === 'gameover' && !gameOver){
-      finishGame(data.winner);
-    } else if(data.status === 'playing'){
-      beginTurnIfNeeded();
+      gameState = data; renderGame(); finishGame(data.winner); return;
+    }
+    if(data.status === 'playing'){
+      gameState = data; renderGame(); beginTurnIfNeeded();
+      // Trigger FX for opponent's last action
       if(data.lastAction && !data.lastAction._seen && data.lastAction.by !== myRole && data.lastAction.type==='play'){
-        const a=data.lastAction;
-        const oppRole=myRole==='p1'?'p2':'p1';
+        const a = data.lastAction;
+        const oppRole = myRole==='p1'?'p2':'p1';
         triggerCardFX(a.suit, a.val, oppRole, myRole, 0, 0);
       }
     }
@@ -625,33 +682,98 @@ function aiTakeTurn(){
 async function createRoom(){
   clearInterval(timerInt); clearOnlineListeners();
   mode='online'; onlineType='casual'; myRole='p1'; gameOver=false; selectedIndex=null; roomId=roomCode();
-  const base={mode:'online',ranked:false,maxPlayers:2,turn:'p1',round:1,status:'waiting',created:Date.now(),lastSuit:null,lastLog:'',lastAction:null,p1:newFighter(currentProfile.name,getDeck(),currentProfile.elo,seatToken),p2:newFighter('',getDeck(),1000,''),presence:{p1:sessionToken,p2:null}};
-  const state=initializeMatchState(base);
-  await set(ref(db,`rooms/${roomId}`),state);
-  enterGame(); showWaitingOverlay(roomId); listenToRoom(roomId); logText(`Room ${roomId} created. Waiting for player 2.`)
+
+  // Store only P1's data. Do NOT run initializeMatchState yet — game hasn't started.
+  // P2 slot is empty. status='waiting' means no game logic runs.
+  const roomData = {
+    mode:'online', ranked:false, maxPlayers:2,
+    status:'waiting', created:Date.now(),
+    lastSuit:null, lastLog:'', lastAction:null,
+    p1: newFighter(currentProfile.name, getDeck(), currentProfile.elo, seatToken),
+    p2: null,  // explicitly null — no imaginary player
+    presence:{ p1:sessionToken, p2:null }
+  };
+  await set(ref(db,`rooms/${roomId}`), roomData);
+
+  // Show the lobby screen with room code prominently
+  $('#lobby-code-display').textContent = roomId;
+  $('#lobby-name-p1').textContent = currentProfile.name;
+  $('#lobby-elo-p1').textContent = `ELO ${currentProfile.elo}`;
+  $('#lobby-name-p2').textContent = 'Waiting...';
+  $('#lobby-elo-p2').textContent = '';
+  $('#lobby-seat-p2').className = 'lobby-seat empty';
+  $('#lobby-pulse').textContent = 'Waiting for opponent...';
+  setScreen('lobby');
+
+  // Listen for P2 joining
+  listenToRoom(roomId);
 }
 
 async function joinRoom(code){
   clearInterval(timerInt); clearOnlineListeners();
+
+  // Validate: joiner must have a real profile
+  if(!currentProfile.name || currentProfile.name.length < 2){
+    msg('You must be logged in with a valid name to join a room.'); return;
+  }
+
   mode='online'; onlineType='casual'; myRole='p2'; gameOver=false; selectedIndex=null;
-  const roomRef=ref(db,`rooms/${code}`);
+  const cleanCode = code.trim().toUpperCase();
+  if(!cleanCode){ msg('Enter a room code first.'); return; }
+
+  const roomRef = ref(db, `rooms/${cleanCode}`);
+
+  // First check room exists and is joinable
+  const snap = await get(roomRef);
+  if(!snap.exists()){ msg('Room not found.'); mode='menu'; return; }
+  const roomData = snap.val();
+  if(roomData.status !== 'waiting'){ msg('That room has already started or is full.'); mode='menu'; return; }
+  if(roomData.p2 !== null && roomData.p2?.name){ msg('Room is already full.'); mode='menu'; return; }
+  // Prevent joining your own room
+  if(roomData.p1?.seatToken === seatToken){ msg('You cannot join your own room.'); mode='menu'; return; }
+
+  // Atomic join — only succeeds if room is still waiting and p2 is empty
   const res = await runTransaction(roomRef, cur=>{
-    if(cur===null) return cur;
-    if(cur.maxPlayers!==2) cur.maxPlayers=2;
-    const occupied = [!!cur.p1?.name, !!cur.p2?.name].filter(Boolean).length;
-    if(occupied>=2) return;
-    if(cur.p2 && cur.p2.name) return;
+    if(!cur) return cur;
+    if(cur.status !== 'waiting') return; // abort — already started
+    if(cur.p2 !== null && cur.p2?.name) return; // abort — already full
+    if(cur.p1?.seatToken === seatToken) return; // abort — same person
+
+    // Fill P2 slot with real profile data
     cur.p2 = newFighter(currentProfile.name, getDeck(), currentProfile.elo, seatToken);
     cur.presence = cur.presence || {};
     cur.presence.p2 = sessionToken;
-    cur.status='playing';
-    return cur;
+
+    // NOW initialize the full match state (both players present)
+    // Carry over P1's fighter data from cur
+    const fullState = {
+      ...cur,
+      turn:'p1', round:1, seq:0,
+      status:'playing',
+      lastSuit:null, lastLog:'', lastAction:null
+    };
+    // Run start-of-turn for p1 (the first turn)
+    // We can't call initializeMatchState here (it's outside transaction),
+    // so we inline the minimal setup and let the listener handle full render
+    return fullState;
   });
-  if(!res.committed || !res.snapshot.exists()){msg('Room not found or join failed.'); mode='menu'; return}
-  const room = res.snapshot.val();
-  if(!(room.p2 && room.p2.seatToken===seatToken)){msg('Room is already full.'); mode='menu'; return}
-  roomId=code;
-  enterGame(); listenToRoom(code)
+
+  if(!res.committed){
+    msg('Could not join room. It may be full or already started.'); mode='menu'; return;
+  }
+  const joined = res.snapshot.val();
+  if(!joined || joined.p2?.seatToken !== seatToken){
+    msg('Join failed — room may be full.'); mode='menu'; return;
+  }
+
+  roomId = cleanCode;
+  // P2 goes straight to the game screen (their transition is immediate)
+  enterGame();
+  gameState = joined;
+  renderGame();
+  logText(`You joined ${joined.p1.name}'s room. Duel begins!`);
+  listenToRoom(cleanCode);
+  beginTurnIfNeeded();
 }
 
 async function joinRankedQueue(){
