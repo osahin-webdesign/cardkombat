@@ -198,6 +198,7 @@ body{background:#0e0b06;display:flex;align-items:center;justify-content:center;m
 <div id="controls">
   <div id="hint">-- CONNECTING TO SERVER --</div>
   <div id="btns">
+    <button class="btn" onclick="discardCard()">[ DISCARD ]</button>
     <button class="btn disabled" id="playbtn" onclick="playSelected()">[ PLAY CARD ]</button>
     <button class="btn disabled" id="drawbtn" onclick="drawOne()">[ DRAW ]</button>
   </div>
@@ -211,6 +212,7 @@ body{background:#0e0b06;display:flex;align-items:center;justify-content:center;m
   <div id="lobby-panel">
     <div class="lobby-section">
       <div class="lobby-section-title">&#9658; CREATE A ROOM</div>
+      <input class="lobby-input" id="playerName" placeholder="Enter your name..." maxlength="12">
       <button class="lobby-btn" id="createBtn" onclick="createRoom()">[ CREATE NEW GAME ]</button>
     </div>
     <div class="lobby-divider">— OR —</div>
@@ -304,6 +306,7 @@ function randCode(){
 
 /* ── LOBBY ── */
 window.createRoom = async function(){
+  const name = document.getElementById('playerName').value.trim() || 'PLAYER';
   setLobbyError('');
   document.getElementById('createBtn').textContent = '[ CREATING... ]';
   roomId = randCode();
@@ -313,8 +316,8 @@ window.createRoom = async function(){
   const p2hand = deck.splice(0,5);
   const state = {
     deck: deck,
-    p1: {hp:100,atk:10,def:5,spd:5,bleed:0,curse:0,hand:p1hand},
-    p2: {hp:100,atk:11,def:4,spd:5,bleed:0,curse:0,hand:p2hand},
+    p1: {hp:100,atk:10,def:5,spd:5,bleed:0,curse:0,hand:p1hand, name:name},
+    p2: {hp:100,atk:11,def:4,spd:5,bleed:0,curse:0,hand:p2hand, name:"FOE"},
     turn: 'p1',
     round: 1,
     lastSuit: null,
@@ -349,7 +352,10 @@ window.joinRoom = async function(){
     roomId = code;
     myRole = 'p2';
     // Update status to playing
-    await update(ref(db,'rooms/'+roomId),{status:'playing'});
+    await update(ref(db,'rooms/'+roomId),{
+  status:'playing',
+  p2: { ...state.p2, name:name }
+});
     setNetStatus('connected','● CONNECTED');
     hideLobby();
     listenToRoom();
@@ -426,6 +432,11 @@ function initCanvas(){
 function startLocalGame(state){
   setNetStatus('connected','● ONLINE');
   // Init local copies from Firebase state
+  document.getElementById('p1label').textContent = state.p1.name;
+document.getElementById('p2label').textContent = state.p2.name;
+
+document.querySelector('#fc1 .fcard-name').textContent = state.p1.name;
+document.querySelector('#fc2 .fcard-name').textContent = state.p2.name;
   syncFromState(state);
   renderHand();
   updateBars();
@@ -632,22 +643,54 @@ function dealCard(){
 
 window.drawOne = async function(){
   if(busy||gameOver) return;
-  if(myHand.length>=7){log('HAND FULL. PLAY A CARD FIRST.');return;}
+
   const snap = await get(ref(db,'rooms/'+roomId));
   const state = snap.val();
-  if(!state.deck||!state.deck.length){log('DECK IS EMPTY.');return;}
+
+  if(!state.deck || !state.deck.length){
+    log('NO CARDS LEFT');
+    return;
+  }
+
   const card = state.deck[0];
   const newDeck = state.deck.slice(1);
   const newHand = [...(state[myRole].hand||[]), card];
-  const updates={};
+
+  const updates = {};
   updates['deck'] = newDeck;
   updates[myRole+'/hand'] = newHand;
+
+  // 🔴 KEY CHANGE
+  updates['turn'] = myRole==='p1' ? 'p2' : 'p1';
+  updates['round'] = (state.round||1)+1;
+
+  updates['lastAction'] = { by:myRole, type:'draw', _seen:false };
+
   await update(ref(db,'rooms/'+roomId), updates);
-  log('CARD DRAWN.');
+
+  log('YOU DRAW AND END YOUR TURN');
 };
 
+  window.discardCard = async function(){
+  if(sel===null || busy) return;
+
+  myHand.splice(sel,1);
+  sel=null;
+
+  const updates = {};
+  updates[myRole+'/hand'] = myHand;
+
+  await update(ref(db,'rooms/'+roomId), updates);
+
+  log('CARD DISCARDED');
+};
 /* ── PLAY CARD ── */
 window.playSelected = async function(){
+  if(myHand.length === 0){
+  log('NO CARDS - FORCED DRAW');
+  await drawOne();
+  return;
+}
   if(busy||gameOver) return;
   if(sel===null){log('SELECT A CARD FIRST.');return;}
   const card = myHand[sel];
@@ -658,7 +701,8 @@ window.playSelected = async function(){
   renderHand();
   updatePlayBtn();
   await resolveAndPush(card);
-};
+
+
 
 async function resolveAndPush(card){
   // Fetch fresh state
@@ -673,7 +717,7 @@ async function resolveAndPush(card){
   let comboBonus=0;
   if(state.lastSuit && state.lastSuit===card.suit){
     comboCount = (state.comboCount||0)+1;
-    comboBonus = comboCount*4;
+    comboBonus = Math.min(comboCount*2,10);
     showCombo('COMBO x'+comboCount+'  +'+comboBonus+' POWER');
     spawnParticles(document.getElementById(myRole==='p1'?'fc1':'fc2'),'combo',14);
     msgs.push('COMBO x'+comboCount);
@@ -757,7 +801,7 @@ async function resolveAndPush(card){
 
 function resolveNormal(su, pow, roll, myData, oppData, myEl, oppEl, myFc, oppFc, action, msgs, state){
   if(su.base==='strike'){
-    let dmg=Mf(pow*0.9+myData.atk*0.5+R()*5);
+    let dmg=Mf(pow*0.6+myData.atk*0.3+R()*3);
     if(roll<0.12){dmg=Mf(dmg*0.35);msgs.push('GLANCED -'+dmg);}
     else if(roll>0.88){dmg=Mf(dmg*1.65);msgs.push('CRUSHING -'+dmg);}
     else msgs.push('STRIKE -'+dmg);
@@ -867,7 +911,7 @@ function resolveSpecial(card, pow, roll, myData, oppData, myEl, oppEl, myFc, opp
     floatAt(myEl,'KING +2 ALL');msgs.push('KING ALL STATS +2');
     if(roll>0.45){const d=Mf(myData.atk*0.7);oppData.hp=Math.max(0,oppData.hp-d);action.dmgToMe=d;setTimeout(()=>{spawnSlash(oppEl,'left');shake(oppFc);floatAt(oppEl,'-'+d+' ROYAL')},400);msgs.push('ROYAL DECREE -'+d);}
   } else { // ACE
-    let dmg=Mf((pow+myData.atk)*1.4+R()*8);
+    let dmg=Mf((pow+myData.atk)*1.0+R()*5);
     if(roll<0.15){dmg=Mf(dmg*0.35);msgs.push('ACE MISFIRED -'+dmg);}
     else{dmg=Math.max(2,dmg-Mf(oppData.def*0.3));msgs.push('ACE DOUBLE STRIKE -'+dmg);}
     oppData.hp=Math.max(0,oppData.hp-dmg);
