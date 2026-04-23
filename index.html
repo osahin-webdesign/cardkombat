@@ -910,7 +910,7 @@ async function finishGame(winner){
 }
 
 // ── Action dispatch ───────────────────────────────────────────────────────────
-function handleAction(type){
+async function handleAction(type){
   if(mode==='local') return performLocalAction(type);
   if(mode==='online') return applyOnlineAction(type);
 }
@@ -950,32 +950,82 @@ function performLocalAction(type){
 // the round-trip through Firebase JSON. Turn ownership (cur.turn !== myRole)
 // is sufficient to prevent out-of-turn actions.
 async function applyOnlineAction(actionType){
-  if(!roomId) return;
+  if(!roomId||!gameState||gameOver) return;
+
+  const current=gameState;
+  if(current.status!=='playing') return;
+  if(current.turn!==myRole){
+    logText('It is not your turn yet.');
+    return;
+  }
+
+  const me=current[myRole];
+  if(!me) return;
+  const actionIndex=selectedIndex;
+
+  if(actionType==='play'){
+    if(actionIndex===null){
+      logText('Select a card first.');
+      return;
+    }
+    const chosen=me.hand[actionIndex];
+    if(!chosen){
+      logText('That card is no longer available.');
+      selectedIndex=null;
+      renderGame();
+      return;
+    }
+    if(!canPlayCard(me, chosen)){
+      logText(`Not enough energy to play ${chosen.val} of ${chosen.suit.toUpperCase()}.`);
+      return;
+    }
+  }
+
+  if(actionType==='discard' && actionIndex===null){
+    logText('Select a card to discard.');
+    return;
+  }
+
   const roomRef=ref(db,`rooms/${roomId}`);
   let newLog='';
-  const actionIndex=selectedIndex;
   const result=await runTransaction(roomRef, cur=>{
     if(!cur) return cur;
     if(cur.status!=='playing') return cur;
-    // Only enforce turn order — seatToken check removed (was causing silent aborts)
     if(cur.turn!==myRole) return cur;
     const state=deepClone(cur);
+
     if(actionType==='draw'){
       newLog=[`${state[myRole].name} draws and ends the turn.`, ...drawCardAndEndTurn(state,myRole)].filter(Boolean).join(' | ');
     } else if(actionType==='discard'){
       if(actionIndex===null) return cur;
       discardCardForEnergy(state,myRole,actionIndex);
+      state.seq=(state.seq||0)+1;
       newLog=`${state[myRole].name} discards to recover energy.`;
     } else if(actionType==='play'){
       if(actionIndex===null) return cur;
+      const chosen=state[myRole].hand[actionIndex];
+      if(!chosen||!canPlayCard(state[myRole], chosen)) return cur;
       const res=resolveCardPlay(state,myRole,actionIndex);
       newLog=[res.text,...res.passed].filter(Boolean).join(' | ');
-    } else { return cur }
+    } else {
+      return cur;
+    }
+
     checkForWinner(state);
     state.lastLog=newLog;
     return state;
   });
-  if(result.committed){ selectedIndex=null; if(newLog) logText(newLog) }
+
+  if(result.committed && result.snapshot.exists()){
+    selectedIndex=null;
+    gameState=result.snapshot.val();
+    if(newLog) logText(newLog);
+    renderGame();
+    if(gameState.status==='gameover') finishGame(gameState.winner);
+    else beginTurnIfNeeded();
+  } else {
+    logText('Move did not go through. Check turn order and card selection.');
+  }
 }
 
 // ── AI ────────────────────────────────────────────────────────────────────────
@@ -1186,7 +1236,17 @@ $('#leaveMatchBtn').onclick=()=>{
   leaveMatch(false, false)
 };
 
-$('#playbtn').onclick=()=>handleAction('play');
+$('#playbtn').onclick=async()=>{
+  if(mode==='online' && (!gameState || gameState.turn!==myRole)){
+    logText('It is not your turn yet.');
+    return;
+  }
+  if(selectedIndex===null){
+    logText('Select a card first.');
+    return;
+  }
+  await handleAction('play');
+};
 $('#drawbtn').onclick=()=>handleAction('draw');
 $('#discardBtn').onclick=()=>handleAction('discard');
 </script>
