@@ -344,6 +344,7 @@ const SUITS={
 };
 const VAL_POWER={2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,10:10,J:11,Q:12,K:13,A:14};
 const RARITY_RULES={common:{copies:4,cost:1},uncommon:{copies:3,cost:1},rare:{copies:2,cost:2},legendary:{copies:1,cost:3}};
+const COMPETITIVE_SYSTEM={MAX_GUARD:12,MAX_EXPOSE:4,MAX_FOCUS:5,MAX_HEX:6,MAX_SIPHON:4,MAX_PRESSURE:5,MAX_STANCE:3};
 const CARD_LIBRARY=[
   {id:'spade_5',suit:'spade',val:'5',rarity:'common',flavor:'A neat cut in candlelight.'},
   {id:'spade_7',suit:'spade',val:'7',rarity:'common',flavor:'Steel speaks plainly.'},
@@ -508,11 +509,68 @@ function mutateDeck(action,id){
 }
 
 // ── Game logic ────────────────────────────────────────────────────────────────
+function inferArchetype(deckList){
+  const counts={spade:0,heart:0,club:0,diamond:0,drain:0,wound:0,void:0,mirror:0};
+  for(const id of deckList){
+    const card=CARD_LIBRARY.find(c=>c.id===id);
+    if(card) counts[card.suit]=(counts[card.suit]||0)+1;
+  }
+  const pairs=[
+    ['duelist',(counts.spade+counts.wound)],
+    ['warlock',(counts.diamond+counts.void)],
+    ['bastion',(counts.club+counts.heart)],
+    ['trickster',(counts.mirror+counts.drain)]
+  ].sort((a,b)=>b[1]-a[1]);
+  return pairs[0][0];
+}
+
 function newFighter(name, deckList, elo=1000, token=''){
   const deck=makeDeckFromList(deckList), hand=[];
   for(let i=0;i<5;i++) if(deck.length) hand.push(deck.shift());
-  return {name,hp:STARTING_HP,atk:8,def:5,spd:5,bleed:0,curse:0,energy:MAX_ENERGY,maxEnergy:MAX_ENERGY,hand,deck,discard:[],elo,wins:0,losses:0,combo:0,mirror:false,queenBuff:false,seatToken:token}
+  return {
+    name,hp:STARTING_HP,atk:8,def:5,spd:5,bleed:0,curse:0,energy:MAX_ENERGY,maxEnergy:MAX_ENERGY,
+    hand,deck,discard:[],elo,wins:0,losses:0,combo:0,mirror:false,queenBuff:false,seatToken:token,
+    archetype:inferArchetype(deckList),
+    guard:0, expose:0, focus:0, hex:0, siphon:0, pressure:0, mirrorCharges:0, stance:0,
+    suitMastery:{spade:0,heart:0,club:0,diamond:0,drain:0,wound:0,void:0,mirror:0}
+  }
 }
+
+function applyArchetypePassive(player, foe, text){
+  if(player.archetype==='duelist' && player.pressure>=2){ player.atk=Math.min(20, player.atk+1); text.push('Duelist edge +1 ATK'); player.pressure=Math.max(0, player.pressure-1); }
+  if(player.archetype==='warlock' && foe.curse>0){ const ping=1+Math.floor(foe.curse/2); foe.hp=Math.max(0, foe.hp-ping); text.push(`Warlock rot deals ${ping}`); }
+  if(player.archetype==='bastion' && player.guard>0){ player.hp=Math.min(STARTING_HP, player.hp+1); text.push('Bastion steadies +1 HP'); }
+  if(player.archetype==='trickster' && player.focus>=2){ player.energy=Math.min(player.maxEnergy, player.energy+1); player.focus=Math.max(0, player.focus-2); text.push('Trickster converts focus to energy'); }
+}
+
+function applySuitMastery(player, suit){
+  if(!player.suitMastery) player.suitMastery={spade:0,heart:0,club:0,diamond:0,drain:0,wound:0,void:0,mirror:0};
+  player.suitMastery[suit]=Math.min(6,(player.suitMastery[suit]||0)+1);
+}
+
+function applyIncomingDamage(target, source, amount, tags=[], text=[]){
+  let dmg=Math.max(0, Math.floor(amount));
+  if(target.expose>0){ dmg += target.expose; text.push(`Expose adds ${target.expose}`); target.expose=Math.max(0,target.expose-1); }
+  if(target.guard>0){
+    const blocked=Math.min(target.guard, Math.ceil(dmg*0.6));
+    target.guard-=blocked; dmg-=blocked; text.push(`Guard blocks ${blocked}`);
+    if(target.guard===0 && blocked>0){ target.expose=Math.min(COMPETITIVE_SYSTEM.MAX_EXPOSE, target.expose+1); text.push('Guard shatters: target exposed'); }
+  }
+  if(target.mirrorCharges>0 && tags.includes('targeted')){
+    const reflected=Math.ceil(dmg*0.35);
+    source.hp=Math.max(0, source.hp-reflected);
+    target.mirrorCharges-=1;
+    text.push(`Mirror reflects ${reflected}`);
+  }
+  target.hp=Math.max(0, target.hp-dmg);
+  return dmg;
+}
+
+function addGuard(player, amount){ player.guard=Math.min(COMPETITIVE_SYSTEM.MAX_GUARD, player.guard+amount); }
+function addFocus(player, amount){ player.focus=Math.min(COMPETITIVE_SYSTEM.MAX_FOCUS, player.focus+amount); }
+function addHex(player, amount){ player.hex=Math.min(COMPETITIVE_SYSTEM.MAX_HEX, player.hex+amount); }
+function addPressure(player, amount){ player.pressure=Math.min(COMPETITIVE_SYSTEM.MAX_PRESSURE, player.pressure+amount); }
+function addSiphon(player, amount){ player.siphon=Math.min(COMPETITIVE_SYSTEM.MAX_SIPHON, player.siphon+amount); }
 
 function startOfTurn(state, role){
   const pl=state[role]; if(!pl) return {forced:false,log:[]};
@@ -520,6 +578,10 @@ function startOfTurn(state, role){
   let log=[];
   if(pl.bleed>0){const dmg=mf(pl.bleed*2+rr()*2); pl.hp=Math.max(0,pl.hp-dmg); pl.bleed=Math.max(0,pl.bleed-1); log.push(`${pl.name} bleeds for ${dmg}`)}
   if(pl.curse>0){const dmg=mf(pl.curse*2+rr()*2); pl.hp=Math.max(0,pl.hp-dmg); pl.curse=Math.max(0,pl.curse-1); log.push(`${pl.name} suffers ${dmg} curse`)}
+  pl.expose=Math.max(0,(pl.expose||0)-1);
+  pl.pressure=Math.max(0,(pl.pressure||0)-1);
+  pl.focus=Math.max(0,(pl.focus||0)-1);
+  if(pl.siphon>=3){ pl.energy=Math.min(pl.maxEnergy, pl.energy+1); pl.siphon=0; log.push(`${pl.name} converts siphon into +1 energy`) }
   if(pl.hand.length===0){
     if(pl.deck.length>0){pl.hand.push(pl.deck.shift()); pl.energy=0; log.push(`${pl.name} is forced to draw and loses the turn`); return {forced:true,log}}
     pl.hp=Math.max(0,pl.hp-6); pl.energy=0; log.push(`${pl.name} has no cards left and takes 6 fatigue`); return {forced:true,log}
@@ -552,30 +614,90 @@ function resolveCardPlay(state, role, handIndex){
   const me=state[role], oppRole=role==='p1'?'p2':'p1', foe=state[oppRole], card=me.hand[handIndex];
   if(!card||!canPlayCard(me,card)) return {text:'Cannot play that card.',passed:[]};
   me.hand.splice(handIndex,1); me.discard.push(card); me.energy-=(card.cost||1);
+  applySuitMastery(me, card.suit);
   const ritual=detectRitual(card);
   let comboBonus=0;
-  if(state.lastSuit===card.suit){me.combo=(me.combo||0)+1; comboBonus=Math.min(me.combo*2,8); showCombo(`COMBO x${me.combo}`)} else me.combo=0;
+  if(state.lastSuit===card.suit){ me.combo=(me.combo||0)+1; comboBonus=Math.min(me.combo*2,8); showCombo(`COMBO x${me.combo}`); addPressure(me,1); }
+  else me.combo=0;
   if(ritual?.bonus?.damage) comboBonus += ritual.bonus.damage/2;
-  const suit=gSuit(card.suit), basePow=card.pw+comboBonus; let text=[];
-  if(card.val==='J'){const steal=mf(2+rr()*3); me.atk=Math.min(20,me.atk+steal); foe.atk=Math.max(1,foe.atk-steal); text.push(`KNAVE steals ${steal} ATK`)}
-  else if(card.val==='Q'){const heal=mf(7+rr()*6); me.hp=Math.min(STARTING_HP,me.hp+heal); me.queenBuff=true; foe.curse=Math.min(8,foe.curse+2); text.push(`QUEEN heals ${heal} and empowers the next hit`)}
-  else if(card.val==='K'){me.atk=Math.min(20,me.atk+2); me.def=Math.min(16,me.def+2); me.spd=Math.min(16,me.spd+1); const royal=mf(4+me.atk*0.35); foe.hp=Math.max(0,foe.hp-royal); text.push(`KING fortifies and strikes for ${royal}`)}
-  else if(card.val==='A'){const dmg=mf(basePow*0.75+me.atk*0.45+rr()*3), dealt=Math.max(2,dmg-mf(foe.def*0.25)); if(foe.mirror){me.hp=Math.max(0,me.hp-mf(dealt*0.6)); foe.mirror=false; text.push(`ACE hit is reflected for ${mf(dealt*0.6)}`)} else {foe.hp=Math.max(0,foe.hp-dealt); text.push(`ACE crashes in for ${dealt}`)}}
+  const suit=gSuit(card.suit), basePow=card.pw+comboBonus+(me.focus||0); let text=[];
+  applyArchetypePassive(me, foe, text);
+
+  if(card.val==='J'){
+    const steal=mf(2+rr()*3)+(me.suitMastery[card.suit]>=3?1:0);
+    me.atk=Math.min(20,me.atk+steal); foe.atk=Math.max(1,foe.atk-steal); addFocus(me,1); text.push(`KNAVE steals ${steal} ATK and builds focus`);
+  }
+  else if(card.val==='Q'){
+    const heal=mf(7+rr()*6)+Math.floor(me.focus/2); const before=me.hp;
+    me.hp=Math.min(STARTING_HP,me.hp+heal); me.queenBuff=true; addGuard(me,2); foe.curse=Math.min(8,foe.curse+2);
+    if(me.hp===STARTING_HP && before+heal>STARTING_HP) addFocus(me,1);
+    text.push(`QUEEN heals ${me.hp-before}, fortifies guard, and empowers the next hit`);
+  }
+  else if(card.val==='K'){
+    me.atk=Math.min(20,me.atk+2); me.def=Math.min(16,me.def+2); me.spd=Math.min(16,me.spd+1); addGuard(me,2);
+    const royal=mf(4+me.atk*0.35+me.pressure);
+    const dealt=applyIncomingDamage(foe, me, royal, ['targeted','royal'], text);
+    text.push(`KING commands for ${dealt}`);
+  }
+  else if(card.val==='A'){
+    const raw=mf(basePow*0.75+me.atk*0.45+rr()*3+me.pressure);
+    const dealt=applyIncomingDamage(foe, me, Math.max(2,raw-mf(foe.def*0.2)), ['targeted','finisher'], text);
+    addPressure(me,2); text.push(`ACE crashes in for ${dealt}`);
+  }
   else {
-    if(suit.base==='strike'){let dmg=mf(basePow*0.52+me.atk*0.35+rr()*3); if(me.queenBuff){dmg=mf(dmg*1.35); me.queenBuff=false; text.push('QUEEN buff triggers')} dmg=Math.max(1,dmg-mf(foe.def*0.33+rr()*2)); if(foe.mirror){me.hp=Math.max(0,me.hp-mf(dmg*0.55)); foe.mirror=false; text.push(`STRIKE is partly mirrored for ${mf(dmg*0.55)}`)} else {foe.hp=Math.max(0,foe.hp-dmg); text.push(`STRIKE deals ${dmg}`)}}
-    if(suit.base==='mend'){const heal=mf(basePow*0.42+me.def*0.25+rr()*3); me.hp=Math.min(STARTING_HP,me.hp+heal); text.push(`MEND restores ${heal}`)}
-    if(suit.base==='brace'){const dDef=Math.max(1,mf(basePow*0.16)), dHp=Math.max(1,mf(basePow*0.20)); me.def=Math.min(16,me.def+dDef); me.hp=Math.min(STARTING_HP,me.hp+dHp); text.push(`BRACE grants +${dDef} DEF and ${dHp} HP`)}
-    if(suit.base==='curse'){const dmg=mf(basePow*0.28+rr()*3); foe.hp=Math.max(0,foe.hp-dmg); foe.curse=Math.min(8,foe.curse+2); text.push(`CURSE deals ${dmg} and adds 2 curse`)}
-    if(suit.base==='drain'){const dmg=mf(basePow*0.45+me.atk*0.25+rr()*3), steal=Math.max(1,mf(dmg*0.45)); foe.hp=Math.max(0,foe.hp-dmg); me.hp=Math.min(STARTING_HP,me.hp+steal); text.push(`DRAIN steals ${steal} life from ${dmg} damage`)}
-    if(suit.base==='wound'){const dmg=mf(basePow*0.38+me.atk*0.28+rr()*3); foe.hp=Math.max(0,foe.hp-dmg); foe.bleed=Math.min(8,foe.bleed+2); text.push(`WOUND deals ${dmg} and adds 2 bleed`)}
-    if(suit.base==='void'){foe.bleed=0; foe.curse=0; const dmg=mf(basePow*0.36+rr()*4); foe.hp=Math.max(0,foe.hp-dmg); text.push(`VOID purges debuffs and hits for ${dmg}`)}
-    if(suit.base==='mirror'){me.mirror=true; text.push(`MIRROR readies a reflection`)}
+    if(suit.base==='strike'){
+      let raw=mf(basePow*0.52+me.atk*0.35+rr()*3+me.pressure);
+      if(me.queenBuff){ raw=mf(raw*1.35); me.queenBuff=false; text.push('QUEEN buff triggers'); }
+      if(foe.bleed>0){ raw+=foe.bleed*2; text.push(`Bleed burst +${foe.bleed*2}`); }
+      const dealt=applyIncomingDamage(foe, me, Math.max(1,raw-mf(foe.def*0.28+rr()*2)), ['targeted','strike'], text);
+      addPressure(me,1); text.push(`STRIKE deals ${dealt}`);
+    }
+    if(suit.base==='mend'){
+      const before=me.hp; const heal=mf(basePow*0.42+me.def*0.25+rr()*3+me.guard*0.15); me.hp=Math.min(STARTING_HP,me.hp+heal);
+      addFocus(me, me.hp===STARTING_HP ? 2 : 1); text.push(`MEND restores ${me.hp-before} and builds focus`);
+    }
+    if(suit.base==='brace'){
+      const dDef=Math.max(1,mf(basePow*0.16)), dHp=Math.max(1,mf(basePow*0.20)); me.def=Math.min(16,me.def+dDef); me.hp=Math.min(STARTING_HP,me.hp+dHp); addGuard(me,3+Math.floor(me.suitMastery.club/2)); text.push(`BRACE grants +${dDef} DEF, ${dHp} HP, and guard`);
+    }
+    if(suit.base==='curse'){
+      const dmg=applyIncomingDamage(foe, me, mf(basePow*0.25+rr()*3), ['spell'], text); foe.curse=Math.min(8,foe.curse+2); addHex(foe,2); text.push(`CURSE deals ${dmg} and adds hex`);
+    }
+    if(suit.base==='drain'){
+      const dmg=applyIncomingDamage(foe, me, mf(basePow*0.42+me.atk*0.22+rr()*3+foe.hex), ['targeted','drain'], text);
+      const steal=Math.max(1,mf(dmg*0.45))+Math.floor(foe.hex/2); const before=me.hp; me.hp=Math.min(STARTING_HP,me.hp+steal); addSiphon(me,1); foe.hex=Math.max(0,foe.hex-1);
+      text.push(`DRAIN steals ${me.hp-before} life and feeds siphon`);
+    }
+    if(suit.base==='wound'){
+      const dmg=applyIncomingDamage(foe, me, mf(basePow*0.34+me.atk*0.26+rr()*3+foe.bleed), ['targeted','wound'], text);
+      foe.bleed=Math.min(8,foe.bleed+2+(foe.expose>0?1:0)); foe.expose=Math.min(COMPETITIVE_SYSTEM.MAX_EXPOSE, foe.expose+1); text.push(`WOUND deals ${dmg}, adds bleed, and exposes`);
+    }
+    if(suit.base==='void'){
+      const purged=(foe.bleed||0)+(foe.curse||0)+(foe.hex||0); foe.bleed=0; foe.curse=0; foe.hex=0;
+      const dmg=applyIncomingDamage(foe, me, mf(basePow*0.30+rr()*4+purged*1.5), ['spell','void'], text); if(purged>0) me.energy=Math.min(me.maxEnergy, me.energy+1);
+      text.push(`VOID purges ${purged} stacks and hits for ${dmg}`);
+    }
+    if(suit.base==='mirror'){
+      me.mirror=true; me.mirrorCharges=Math.min(2,(me.mirrorCharges||0)+1); me.stance=Math.min(COMPETITIVE_SYSTEM.MAX_STANCE,(me.stance||0)+1); addFocus(me,1); text.push(`MIRROR readies a reflection and counter stance`);
+    }
   }
+
+  if(foe.curse>0 && card.suit==='void'){
+    const burst=foe.curse*3; const dealt=applyIncomingDamage(foe, me, burst, ['spell'], text); foe.curse=0; text.push(`Hex collapse deals ${dealt}`);
+  }
+  if(card.suit==='spade' && foe.expose>0){ const bonus=foe.expose*2; const dealt=applyIncomingDamage(foe, me, bonus, ['targeted'], text); text.push(`Execution line deals ${dealt}`); }
+  if(card.suit==='drain' && me.focus>=2){ me.energy=Math.min(me.maxEnergy, me.energy+1); me.focus=Math.max(0,me.focus-2); text.push('Focused drain refunds 1 energy'); }
+  if(card.suit==='heart' && me.guard>=4){ me.hp=Math.min(STARTING_HP, me.hp+3); text.push('Sanctuary heals 3'); }
+  if(card.suit==='club' && me.pressure>=2){ me.guard=Math.min(COMPETITIVE_SYSTEM.MAX_GUARD, me.guard+2); me.pressure=Math.max(0,me.pressure-1); text.push('Anchored posture converts pressure to guard'); }
+  if(card.suit==='mirror' && me.stance>=2){ foe.expose=Math.min(COMPETITIVE_SYSTEM.MAX_EXPOSE, foe.expose+1); text.push('Counter stance exposes the foe'); }
+
   if(ritual){
-    if(ritual.bonus.damage){foe.hp=Math.max(0,foe.hp-ritual.bonus.damage); text.push(`${ritual.name} deals ${ritual.bonus.damage}`)}
-    if(ritual.bonus.heal){me.hp=Math.min(STARTING_HP,me.hp+ritual.bonus.heal); text.push(`${ritual.name} restores ${ritual.bonus.heal}`)}
-    if(ritual.bonus.energy){me.energy=Math.min(me.maxEnergy,me.energy+ritual.bonus.energy); text.push(`${ritual.name} grants +${ritual.bonus.energy} energy`)}
+    if(ritual.bonus.damage){ const dealt=applyIncomingDamage(foe, me, ritual.bonus.damage, ['ritual'], text); text.push(`${ritual.name} deals ${dealt}`) }
+    if(ritual.bonus.heal){ const before=me.hp; me.hp=Math.min(STARTING_HP,me.hp+ritual.bonus.heal); text.push(`${ritual.name} restores ${me.hp-before}`) }
+    if(ritual.bonus.energy){ me.energy=Math.min(me.maxEnergy,me.energy+ritual.bonus.energy); text.push(`${ritual.name} grants +${ritual.bonus.energy} energy`) }
+    if(ritual.bonus.guard){ addGuard(me,ritual.bonus.guard); text.push(`${ritual.name} grants ${ritual.bonus.guard} guard`) }
   }
+
+  if((me.suitMastery[card.suit]||0)>=4) text.push(`${card.suit.toUpperCase()} MASTERY ONLINE`);
   state.lastSuit=card.suit;
   state.lastAction={by:role,type:'play',cardId:card.id,suit:card.suit,val:card.val,text:text.join(' | '),ritual:ritual?.name||'',combo:me.combo||0,_seen:false};
   return {text:text.join(' | '),passed:passTurn(state)}
@@ -622,13 +744,23 @@ function renderGame(){
   $('#fc1 .fcard-name').textContent=gameState.p1.name;
   $('#fc2 .fcard-name').textContent=gameState.p2?.name||'OPEN';
   if(me){
-    $('#s-atk').textContent=me.atk;
-    $('#s-def').textContent=me.def;
-    $('#s-spd').textContent=me.spd;
-    $('#s-bld').textContent=me.bleed;
-    $('#s-crs').textContent=me.curse;
-    $('#s-eng').textContent=me.energy;
-    $('#s-cmb').textContent=me.combo||0;
+    $('#s-atk').textContent=`${Math.floor(me.atk)} / G${me.guard||0}`;
+    $('#s-def').textContent=`${Math.floor(me.def)} / F${me.focus||0}`;
+    $('#s-spd').textContent=`${Math.floor(me.spd)} / P${me.pressure||0}`;
+    $('#s-bld').textContent=`${me.bleed} / X${me.expose||0}`;
+    $('#s-crs').textContent=`${me.curse} / H${me.hex||0}`;
+    $('#s-eng').textContent=`${me.energy} / S${me.siphon||0}`;
+    $('#s-cmb').textContent=`${me.combo||0} / ${String(me.archetype||'').slice(0,3).toUpperCase()}`;
+  }
+  const statusSpans=document.querySelectorAll('#status-bar span');
+  if(statusSpans.length>=7){
+    statusSpans[0].childNodes[0].textContent='ATK/GRD ';
+    statusSpans[1].childNodes[0].textContent='DEF/FOC ';
+    statusSpans[2].childNodes[0].textContent='SPD/PRS ';
+    statusSpans[3].childNodes[0].textContent='BLD/EXP ';
+    statusSpans[4].childNodes[0].textContent='CRS/HEX ';
+    statusSpans[5].childNodes[0].textContent='ENG/SIP ';
+    statusSpans[6].childNodes[0].textContent='COM/ARC ';
   }
   $('#s-seq').textContent=gameState.seq||0;
   $('#leaveMatchBtn').disabled = (mode !== 'local');
@@ -656,7 +788,7 @@ function updateButtons(){
   $('#playbtn').disabled=!(myTurn&&selected&&canPlayCard(me,selected));
   $('#drawbtn').disabled=!myTurn;
   $('#discardBtn').disabled=!(myTurn&&selectedIndex!==null);
-  if(myTurn){$('#hint').textContent=selected?`${selected.val} of ${selected.suit.toUpperCase()} — cost ${selected.cost}${ritualHistory.length?` — ritual chain ${ritualHistory.map(x=>x.split(':')[0][0].toUpperCase()).join('/')}`:''}`:'-- choose a card, draw, or discard --'}
+  if(myTurn){$('#hint').textContent=selected?`${selected.val} of ${selected.suit.toUpperCase()} — cost ${selected.cost} — ${currentPlayer()?.archetype||'build'}${ritualHistory.length?` — ritual chain ${ritualHistory.map(x=>x.split(':')[0][0].toUpperCase()).join('/')}`:''}`:'-- choose a card, draw, or discard --'}
 }
 
 function setNetStatus(cls, txt){ const el=$('#net-status'); el.className=cls; el.textContent=txt }
@@ -681,22 +813,32 @@ function screenShake(power=1){
 
 function detectRitual(card){
   ritualHistory.push(`${card.suit}:${card.val}`);
-  if(ritualHistory.length>3) ritualHistory.shift();
+  if(ritualHistory.length>4) ritualHistory.shift();
   const suits=ritualHistory.map(x=>x.split(':')[0]);
-  const vals=ritualHistory.map(x=>x.split(':')[1]);
-  if(suits.length===3 && suits.every(s=>s===suits[0])) return {name:`RITUAL: ${suits[0].toUpperCase()} TRINITY`, bonus:{damage:10}};
-  const nums=vals.map(v=>VAL_POWER[v]||0);
-  if(nums.length===3 && nums[0]<nums[1]<nums[2]) return {name:'RITUAL: ASCENDANT RUN', bonus:{heal:8}};
-  if(suits.length===3 && new Set(suits).size===3) return {name:'RITUAL: THREE HOUSES', bonus:{energy:1}};
+  const vals=ritualHistory.map(x=>VAL_POWER[x.split(':')[1]]||0);
+  const last3=suits.slice(-3).join(',');
+  const last4=suits.slice(-4).join(',');
+  if(last3 && suits.slice(-3).every(s=>s===suits[suits.length-1])) return {name:`RITUAL: ${suits[suits.length-1].toUpperCase()} TRINITY`, bonus:{damage:10}};
+  if(vals.length>=3){ const seq=vals.slice(-3); if(seq[0]<seq[1] && seq[1]<seq[2]) return {name:'RITUAL: ASCENDANT RUN', bonus:{heal:8, energy:1}}; }
+  if(suits.slice(-3).length===3 && new Set(suits.slice(-3)).size===3) return {name:'RITUAL: THREE HOUSES', bonus:{energy:1, guard:2}};
+  if(last4==='spade,heart,spade,heart') return {name:'RITUAL: PULSE DUEL', bonus:{heal:10, damage:6}};
+  if(last4==='diamond,void,diamond,void') return {name:'RITUAL: BLACK MASS', bonus:{damage:14}};
+  if(last4==='club,mirror,club,mirror') return {name:'RITUAL: LOCKSTEP', bonus:{guard:4, energy:1}};
   return null;
 }
 
 function scoreAICardByStyle(state, card){
   const base=scoreAICard(state, card);
-  const kind=gSuit(card.suit).base;
-  if(aiStyle==='aggressive') return base + (kind==='strike'||kind==='wound'||kind==='drain'?5:0) + (card.val==='A'?8:0);
-  if(aiStyle==='defensive') return base + (kind==='mend'||kind==='brace'||kind==='mirror'?5:0) + (card.val==='Q'?5:0);
-  return base + (kind==='curse'||kind==='mirror'||kind==='void'?6:0) + (card.val==='J'?4:0);
+  const ai=state.p2, foe=state.p1, kind=gSuit(card.suit).base;
+  let score=base;
+  if(aiStyle==='aggressive') score += (kind==='strike'||kind==='wound'||kind==='drain'?6:0) + (foe.expose||0)*2 + ((foe.bleed||0)&&kind==='strike'?5:0);
+  else if(aiStyle==='defensive') score += (kind==='mend'||kind==='brace'||kind==='mirror'?6:0) + ((ai.guard||0)<4 && kind==='brace'?6:0) + ((ai.focus||0)>=2 && kind==='drain'?4:0);
+  else score += (kind==='curse'||kind==='mirror'||kind==='void'?7:0) + ((foe.hex||0)&&kind==='drain'?5:0) + ((foe.curse||0)&&kind==='void'?8:0);
+  if(ai.archetype==='warlock' && (kind==='curse'||kind==='void')) score += 5;
+  if(ai.archetype==='bastion' && (kind==='brace'||kind==='mend')) score += 5;
+  if(ai.archetype==='duelist' && (kind==='strike'||kind==='wound')) score += 5;
+  if(ai.archetype==='trickster' && (kind==='mirror'||kind==='drain')) score += 5;
+  return score+rr();
 }
 
 function startTurnTimer(){
@@ -1133,6 +1275,7 @@ function scoreAICard(state, card){
 function aiTakeTurn(){
   if(mode!=='local'||!gameState||gameOver||gameState.turn!=='p2'||gameState.status!=='playing') return;
   const state=deepClone(gameState), ai=state.p2;
+  aiStyle = ai.archetype==='warlock' ? 'trickster' : ai.archetype==='bastion' ? 'defensive' : 'aggressive';
   const playable=ai.hand.map((card,i)=>({card,i})).filter(x=>canPlayCard(ai,x.card));
   let logParts=[];
   if(!playable.length){
