@@ -340,6 +340,7 @@ window.createRoom = async function(){
 };
 
 window.joinRoom = async function(){
+  const name = document.getElementById('playerName').value.trim() || 'PLAYER';
   const code = document.getElementById('joinCode').value.trim().toUpperCase();
   if(!code||code.length<4){setLobbyError('ENTER A VALID ROOM CODE');return;}
   setLobbyError('JOINING...');
@@ -444,8 +445,7 @@ document.querySelector('#fc2 .fcard-name').textContent = state.p2.name;
   log('DUEL BEGINS — ROUND 1');
   showBnr('ROUND  1');
   // Set up labels
-  document.getElementById('p1label').textContent = myRole==='p1'?'YOU':'FOE';
-  document.getElementById('p2label').textContent = myRole==='p2'?'YOU':'FOE';
+  
   // Enable draw button
   document.getElementById('drawbtn').classList.remove('disabled');
   checkTurn(state.turn);
@@ -701,6 +701,7 @@ window.playSelected = async function(){
   renderHand();
   updatePlayBtn();
   await resolveAndPush(card);
+};
 
 
 
