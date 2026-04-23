@@ -3,23 +3,31 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Card Kombat Deluxe - Refined</title>
+<title>Card Kombat Multiplayer Hardened</title>
 <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Cutive+Mono&display=swap" rel="stylesheet">
 <style>
-:root{--line:#3b2c11;--gold:#c49a35;--gold2:#8b6914;--paper:#e8dfc8;--paper2:#d6c7a0;--ink:#2a1f0e;--faded:#7a6a4a;--red:#8e2413;--green:#2b6a2b;--purple:#7f66b5}
+:root{
+  --line:#3b2c11;--gold:#c49a35;--gold2:#8b6914;--paper:#e8dfc8;--paper2:#d6c7a0;
+  --ink:#2a1f0e;--faded:#7a6a4a;--red:#8e2413;--green:#2b6a2b;--purple:#7f66b5;
+}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:radial-gradient(circle at top,#24170a 0%,#100b06 35%,#070503 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;color:var(--paper2);font-family:'Cutive Mono',monospace}
 button,input{font-family:inherit}
-#cabinet{width:100%;max-width:980px;min-height:760px;border:4px solid var(--line);background:linear-gradient(180deg,#130e07,#0b0805);position:relative;overflow:hidden;box-shadow:0 0 90px rgba(0,0,0,.9), inset 0 0 40px rgba(0,0,0,.55)}
+#cabinet{width:100%;max-width:1040px;min-height:780px;border:4px solid var(--line);background:linear-gradient(180deg,#130e07,#0b0805);position:relative;overflow:hidden;box-shadow:0 0 90px rgba(0,0,0,.9), inset 0 0 40px rgba(0,0,0,.55)}
 #cabinet::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:300;background:repeating-linear-gradient(0deg,transparent 0,transparent 2px,rgba(255,255,255,.015) 2px,rgba(255,255,255,.015) 4px)}
 .hidden{display:none!important}
 .btn{border:1px solid var(--line);background:#110c06;color:var(--paper2);padding:9px 14px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:.15s;font-size:12px}
 .btn:hover{transform:translateY(-1px);border-color:var(--gold);color:#fff;background:#1a1208}
 .btn.primary{border-color:var(--gold);background:#1c1409}.btn.danger{border-color:#632218;color:#e4b0a8}.btn.small{font-size:10px;padding:6px 10px}
 .btn:disabled,.btn.disabled{opacity:.35;pointer-events:none}
-.input{width:100%;background:#0c0906;color:var(--paper2);border:1px solid var(--line);padding:9px 10px;letter-spacing:1px}
+.input{width:100%;background:#0c0906;color:var(--paper2);border:1px solid var(--line);padding:10px 12px;letter-spacing:1px}
 .section-title{color:var(--gold);letter-spacing:3px;font-size:11px;margin-bottom:10px;text-transform:uppercase}
-#screen-menu,#screen-game,#screen-builder{position:absolute;inset:0}
+#screen-login,#screen-menu,#screen-builder,#screen-game{position:absolute;inset:0}
+#screen-login{display:flex;align-items:center;justify-content:center;background:rgba(6,4,2,.98);z-index:900}
+.login-card{width:min(420px,92%);border:2px solid var(--line);background:linear-gradient(180deg,#120d07,#090704);padding:24px}
+.brand{font-family:'Special Elite',serif;color:var(--gold);font-size:32px;letter-spacing:6px;text-align:center;padding:0 0 8px}
+.subbrand{text-align:center;color:#8e7a53;font-size:12px;letter-spacing:3px;margin-bottom:18px}
+.cardbox{border:1px solid var(--line);background:#0b0705;padding:12px}
 #screen-menu{display:flex;align-items:center;justify-content:center;padding:20px}
 .menu-shell{width:100%;height:100%;display:grid;grid-template-columns:1.1fr .9fr;gap:18px}
 .fireplace-wrap{border:2px solid var(--line);background:linear-gradient(180deg,#151008,#0a0704);position:relative;overflow:hidden;min-height:700px}
@@ -41,12 +49,9 @@ button,input{font-family:inherit}
 @keyframes flicker{0%,100%{transform:scaleY(1) translateY(0) rotate(-1deg);opacity:.92}25%{transform:scaleY(1.08) translateY(-3px) rotate(2deg);opacity:1}50%{transform:scaleY(.94) translateY(2px) rotate(-2deg);opacity:.86}75%{transform:scaleY(1.12) translateY(-4px) rotate(1deg);opacity:1}}
 @keyframes emberUp{0%{transform:translateY(0) translateX(0) scale(1);opacity:.95}100%{transform:translateY(-150px) translateX(20px) scale(.2);opacity:0}}
 .menu-panel{border:2px solid var(--line);background:linear-gradient(180deg,#120d07,#090704);padding:18px;display:flex;flex-direction:column;gap:14px}
-.brand{font-family:'Special Elite',serif;color:var(--gold);font-size:34px;letter-spacing:6px;text-align:center;padding:10px 0 6px;border-bottom:1px solid var(--line)}
-.subbrand{text-align:center;color:#8e7a53;font-size:12px;letter-spacing:3px}
-.cardbox{border:1px solid var(--line);background:#0b0705;padding:12px}
 .menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.tiny{font-size:11px;color:#9f8a63;line-height:1.5}
 .rating-box{display:flex;justify-content:space-between;align-items:center;font-size:12px}
+.panel-note{font-size:11px;color:#a99164;line-height:1.55}
 #home-message{min-height:16px;color:#d8bca0;font-size:11px}
 #screen-builder{padding:18px;background:rgba(6,4,3,.98)}
 .builder-shell{width:100%;height:100%;border:2px solid var(--line);background:linear-gradient(180deg,#120d07,#090704);display:grid;grid-template-columns:300px 1fr;gap:16px;padding:16px}
@@ -76,7 +81,7 @@ button,input{font-family:inherit}
 #tmr-label{font-size:9px;color:var(--faded);letter-spacing:2px}
 #tmr-bar-wrap{width:80px;height:6px;background:#0b0906;border:1px solid var(--line)} #tmr-bar{height:100%;width:100%;background:var(--gold);transition:width 1s linear}
 #tmr.urgent{color:#e37a63;animation:pulse-red .55s ease-in-out infinite} @keyframes pulse-red{50%{opacity:.4}}
-#arena{height:280px;position:relative;border-bottom:1px solid var(--line);overflow:hidden;background:radial-gradient(circle at 50% 24%,rgba(199,144,53,.09),transparent 32%),repeating-linear-gradient(90deg,transparent 0,transparent 72px,rgba(58,45,16,.06) 72px,rgba(58,45,16,.06) 73px),linear-gradient(180deg,#120e08,#0b0805 62%,#0a0705 100%)}
+#arena{height:300px;position:relative;border-bottom:1px solid var(--line);overflow:hidden;background:radial-gradient(circle at 50% 24%,rgba(199,144,53,.09),transparent 32%),repeating-linear-gradient(90deg,transparent 0,transparent 72px,rgba(58,45,16,.06) 72px,rgba(58,45,16,.06) 73px),linear-gradient(180deg,#120e08,#0b0805 62%,#0a0705 100%)}
 #arena-grid{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0,transparent 39px,rgba(58,45,16,.05) 39px,rgba(58,45,16,.05) 40px)}
 #floor{position:absolute;bottom:0;width:100%;height:34px;background:#0a0806;border-top:2px solid var(--line)}
 #p1z,#p2z{position:absolute;bottom:34px;display:flex;flex-direction:column;align-items:center;gap:4px;z-index:20} #p1z{left:64px} #p2z{right:64px}
@@ -87,7 +92,7 @@ button,input{font-family:inherit}
 #bnr,#combo-flash,#opp-indicator{position:absolute;left:50%;transform:translateX(-50%);background:#0a0906;border:1px solid var(--line);padding:5px 12px;letter-spacing:3px;font-size:11px;z-index:30}
 #bnr{top:32px;display:none} #combo-flash{bottom:42px;display:none} #opp-indicator{top:10px;display:none}
 #fx-canvas{position:absolute;inset:0;pointer-events:none;z-index:25}.floatxt{position:absolute;font-size:12px;pointer-events:none;z-index:50;text-shadow:1px 1px 0 #000}
-#status-bar{display:grid;grid-template-columns:repeat(7,1fr);padding:6px 12px;background:#100d08;border-bottom:1px solid var(--line);gap:10px;font-size:10px}
+#status-bar{display:grid;grid-template-columns:repeat(8,1fr);padding:6px 12px;background:#100d08;border-bottom:1px solid var(--line);gap:10px;font-size:10px}
 #status-bar span{display:flex;justify-content:space-between;color:var(--gold)} #status-bar span b{color:var(--paper2)}
 #log{min-height:50px;max-height:50px;padding:8px 12px;background:#090704;border-bottom:1px solid var(--line);font-size:11px;color:var(--paper2);line-height:1.5;overflow:hidden}
 #hand{display:flex;justify-content:center;gap:8px;padding:12px 10px;flex-wrap:wrap;min-height:138px;background:#0f0c08;border-bottom:1px solid var(--line)}
@@ -96,50 +101,104 @@ button,input{font-family:inherit}
 .hctop,.hcbot{position:absolute;font-size:9px;font-family:'Special Elite',serif}.hctop{top:3px;left:4px}.hcbot{bottom:3px;right:4px;transform:rotate(180deg)}
 .hcs{font-size:22px}.hcv{font-size:10px}.hct{font-size:8px;text-align:center}.hccost{position:absolute;top:3px;right:4px;font-size:8px;border:1px solid #6a5a39;padding:1px 3px;background:#efe0b9}.hcrare{position:absolute;bottom:4px;left:4px;font-size:7px}.suit-red .hcs,.suit-red .hcv,.suit-red .hctop,.suit-red .hcbot{color:var(--red)}
 #controls{background:#0b0906;padding:10px 12px} #hint{font-size:10px;color:var(--faded);text-align:center;letter-spacing:2px;min-height:14px;margin-bottom:8px}
-#btns{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}.panel-note{font-size:11px;color:#a99164;line-height:1.55}
+#btns{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
 @media (max-width:880px){.menu-shell,.builder-shell{grid-template-columns:1fr}.fireplace-wrap{min-height:340px}}
 </style>
 </head>
 <body>
 <div id="cabinet">
-<section id="screen-menu">
+<section id="screen-login">
+  <div class="login-card">
+    <div class="brand">CARD KOMBAT</div>
+    <div class="subbrand">DUELIST LOGIN</div>
+    <div class="cardbox">
+      <div class="section-title">Enter your duelist name</div>
+      <input class="input" id="loginName" maxlength="16" placeholder="DUELIST NAME">
+      <div class="panel-note" style="margin-top:10px">Stats are tied to this exact name and saved in Firebase. Use the same name to keep your wins, losses, and ELO.</div>
+      <div style="display:flex;gap:8px;margin-top:14px">
+        <button class="btn primary" id="loginBtn">Enter</button>
+      </div>
+      <div id="loginMsg" style="margin-top:10px;color:#d8bca0;font-size:11px"></div>
+    </div>
+  </div>
+</section>
+
+<section id="screen-menu" class="hidden">
   <div class="menu-shell">
     <div class="fireplace-wrap">
       <div class="parlor"></div><div class="frame">CARD<br>KOMBAT</div><div class="mantel"></div>
       <div class="hearth"><div class="fire-bricks"></div><div class="log l1"></div><div class="log l2"></div><div class="flame f1"></div><div class="flame f2"></div><div class="flame f3"></div><div class="ember e1"></div><div class="ember e2"></div><div class="ember e3"></div><div class="ember e4"></div></div>
-      <div class="rug"></div><div class="fire-note">Stoke the fire, tune the deck, then choose your path: casual duel, ranked queue, or a private room.</div>
+      <div class="rug"></div><div class="fire-note">This build hardens multiplayer first: atomic room joins, max two players, seat-token turn validation, profile stats, and consistent state transitions.</div>
     </div>
     <div class="menu-panel">
-      <div class="brand">CARD KOMBAT</div><div class="subbrand">DELUXE DUELIST EDITION</div>
-      <div class="cardbox"><div class="section-title">Profile</div><input class="input" id="playerNameHome" maxlength="14" placeholder="Enter duelist name"><div class="rating-box" style="margin-top:10px"><span>Local Rating</span><strong id="homeRating">1000</strong></div><div class="tiny" style="margin-top:8px">Ranked rating is stored in this browser for now, so you can test progression without signing in.</div></div>
-      <div class="cardbox"><div class="section-title">Play</div><div class="menu-grid"><button class="btn primary" id="offlineBtn">Offline vs AI</button><button class="btn" id="rankedBtn">Ranked Queue</button><button class="btn" id="createRoomBtn">Create Room</button><button class="btn" id="joinRoomMenuBtn">Join Room</button></div><div style="margin-top:10px;display:grid;gap:8px"><input class="input" id="joinCodeHome" maxlength="6" placeholder="Room code"><button class="btn" id="openBuilderBtn">Deck Builder</button></div><div id="home-message" style="margin-top:10px"></div></div>
+      <div class="brand">CARD KOMBAT</div><div class="subbrand">MULTIPLAYER HARDENED BUILD</div>
+      <div class="cardbox">
+        <div class="section-title">Profile</div>
+        <div class="rating-box"><span>Name</span><strong id="homeName">-</strong></div>
+        <div class="rating-box" style="margin-top:8px"><span>ELO</span><strong id="homeRating">1000</strong></div>
+        <div class="rating-box" style="margin-top:8px"><span>Wins</span><strong id="homeWins">0</strong></div>
+        <div class="rating-box" style="margin-top:8px"><span>Losses</span><strong id="homeLosses">0</strong></div>
+      </div>
+      <div class="cardbox">
+        <div class="section-title">Play</div>
+        <div class="menu-grid">
+          <button class="btn primary" id="offlineBtn">Offline vs AI</button>
+          <button class="btn" id="rankedBtn">Ranked Queue</button>
+          <button class="btn" id="createRoomBtn">Create Room</button>
+          <button class="btn" id="joinRoomMenuBtn">Join Room</button>
+        </div>
+        <div style="margin-top:10px;display:grid;gap:8px">
+          <input class="input" id="joinCodeHome" maxlength="6" placeholder="ROOM CODE">
+          <button class="btn" id="openBuilderBtn">Deck Builder</button>
+        </div>
+        <div id="home-message" style="margin-top:10px"></div>
+      </div>
       <div class="cardbox"><div class="section-title">Current Deck</div><div class="panel-note" id="deckSummary">24 cards loaded.</div></div>
-      <div class="cardbox"><div class="section-title">Modes</div><div class="panel-note">- Offline AI is fully local and stable.<br>- Ranked uses a shared Firebase queue with local browser rating.<br>- Drawing ends your turn. If your hand is empty, the game forces a draw or fatigue.</div></div>
+      <div class="cardbox"><div class="section-title">Networking Notes</div><div class="panel-note">- Room joins use Firebase transactions and stop at two seats.<br>- All actions are applied through a state reducer guarded by actor seat token + turn checks.<br>- Profiles are loaded from Firebase by name and updated on ranked results.</div></div>
     </div>
   </div>
 </section>
+
 <section id="screen-builder" class="hidden">
   <div class="builder-shell">
-    <div class="builder-left"><div class="section-title">Deck Builder</div><div class="panel-note" style="margin-bottom:10px">Build a 24-card deck. Max copies: common 4, uncommon 3, rare 2, legendary 1.</div><div class="statline"><span>Deck Size</span><strong id="deckCount">0 / 24</strong></div><div class="statline"><span>Commons</span><strong id="countCommon">0</strong></div><div class="statline"><span>Uncommons</span><strong id="countUncommon">0</strong></div><div class="statline"><span>Rares</span><strong id="countRare">0</strong></div><div class="statline"><span>Legendaries</span><strong id="countLegendary">0</strong></div><div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="btn primary" id="saveDeckBtn">Save Deck</button><button class="btn" id="resetDeckBtn">Default Deck</button><button class="btn" id="backHomeBtn">Back</button></div><div class="section-title" style="margin-top:16px">Deck List</div><div id="deckList" class="deck-list"></div></div>
+    <div class="builder-left">
+      <div class="section-title">Deck Builder</div>
+      <div class="panel-note" style="margin-bottom:10px">Build a 24-card deck. Max copies: common 4, uncommon 3, rare 2, legendary 1.</div>
+      <div class="statline"><span>Deck Size</span><strong id="deckCount">0 / 24</strong></div>
+      <div class="statline"><span>Commons</span><strong id="countCommon">0</strong></div>
+      <div class="statline"><span>Uncommons</span><strong id="countUncommon">0</strong></div>
+      <div class="statline"><span>Rares</span><strong id="countRare">0</strong></div>
+      <div class="statline"><span>Legendaries</span><strong id="countLegendary">0</strong></div>
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+        <button class="btn primary" id="saveDeckBtn">Save Deck</button>
+        <button class="btn" id="resetDeckBtn">Default Deck</button>
+        <button class="btn" id="backHomeBtn">Back</button>
+      </div>
+      <div class="section-title" style="margin-top:16px">Deck List</div>
+      <div id="deckList" class="deck-list"></div>
+    </div>
     <div class="builder-right"><div class="section-title">Card Library</div><div id="libraryGrid" class="library-grid"></div></div>
   </div>
 </section>
+
 <section id="screen-game" class="hidden">
   <div id="game-topbar"><div id="title-text">CARD KOMBAT</div><div style="display:flex;gap:8px;align-items:center"><button class="btn small" id="leaveMatchBtn">Leave Match</button><div id="net-status">● OFFLINE</div></div></div>
   <div id="game-info">
-    <div class="hw"><div class="hlbl" id="p1label">YOU</div><div class="ho"><div class="hi" id="p1h" style="width:100%"></div></div><div class="meta-row"><span>DECK <b id="p1DeckCount">0</b></span><span>HAND <b id="p1HandCount">0</b></span><span>RATING <b id="p1Rating">-</b></span></div><div class="energy-row" id="p1Energy"></div></div>
+    <div class="hw"><div class="hlbl" id="p1label">YOU</div><div class="ho"><div class="hi" id="p1h" style="width:100%"></div></div><div class="meta-row"><span>DECK <b id="p1DeckCount">0</b></span><span>HAND <b id="p1HandCount">0</b></span><span>ELO <b id="p1Rating">-</b></span></div><div class="energy-row" id="p1Energy"></div></div>
     <div id="tmr-wrap"><div id="tmr-label">TURN</div><div id="tmr">18</div><div id="tmr-bar-wrap"><div id="tmr-bar"></div></div></div>
-    <div class="hw" style="text-align:right"><div class="hlbl" id="p2label" style="text-align:right">FOE</div><div class="ho"><div class="hi" id="p2h" style="width:100%"></div></div><div class="meta-row" style="justify-content:flex-end"><span>DECK <b id="p2DeckCount">0</b></span><span>HAND <b id="p2HandCount">0</b></span><span>RATING <b id="p2Rating">-</b></span></div><div class="energy-row" id="p2Energy" style="justify-content:flex-end"></div></div>
+    <div class="hw" style="text-align:right"><div class="hlbl" id="p2label" style="text-align:right">FOE</div><div class="ho"><div class="hi" id="p2h" style="width:100%"></div></div><div class="meta-row" style="justify-content:flex-end"><span>DECK <b id="p2DeckCount">0</b></span><span>HAND <b id="p2HandCount">0</b></span><span>ELO <b id="p2Rating">-</b></span></div><div class="energy-row" id="p2Energy" style="justify-content:flex-end"></div></div>
   </div>
   <div id="arena"><div id="arena-grid"></div><canvas id="fx-canvas"></canvas><div id="p1z"><div class="fcard" id="fc1"><div class="fp">1</div><div class="fsuit">♠</div><div class="fcard-name">YOU</div><div class="fpb">1</div></div><div class="fname-tag">P1</div></div><div id="p2z"><div class="fcard" id="fc2" style="transform:scaleX(-1)"><div class="fp">2</div><div class="fsuit">♦</div><div class="fcard-name">FOE</div><div class="fpb">2</div></div><div class="fname-tag" style="transform:scaleX(-1)">P2</div></div><div id="floor"></div><div id="bnr"></div><div id="combo-flash"></div><div id="opp-indicator">OPPONENT IS THINKING...</div></div>
-  <div id="status-bar"><span>ATK <b id="s-atk">0</b></span><span>DEF <b id="s-def">0</b></span><span>SPD <b id="s-spd">0</b></span><span>BLEED <b id="s-bld">0</b></span><span>CURSE <b id="s-crs">0</b></span><span>ENERGY <b id="s-eng">0</b></span><span>COMBO <b id="s-cmb">0</b></span></div>
+  <div id="status-bar"><span>ATK <b id="s-atk">0</b></span><span>DEF <b id="s-def">0</b></span><span>SPD <b id="s-spd">0</b></span><span>BLEED <b id="s-bld">0</b></span><span>CURSE <b id="s-crs">0</b></span><span>ENERGY <b id="s-eng">0</b></span><span>COMBO <b id="s-cmb">0</b></span><span>SEQ <b id="s-seq">0</b></span></div>
   <div id="log">Awaiting duel...</div><div id="hand"></div>
   <div id="controls"><div id="hint">-- choose an action --</div><div id="btns"><button class="btn" id="discardBtn">Discard (+1 energy)</button><button class="btn primary" id="playbtn">Play Card</button><button class="btn" id="drawbtn">Draw (end turn)</button></div></div>
 </section>
 </div>
+
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-import { getDatabase, ref, set, get, onValue, push, remove } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
+import { getDatabase, ref, set, get, onValue, push, remove, runTransaction, update } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
 
 const firebaseConfig = {apiKey:"AIzaSyBGXQGsslxSl1AwSu83SMkFi5_aJ-Qhqk4",authDomain:"cardkombat.firebaseapp.com",projectId:"cardkombat",storageBucket:"cardkombat.firebasestorage.app",messagingSenderId:"616844059072",appId:"1:616844059072:web:ba1e4897308e9e9ab8e825",databaseURL:"https://cardkombat-default-rtdb.firebaseio.com"};
 const app = initializeApp(firebaseConfig);
@@ -151,114 +210,376 @@ const VAL_POWER={2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,10:10,J:11,Q:12,K:13,A:14};
 const RARITY_RULES={common:{copies:4,cost:1},uncommon:{copies:3,cost:1},rare:{copies:2,cost:2},legendary:{copies:1,cost:3}};
 const CARD_LIBRARY=[{id:'spade_5', suit:'spade', val:'5', rarity:'common'},{id:'spade_7', suit:'spade', val:'7', rarity:'common'},{id:'spade_9', suit:'spade', val:'9', rarity:'uncommon'},{id:'heart_4', suit:'heart', val:'4', rarity:'common'},{id:'heart_7', suit:'heart', val:'7', rarity:'common'},{id:'heart_Q', suit:'heart', val:'Q', rarity:'rare'},{id:'club_5', suit:'club', val:'5', rarity:'common'},{id:'club_8', suit:'club', val:'8', rarity:'uncommon'},{id:'diamond_5', suit:'diamond', val:'5', rarity:'common'},{id:'diamond_8', suit:'diamond', val:'8', rarity:'uncommon'},{id:'drain_6', suit:'drain', val:'6', rarity:'uncommon'},{id:'wound_6', suit:'wound', val:'6', rarity:'uncommon'},{id:'void_8', suit:'void', val:'8', rarity:'rare'},{id:'mirror_9', suit:'mirror', val:'9', rarity:'rare'},{id:'spade_K', suit:'spade', val:'K', rarity:'rare'},{id:'drain_J', suit:'drain', val:'J', rarity:'rare'},{id:'wound_A', suit:'wound', val:'A', rarity:'legendary'},{id:'mirror_A', suit:'mirror', val:'A', rarity:'legendary'}];
 
-let mode='menu', onlineType=null, roomId=null, myRole='p1', gameState=null, selectedIndex=null, gameOver=false, timerInt=null, particles=[], canvas=null, ctx=null, stateUnsubscribe=null, aiTimeout=null, queuePoll=null;
-const LS={name:'ck_name_v3',rating:'ck_rating_v3',deck:'ck_deck_v3'};
+const LS={name:'ck_name_secure',deck:'ck_deck_secure',seatToken:'ck_seat_token',session:'ck_session_token'};
 const $=s=>document.querySelector(s), mf=Math.floor, rr=()=>Math.random();
+let mode='menu', onlineType=null, roomId=null, myRole='p1', gameState=null, selectedIndex=null, gameOver=false, timerInt=null, particles=[], canvas=null, ctx=null, stateUnsubscribe=null, aiTimeout=null, queuePoll=null;
+let currentProfile={name:'',wins:0,losses:0,elo:1000};
+let seatToken = localStorage.getItem(LS.seatToken) || crypto.randomUUID();
+localStorage.setItem(LS.seatToken, seatToken);
+let sessionToken = localStorage.getItem(LS.session) || crypto.randomUUID();
+localStorage.setItem(LS.session, sessionToken);
 
-function getStoredName(){return localStorage.getItem(LS.name)||'PLAYER'}
-function setStoredName(name){localStorage.setItem(LS.name,name||'PLAYER')}
-function getRating(){return Number(localStorage.getItem(LS.rating)||1000)}
-function setRating(v){localStorage.setItem(LS.rating,String(v)); renderHome()}
+function profileKey(name){ return name.trim().toUpperCase().replace(/[^A-Z0-9_ -]/g,'').replace(/\s+/g,'_') }
 function msg(t){$('#home-message').textContent=t}
+function loginMsg(t){$('#loginMsg').textContent=t}
 function gSuit(s){return SUITS[s]||SUITS.spade}
-function shuffle(arr){const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=mf(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]} return a}
-function getDefaultDeck(){return ['spade_5','spade_5','spade_7','spade_7','spade_9','heart_4','heart_4','heart_7','heart_7','heart_Q','club_5','club_5','club_8','club_8','diamond_5','diamond_5','diamond_8','diamond_8','drain_6','drain_J','wound_6','wound_A','void_8','mirror_9']}
+function getStoredName(){return localStorage.getItem(LS.name)||''}
+function setStoredName(name){localStorage.setItem(LS.name,name)}
 function getDeck(){const raw=localStorage.getItem(LS.deck); if(!raw) return getDefaultDeck(); try{const parsed=JSON.parse(raw); return Array.isArray(parsed)&&parsed.length===DECK_SIZE?parsed:getDefaultDeck()}catch{return getDefaultDeck()}}
 function saveDeck(deck){localStorage.setItem(LS.deck,JSON.stringify(deck)); renderHome()}
+function getDefaultDeck(){return ['spade_5','spade_5','spade_7','spade_7','spade_9','heart_4','heart_4','heart_7','heart_7','heart_Q','club_5','club_5','club_8','club_8','diamond_5','diamond_5','diamond_8','diamond_8','drain_6','drain_J','wound_6','wound_A','void_8','mirror_9']}
+function shuffle(arr){const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=mf(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]} return a}
+function makeDeckFromList(list){return shuffle(list.map(id=>{const base=CARD_LIBRARY.find(c=>c.id===id); return {...base,pw:VAL_POWER[base.val],cost:RARITY_RULES[base.rarity].cost}}))}
 function deepClone(v){return JSON.parse(JSON.stringify(v))}
-function roomCode(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let out=''; for(let i=0;i<5;i++) out+=chars[mf(rr()*chars.length)]; return out}
-function getLocalPlayerName(){const v=($('#playerNameHome').value||'').trim().toUpperCase(); return v||getStoredName()}
-function canPlayCard(player, card){return !!card && player.energy >= (card.cost||1)}
-function setScreen(which){$('#screen-menu').classList.toggle('hidden',which!=='menu'); $('#screen-builder').classList.toggle('hidden',which!=='builder'); $('#screen-game').classList.toggle('hidden',which!=='game')}
+function setScreen(which){$('#screen-login').classList.toggle('hidden',which!=='login'); $('#screen-menu').classList.toggle('hidden',which!=='menu'); $('#screen-builder').classList.toggle('hidden',which!=='builder'); $('#screen-game').classList.toggle('hidden',which!=='game')}
 function clearOnlineListeners(){if(stateUnsubscribe){stateUnsubscribe(); stateUnsubscribe=null} if(queuePoll){clearInterval(queuePoll); queuePoll=null}}
 function clearAITimeout(){if(aiTimeout){clearTimeout(aiTimeout); aiTimeout=null}}
 function logText(t){$('#log').textContent=t}
 function showBanner(t){const b=$('#bnr'); b.textContent=t; b.style.display='block'; setTimeout(()=>b.style.display='none',1600)}
 function showCombo(t){const c=$('#combo-flash'); c.textContent=t; c.style.display='block'; setTimeout(()=>c.style.display='none',1200)}
-function makeDeckFromList(list){return shuffle(list.map(id=>{const base=CARD_LIBRARY.find(c=>c.id===id); return {...base,pw:VAL_POWER[base.val],cost:RARITY_RULES[base.rarity].cost}}))}
-function newFighter(name, deckList, rating=1000){const deck=makeDeckFromList(deckList), hand=[]; for(let i=0;i<5;i++) if(deck.length) hand.push(deck.shift()); return {name,hp:STARTING_HP,atk:8,def:5,spd:5,bleed:0,curse:0,energy:MAX_ENERGY,maxEnergy:MAX_ENERGY,hand,deck,discard:[],rating,combo:0,mirror:false,queenBuff:false}}
+function getLocalPlayerName(){return currentProfile.name}
+function canPlayCard(player, card){return !!card && player.energy >= (card.cost||1)}
 
-function renderHome(){ $('#playerNameHome').value=getStoredName(); $('#homeRating').textContent=getRating(); const deck=getDeck(); const rareCounts={common:0,uncommon:0,rare:0,legendary:0}; deck.forEach(id=>rareCounts[CARD_LIBRARY.find(c=>c.id===id).rarity]++); $('#deckSummary').textContent=`${deck.length} cards ready. Common ${rareCounts.common}, Uncommon ${rareCounts.uncommon}, Rare ${rareCounts.rare}, Legendary ${rareCounts.legendary}.` }
-function renderBuilder(){ const deck=getDeck(), counts={}, rarityTotals={common:0,uncommon:0,rare:0,legendary:0}; deck.forEach(id=>{counts[id]=(counts[id]||0)+1; rarityTotals[CARD_LIBRARY.find(c=>c.id===id).rarity]++}); $('#deckCount').textContent=`${deck.length} / ${DECK_SIZE}`; $('#countCommon').textContent=rarityTotals.common; $('#countUncommon').textContent=rarityTotals.uncommon; $('#countRare').textContent=rarityTotals.rare; $('#countLegendary').textContent=rarityTotals.legendary; const deckList=$('#deckList'), grid=$('#libraryGrid'); deckList.innerHTML=''; grid.innerHTML=''; Object.entries(counts).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([id,count])=>{const c=CARD_LIBRARY.find(x=>x.id===id); const row=document.createElement('div'); row.className='deck-row'; row.innerHTML=`<div><strong>${gSuit(c.suit).g} ${gSuit(c.suit).desc} ${c.val}</strong><span class="badge ${c.rarity}" style="margin-left:8px">${c.rarity}</span></div><div style="display:flex;align-items:center;gap:8px"><span>x${count}</span><button class="btn small danger" data-remove="${id}">-1</button></div>`; deckList.appendChild(row)}); CARD_LIBRARY.forEach(c=>{const copies=counts[c.id]||0, limit=RARITY_RULES[c.rarity].copies, canAdd=copies<limit && deck.length<DECK_SIZE; const card=document.createElement('div'); card.className='lib-card'; card.innerHTML=`<div class="top"><span>${c.val}</span><span class="badge ${c.rarity}">${c.rarity}</span></div><div class="glyph">${gSuit(c.suit).g}</div><div class="name">${gSuit(c.suit).desc}</div><div class="meta">Cost: ${RARITY_RULES[c.rarity].cost}<br>Copies: ${copies}/${limit}<br>Base suit: ${c.suit}</div><div class="controls"><button class="btn small" data-add="${c.id}" ${canAdd?'':'disabled'}>Add</button><button class="btn small danger" data-remove="${c.id}" ${copies?'':'disabled'}>Remove</button></div>`; grid.appendChild(card)})}
+async function ensureProfile(name){
+  const key=profileKey(name);
+  const profileRef=ref(db,`profiles/${key}`);
+  const res = await runTransaction(profileRef, cur=>{
+    if(cur===null){
+      return {name:name.trim().toUpperCase(), wins:0, losses:0, elo:1000, updatedAt:Date.now()}
+    }
+    return cur
+  });
+  currentProfile = res.snapshot.val();
+  setStoredName(currentProfile.name);
+  renderHome();
+}
+async function updateProfileAfterRanked(win, oppElo=1000){
+  const name=currentProfile.name;
+  if(!name) return;
+  const key=profileKey(name);
+  const expected = 1 / (1 + Math.pow(10, (oppElo - currentProfile.elo)/400));
+  const score = win ? 1 : 0;
+  const newElo = Math.max(600, Math.round(currentProfile.elo + 24*(score - expected)));
+  currentProfile = {...currentProfile, elo:newElo, wins:currentProfile.wins + (win?1:0), losses:currentProfile.losses + (win?0:1)};
+  await set(ref(db,`profiles/${key}`), {...currentProfile, updatedAt:Date.now()});
+  renderHome();
+}
+
+function renderHome(){
+  $('#homeName').textContent=currentProfile.name||'-';
+  $('#homeRating').textContent=currentProfile.elo||1000;
+  $('#homeWins').textContent=currentProfile.wins||0;
+  $('#homeLosses').textContent=currentProfile.losses||0;
+  const deck=getDeck(); const rareCounts={common:0,uncommon:0,rare:0,legendary:0}; deck.forEach(id=>rareCounts[CARD_LIBRARY.find(c=>c.id===id).rarity]++); $('#deckSummary').textContent=`${deck.length} cards ready. Common ${rareCounts.common}, Uncommon ${rareCounts.uncommon}, Rare ${rareCounts.rare}, Legendary ${rareCounts.legendary}.`
+}
+function renderBuilder(){
+  const deck=getDeck(), counts={}, rarityTotals={common:0,uncommon:0,rare:0,legendary:0}; deck.forEach(id=>{counts[id]=(counts[id]||0)+1; rarityTotals[CARD_LIBRARY.find(c=>c.id===id).rarity]++});
+  $('#deckCount').textContent=`${deck.length} / ${DECK_SIZE}`; $('#countCommon').textContent=rarityTotals.common; $('#countUncommon').textContent=rarityTotals.uncommon; $('#countRare').textContent=rarityTotals.rare; $('#countLegendary').textContent=rarityTotals.legendary;
+  const deckList=$('#deckList'), grid=$('#libraryGrid'); deckList.innerHTML=''; grid.innerHTML='';
+  Object.entries(counts).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([id,count])=>{const c=CARD_LIBRARY.find(x=>x.id===id); const row=document.createElement('div'); row.className='deck-row'; row.innerHTML=`<div><strong>${gSuit(c.suit).g} ${gSuit(c.suit).desc} ${c.val}</strong><span class="badge ${c.rarity}" style="margin-left:8px">${c.rarity}</span></div><div style="display:flex;align-items:center;gap:8px"><span>x${count}</span><button class="btn small danger" data-remove="${id}">-1</button></div>`; deckList.appendChild(row)});
+  CARD_LIBRARY.forEach(c=>{const copies=counts[c.id]||0, limit=RARITY_RULES[c.rarity].copies, canAdd=copies<limit && deck.length<DECK_SIZE; const card=document.createElement('div'); card.className='lib-card'; card.innerHTML=`<div class="top"><span>${c.val}</span><span class="badge ${c.rarity}">${c.rarity}</span></div><div class="glyph">${gSuit(c.suit).g}</div><div class="name">${gSuit(c.suit).desc}</div><div class="meta">Cost: ${RARITY_RULES[c.rarity].cost}<br>Copies: ${copies}/${limit}<br>Base suit: ${c.suit}</div><div class="controls"><button class="btn small" data-add="${c.id}" ${canAdd?'':'disabled'}>Add</button><button class="btn small danger" data-remove="${c.id}" ${copies?'':'disabled'}>Remove</button></div>`; grid.appendChild(card)})
+}
 function mutateDeck(action,id){const deck=getDeck(), card=CARD_LIBRARY.find(c=>c.id===id); if(!card) return; const count=deck.filter(x=>x===id).length, limit=RARITY_RULES[card.rarity].copies; if(action==='add'){if(deck.length>=DECK_SIZE||count>=limit) return; deck.push(id)} else {const idx=deck.indexOf(id); if(idx>=0) deck.splice(idx,1)} saveDeck(deck); renderBuilder()}
 
-function startOfTurn(state, role){const pl=state[role]; if(!pl) return {forced:false, log:[]}; pl.energy=pl.maxEnergy; let log=[]; if(pl.bleed>0){const dmg=mf(pl.bleed*2+rr()*2); pl.hp=Math.max(0,pl.hp-dmg); pl.bleed=Math.max(0,pl.bleed-1); log.push(`${pl.name} bleeds for ${dmg}`)} if(pl.curse>0){const dmg=mf(pl.curse*2+rr()*2); pl.hp=Math.max(0,pl.hp-dmg); pl.curse=Math.max(0,pl.curse-1); log.push(`${pl.name} suffers ${dmg} curse`)} if(pl.hand.length===0){if(pl.deck.length>0){pl.hand.push(pl.deck.shift()); pl.energy=0; log.push(`${pl.name} is forced to draw and loses the turn`); return {forced:true, log}} else {pl.hp=Math.max(0,pl.hp-6); pl.energy=0; log.push(`${pl.name} has no cards left and takes 6 fatigue`); return {forced:true, log}}} return {forced:false, log}}
-function passTurn(state){const next=state.turn==='p1'?'p2':'p1'; state.turn=next; state.round+=1; const start=startOfTurn(state,next); return start.log}
-function drawCardAndEndTurn(state, role, reason='draw'){const pl=state[role]; if(pl.deck.length>0) pl.hand.push(pl.deck.shift()); else pl.hp=Math.max(0,pl.hp-6); pl.energy=0; state.lastAction={by:role,type:reason,_seen:false}; return passTurn(state)}
-function discardCardForEnergy(state, role, handIndex){const pl=state[role], card=pl.hand.splice(handIndex,1)[0]; if(card) pl.discard.push(card); pl.energy=Math.min(pl.maxEnergy,pl.energy+1); state.lastAction={by:role,type:'discard',card:card?.id,_seen:false}}
-function resolveCardPlay(state, role, handIndex){const me=state[role], oppRole=role==='p1'?'p2':'p1', foe=state[oppRole], card=me.hand[handIndex]; if(!card||!canPlayCard(me,card)) return {text:'Cannot play that card.',passed:[]}; me.hand.splice(handIndex,1); me.discard.push(card); me.energy-=(card.cost||1); let comboBonus=0; if(state.lastSuit===card.suit){me.combo=(me.combo||0)+1; comboBonus=Math.min(me.combo*2,8); showCombo(`COMBO x${me.combo}`)} else me.combo=0; const suit=gSuit(card.suit), basePow=card.pw+comboBonus; let text=[]; if(card.val==='J'){const steal=mf(2+rr()*3); me.atk=Math.min(20,me.atk+steal); foe.atk=Math.max(1,foe.atk-steal); text.push(`KNAVE steals ${steal} ATK`)} else if(card.val==='Q'){const heal=mf(7+rr()*6); me.hp=Math.min(STARTING_HP,me.hp+heal); me.queenBuff=true; foe.curse=Math.min(8,foe.curse+2); text.push(`QUEEN heals ${heal} and empowers the next hit`)} else if(card.val==='K'){me.atk=Math.min(20,me.atk+2); me.def=Math.min(16,me.def+2); me.spd=Math.min(16,me.spd+1); const royal=mf(4+me.atk*0.35); foe.hp=Math.max(0,foe.hp-royal); text.push(`KING fortifies and strikes for ${royal}`)} else if(card.val==='A'){const dmg=mf(basePow*0.75+me.atk*0.45+rr()*3), dealt=Math.max(2,dmg-mf(foe.def*0.25)); if(foe.mirror){me.hp=Math.max(0,me.hp-mf(dealt*0.6)); foe.mirror=false; text.push(`ACE hit is reflected for ${mf(dealt*0.6)}`)} else {foe.hp=Math.max(0,foe.hp-dealt); text.push(`ACE crashes in for ${dealt}`)}} else {if(suit.base==='strike'){let dmg=mf(basePow*0.52+me.atk*0.35+rr()*3); if(me.queenBuff){dmg=mf(dmg*1.35); me.queenBuff=false; text.push('QUEEN buff triggers')} dmg=Math.max(1,dmg-mf(foe.def*0.33+rr()*2)); if(foe.mirror){me.hp=Math.max(0,me.hp-mf(dmg*0.55)); foe.mirror=false; text.push(`STRIKE is partly mirrored for ${mf(dmg*0.55)}`)} else {foe.hp=Math.max(0,foe.hp-dmg); text.push(`STRIKE deals ${dmg}`)}} if(suit.base==='mend'){const heal=mf(basePow*0.42+me.def*0.25+rr()*3); me.hp=Math.min(STARTING_HP,me.hp+heal); text.push(`MEND restores ${heal}`)} if(suit.base==='brace'){const dDef=Math.max(1,mf(basePow*0.16)), dHp=Math.max(1,mf(basePow*0.20)); me.def=Math.min(16,me.def+dDef); me.hp=Math.min(STARTING_HP,me.hp+dHp); text.push(`BRACE grants +${dDef} DEF and ${dHp} HP`)} if(suit.base==='curse'){const dmg=mf(basePow*0.28+rr()*3); foe.hp=Math.max(0,foe.hp-dmg); foe.curse=Math.min(8,foe.curse+2); text.push(`CURSE deals ${dmg} and adds 2 curse`)} if(suit.base==='drain'){const dmg=mf(basePow*0.45+me.atk*0.25+rr()*3), steal=Math.max(1,mf(dmg*0.45)); foe.hp=Math.max(0,foe.hp-dmg); me.hp=Math.min(STARTING_HP,me.hp+steal); text.push(`DRAIN steals ${steal} life from ${dmg} damage`)} if(suit.base==='wound'){const dmg=mf(basePow*0.38+me.atk*0.28+rr()*3); foe.hp=Math.max(0,foe.hp-dmg); foe.bleed=Math.min(8,foe.bleed+2); text.push(`WOUND deals ${dmg} and adds 2 bleed`)} if(suit.base==='void'){foe.bleed=0; foe.curse=0; const dmg=mf(basePow*0.36+rr()*4); foe.hp=Math.max(0,foe.hp-dmg); text.push(`VOID purges debuffs and hits for ${dmg}`)} if(suit.base==='mirror'){me.mirror=true; text.push(`MIRROR readies a reflection`)}} state.lastSuit=card.suit; state.lastAction={by:role,type:'play',cardId:card.id,suit:card.suit,val:card.val,text:text.join(' | '),_seen:false}; const passed=passTurn(state); return {text:text.join(' | '),passed}}
-function checkForWinner(state){if(state.p1.hp<=0 && state.p2.hp<=0){state.status='gameover'; state.winner=state.p1.hp>=state.p2.hp?'p1':'p2'} else if(state.p1.hp<=0){state.status='gameover'; state.winner='p2'} else if(state.p2.hp<=0){state.status='gameover'; state.winner='p1'} else state.status='playing'}
-function initializeMatchState(base){const state=deepClone(base), startLog=startOfTurn(state,state.turn).log; checkForWinner(state); if(startLog.length) state.lastAction={by:state.turn,type:'turnstart',text:startLog.join(' | '),_seen:false}; return state}
+function newFighter(name, deckList, elo=1000, token=''){
+  const deck=makeDeckFromList(deckList), hand=[]; for(let i=0;i<5;i++) if(deck.length) hand.push(deck.shift());
+  return {name,hp:STARTING_HP,atk:8,def:5,spd:5,bleed:0,curse:0,energy:MAX_ENERGY,maxEnergy:MAX_ENERGY,hand,deck,discard:[],elo,wins:0,losses:0,combo:0,mirror:false,queenBuff:false,seatToken:token}
+}
+function startOfTurn(state, role){
+  const pl=state[role]; if(!pl) return {forced:false, log:[]};
+  pl.energy=pl.maxEnergy;
+  let log=[];
+  if(pl.bleed>0){const dmg=mf(pl.bleed*2+rr()*2); pl.hp=Math.max(0,pl.hp-dmg); pl.bleed=Math.max(0,pl.bleed-1); log.push(`${pl.name} bleeds for ${dmg}`)}
+  if(pl.curse>0){const dmg=mf(pl.curse*2+rr()*2); pl.hp=Math.max(0,pl.hp-dmg); pl.curse=Math.max(0,pl.curse-1); log.push(`${pl.name} suffers ${dmg} curse`)}
+  if(pl.hand.length===0){
+    if(pl.deck.length>0){pl.hand.push(pl.deck.shift()); pl.energy=0; log.push(`${pl.name} is forced to draw and loses the turn`); return {forced:true, log}}
+    pl.hp=Math.max(0,pl.hp-6); pl.energy=0; log.push(`${pl.name} has no cards left and takes 6 fatigue`); return {forced:true, log}
+  }
+  return {forced:false, log}
+}
+function passTurn(state){
+  const next=state.turn==='p1'?'p2':'p1';
+  state.turn=next;
+  state.round+=1;
+  state.seq=(state.seq||0)+1;
+  return startOfTurn(state,next).log
+}
+function drawCardAndEndTurn(state, role, reason='draw'){
+  const pl=state[role];
+  if(pl.deck.length>0) pl.hand.push(pl.deck.shift()); else pl.hp=Math.max(0,pl.hp-6);
+  pl.energy=0;
+  state.lastAction={by:role,type:reason,_seen:false};
+  return passTurn(state)
+}
+function discardCardForEnergy(state, role, handIndex){
+  const pl=state[role], card=pl.hand.splice(handIndex,1)[0];
+  if(card) pl.discard.push(card);
+  pl.energy=Math.min(pl.maxEnergy,pl.energy+1);
+  state.lastAction={by:role,type:'discard',card:card?.id,_seen:false}
+}
+function resolveCardPlay(state, role, handIndex){
+  const me=state[role], oppRole=role==='p1'?'p2':'p1', foe=state[oppRole], card=me.hand[handIndex];
+  if(!card || !canPlayCard(me,card)) return {text:'Cannot play that card.', passed:[]};
+  me.hand.splice(handIndex,1); me.discard.push(card); me.energy-=(card.cost||1);
+  let comboBonus=0;
+  if(state.lastSuit===card.suit){me.combo=(me.combo||0)+1; comboBonus=Math.min(me.combo*2,8); showCombo(`COMBO x${me.combo}`)} else me.combo=0;
+  const suit=gSuit(card.suit), basePow=card.pw+comboBonus; let text=[];
+  if(card.val==='J'){const steal=mf(2+rr()*3); me.atk=Math.min(20,me.atk+steal); foe.atk=Math.max(1,foe.atk-steal); text.push(`KNAVE steals ${steal} ATK`)}
+  else if(card.val==='Q'){const heal=mf(7+rr()*6); me.hp=Math.min(STARTING_HP,me.hp+heal); me.queenBuff=true; foe.curse=Math.min(8,foe.curse+2); text.push(`QUEEN heals ${heal} and empowers the next hit`)}
+  else if(card.val==='K'){me.atk=Math.min(20,me.atk+2); me.def=Math.min(16,me.def+2); me.spd=Math.min(16,me.spd+1); const royal=mf(4+me.atk*0.35); foe.hp=Math.max(0,foe.hp-royal); text.push(`KING fortifies and strikes for ${royal}`)}
+  else if(card.val==='A'){const dmg=mf(basePow*0.75+me.atk*0.45+rr()*3), dealt=Math.max(2,dmg-mf(foe.def*0.25)); if(foe.mirror){me.hp=Math.max(0,me.hp-mf(dealt*0.6)); foe.mirror=false; text.push(`ACE hit is reflected for ${mf(dealt*0.6)}`)} else {foe.hp=Math.max(0,foe.hp-dealt); text.push(`ACE crashes in for ${dealt}`)}}
+  else {
+    if(suit.base==='strike'){let dmg=mf(basePow*0.52+me.atk*0.35+rr()*3); if(me.queenBuff){dmg=mf(dmg*1.35); me.queenBuff=false; text.push('QUEEN buff triggers')} dmg=Math.max(1,dmg-mf(foe.def*0.33+rr()*2)); if(foe.mirror){me.hp=Math.max(0,me.hp-mf(dmg*0.55)); foe.mirror=false; text.push(`STRIKE is partly mirrored for ${mf(dmg*0.55)}`)} else {foe.hp=Math.max(0,foe.hp-dmg); text.push(`STRIKE deals ${dmg}`)}}
+    if(suit.base==='mend'){const heal=mf(basePow*0.42+me.def*0.25+rr()*3); me.hp=Math.min(STARTING_HP,me.hp+heal); text.push(`MEND restores ${heal}`)}
+    if(suit.base==='brace'){const dDef=Math.max(1,mf(basePow*0.16)), dHp=Math.max(1,mf(basePow*0.20)); me.def=Math.min(16,me.def+dDef); me.hp=Math.min(STARTING_HP,me.hp+dHp); text.push(`BRACE grants +${dDef} DEF and ${dHp} HP`)}
+    if(suit.base==='curse'){const dmg=mf(basePow*0.28+rr()*3); foe.hp=Math.max(0,foe.hp-dmg); foe.curse=Math.min(8,foe.curse+2); text.push(`CURSE deals ${dmg} and adds 2 curse`)}
+    if(suit.base==='drain'){const dmg=mf(basePow*0.45+me.atk*0.25+rr()*3), steal=Math.max(1,mf(dmg*0.45)); foe.hp=Math.max(0,foe.hp-dmg); me.hp=Math.min(STARTING_HP,me.hp+steal); text.push(`DRAIN steals ${steal} life from ${dmg} damage`)}
+    if(suit.base==='wound'){const dmg=mf(basePow*0.38+me.atk*0.28+rr()*3); foe.hp=Math.max(0,foe.hp-dmg); foe.bleed=Math.min(8,foe.bleed+2); text.push(`WOUND deals ${dmg} and adds 2 bleed`)}
+    if(suit.base==='void'){foe.bleed=0; foe.curse=0; const dmg=mf(basePow*0.36+rr()*4); foe.hp=Math.max(0,foe.hp-dmg); text.push(`VOID purges debuffs and hits for ${dmg}`)}
+    if(suit.base==='mirror'){me.mirror=true; text.push(`MIRROR readies a reflection`)}
+  }
+  state.lastSuit=card.suit;
+  state.lastAction={by:role,type:'play',cardId:card.id,suit:card.suit,val:card.val,text:text.join(' | '),_seen:false};
+  return {text:text.join(' | '), passed:passTurn(state)}
+}
+function checkForWinner(state){
+  if(state.p1.hp<=0 && state.p2.hp<=0){state.status='gameover'; state.winner=state.p1.hp>=state.p2.hp?'p1':'p2'}
+  else if(state.p1.hp<=0){state.status='gameover'; state.winner='p2'}
+  else if(state.p2.hp<=0){state.status='gameover'; state.winner='p1'}
+  else state.status='playing'
+}
+function initializeMatchState(base){
+  const state=deepClone(base);
+  state.seq=0;
+  state.maxPlayers=2;
+  const startLog=startOfTurn(state,state.turn).log;
+  checkForWinner(state);
+  if(startLog.length) state.lastAction={by:state.turn,type:'turnstart',text:startLog.join(' | '),_seen:false};
+  return state
+}
 
-function enterGame(){setScreen('game'); initCanvas()}
-function leaveMatchToMenu(){clearInterval(timerInt); clearAITimeout(); clearOnlineListeners(); mode='menu'; onlineType=null; roomId=null; gameState=null; gameOver=false; selectedIndex=null; $('#opp-indicator').style.display='none'; setScreen('menu'); renderHome(); msg('')}
-function getAIDeck(){return ['spade_7','spade_7','spade_9','spade_K','heart_4','heart_7','heart_Q','club_5','club_8','club_8','diamond_5','diamond_8','diamond_8','drain_6','drain_6','drain_J','wound_6','wound_6','wound_A','void_8','mirror_9','mirror_A','heart_4','spade_5']}
-function startLocalGame(){const name=getLocalPlayerName(); setStoredName(name); clearInterval(timerInt); clearAITimeout(); mode='local'; onlineType=null; myRole='p1'; gameOver=false; selectedIndex=null; const base={mode:'local',ranked:false,turn:'p1',round:1,status:'playing',lastSuit:null,p1:newFighter(name,getDeck(),getRating()),p2:newFighter('EMBER AI',getAIDeck(),1200),lastAction:null}; gameState=initializeMatchState(base); enterGame(); renderGame(); showBanner('OFFLINE VS AI'); logText('The AI studies your opening hand.'); beginTurnIfNeeded()}
-async function createCasualRoom(){const name=getLocalPlayerName(); setStoredName(name); clearInterval(timerInt); clearOnlineListeners(); mode='online'; onlineType='casual'; myRole='p1'; gameOver=false; selectedIndex=null; roomId=roomCode(); const base={mode:'online',ranked:false,turn:'p1',round:1,status:'waiting', ready:false,created:Date.now(),lastSuit:null,p1:newFighter(name,getDeck(),getRating()),p2:newFighter('FOE',getDeck(),1000),lastAction:null}; const state=initializeMatchState(base); await set(ref(db,`rooms/${roomId}`),state); enterGame(); renderGame(); setNetStatus('waiting',`● ROOM ${roomId} WAITING`); listenToRoom(roomId); logText(`Room ${roomId} is waiting for an opponent.`)}
-async function joinCasualRoom(code){const name=getLocalPlayerName(); setStoredName(name); const snap=await get(ref(db,`rooms/${code}`)); if(!snap.exists()){msg('Room not found.'); return} const state=snap.val(); if(state.status==='playing' && state.p2 && state.p2.name){msg('That room is already full.'); return} mode='online'; onlineType='casual'; myRole='p2'; roomId=code; gameOver=false; selectedIndex=null; state.p2=newFighter(name,getDeck(),getRating()); state.status='playing'; await set(ref(db,`rooms/${code}`),state); enterGame(); listenToRoom(code)}
-async function joinRankedQueue(){const name=getLocalPlayerName(); setStoredName(name); msg('Searching ranked queue...'); mode='online'; onlineType='ranked'; myRole='p1'; const me={name,rating:getRating(),deck:getDeck(),joined:Date.now()}, myTicketRef=push(ref(db,'rankedQueue')), myTicketId=myTicketRef.key; await set(myTicketRef,me); const queueSnap=await get(ref(db,'rankedQueue')), all=queueSnap.val()||{}; const others=Object.entries(all).filter(([id])=>id!==myTicketId).map(([id,v])=>({id,...v})).sort((a,b)=>Math.abs(a.rating-me.rating)-Math.abs(b.rating-me.rating)); if(others.length){const opp=others[0]; roomId=roomCode(); const base={mode:'online',ranked:true,turn:'p1',round:1,status:'playing',created:Date.now(),lastSuit:null,p1:newFighter(name,me.deck,me.rating),p2:newFighter(opp.name,opp.deck,opp.rating),lastAction:null}; const roomState=initializeMatchState(base); await set(ref(db,`rooms/${roomId}`),roomState); await remove(ref(db,`rankedQueue/${opp.id}`)); await remove(ref(db,`rankedQueue/${myTicketId}`)); myRole='p1'; enterGame(); listenToRoom(roomId); msg('Ranked match found.'); return} queuePoll=setInterval(async()=>{const meSnap=await get(ref(db,`rankedQueue/${myTicketId}`)); if(!meSnap.exists()){clearInterval(queuePoll); return} const qs=await get(ref(db,'rooms')), rooms=qs.val()||{}; for(const [rid,room] of Object.entries(rooms)){if(room.ranked && room.status==='playing' && room.p2 && room.p2.name===name && room.p2.rating===me.rating){roomId=rid; myRole='p2'; await remove(ref(db,`rankedQueue/${myTicketId}`)); clearInterval(queuePoll); enterGame(); listenToRoom(rid); msg('Ranked match found.'); return}}},1400); setScreen('menu')}
-function listenToRoom(id){clearOnlineListeners(); roomId=id; const roomRef=ref(db,`rooms/${id}`); stateUnsubscribe=onValue(roomRef,snap=>{if(!snap.exists()) return; const state=snap.val(); gameState=state; renderGame(); if(state.status==='waiting'){setNetStatus('waiting',`● ROOM ${id} WAITING`); logText(`Room ${id} is open. Share the code.`); return} if(state.status==='playing') beginTurnIfNeeded(); if(state.status==='gameover' && !gameOver) finishGame(state.winner)})}
-function beginTurnIfNeeded(){if(!gameState || gameOver) return; const whose=gameState.turn; if(mode==='online' && gameState.status!=='playing') return; if(whose===myRole){setNetStatus('myturn','● YOUR TURN'); $('#opp-indicator').style.display='none'; $('#hint').textContent='-- choose a card, draw, or discard --'; startTurnTimer()} else {setNetStatus('connected',mode==='local'?'● AI THINKING':'● ONLINE'); $('#opp-indicator').style.display='block'; pauseTimer(); $('#hint').textContent=mode==='local'?'-- ember ai is thinking --':'-- opponent is playing --'; if(mode==='local' && whose==='p2'){clearAITimeout(); aiTimeout=setTimeout(aiTakeTurn,900)}} updateButtons()}
-function performLocalAction(type){if(!gameState || gameOver || gameState.turn!==myRole) return; const state=deepClone(gameState); let logParts=[]; if(type==='draw'){logParts.push(`${state[myRole].name} draws and ends the turn.`); logParts.push(...drawCardAndEndTurn(state,myRole,'draw'))} else if(type==='discard'){if(selectedIndex===null) return; discardCardForEnergy(state,myRole,selectedIndex); selectedIndex=null; logParts.push(`${state[myRole].name} discards to recover energy.`)} else if(type==='play'){if(selectedIndex===null) return; const res=resolveCardPlay(state,myRole,selectedIndex); selectedIndex=null; logParts.push(res.text); logParts.push(...res.passed)} checkForWinner(state); gameState=state; logText(logParts.filter(Boolean).join(' | ')); renderGame(); if(state.status==='gameover') finishGame(state.winner); else beginTurnIfNeeded()}
-async function performOnlineAction(type){if(!roomId || !gameState || gameOver || gameState.turn!==myRole) return; const state=deepClone(gameState); let logParts=[]; if(type==='draw'){logParts.push(`${state[myRole].name} draws and ends the turn.`); logParts.push(...drawCardAndEndTurn(state,myRole,'draw'))} else if(type==='discard'){if(selectedIndex===null) return; discardCardForEnergy(state,myRole,selectedIndex); selectedIndex=null; logParts.push(`${state[myRole].name} discards to recover energy.`)} else if(type==='play'){if(selectedIndex===null) return; const res=resolveCardPlay(state,myRole,selectedIndex); selectedIndex=null; logParts.push(res.text); logParts.push(...res.passed)} checkForWinner(state); logText(logParts.filter(Boolean).join(' | ')); await set(ref(db,`rooms/${roomId}`),state)}
-function handleAction(type){if(mode==='local') performLocalAction(type); else performOnlineAction(type)}
-function scoreAICard(state, card){const ai=state.p2, me=state.p1; let score=card.pw*0.8-(card.cost||1)*1.2; const base=gSuit(card.suit).base; if(base==='strike') score+=(100-me.hp)*0.06+ai.atk*0.4; if(base==='mend') score+=(100-ai.hp)*0.18; if(base==='brace') score+=(10-ai.def)*1.2; if(base==='curse') score+=(me.curse<4?5:2); if(base==='wound') score+=(me.bleed<4?5:1.5); if(base==='drain') score+=(100-ai.hp)*0.08; if(base==='void') score+=((me.bleed+me.curse)>2?10:1); if(base==='mirror') score+=(ai.hp<45?8:3); if(card.val==='A') score+=(me.hp<38?16:9); if(card.val==='Q') score+=(ai.hp<55?11:3); if(card.val==='K') score+=7; if(card.val==='J') score+=(me.atk>ai.atk?8:4); return score+rr()}
-function aiTakeTurn(){if(mode!=='local' || !gameState || gameOver || gameState.turn!=='p2') return; const state=deepClone(gameState), ai=state.p2; const playable=ai.hand.map((card,i)=>({card,i})).filter(x=>canPlayCard(ai,x.card)); let logParts=[]; if(!playable.length){logParts.push('EMBER AI draws and passes.'); logParts.push(...drawCardAndEndTurn(state,'p2','draw'))} else {playable.sort((a,b)=>scoreAICard(state,a.card)-scoreAICard(state,b.card)); const choice=playable[playable.length-1]; const res=resolveCardPlay(state,'p2',choice.i); logParts.push(`EMBER AI: ${res.text}`); logParts.push(...res.passed)} checkForWinner(state); gameState=state; logText(logParts.filter(Boolean).join(' | ')); renderGame(); if(state.status==='gameover') finishGame(state.winner); else beginTurnIfNeeded()}
 function renderEnergy(el,current,max){el.innerHTML=''; for(let i=0;i<max;i++){const d=document.createElement('div'); d.className='energy-pip'+(i<current?' on':''); el.appendChild(d)}}
 function currentPlayer(){return gameState ? gameState[myRole] : null}
-function renderGame(){if(!gameState) return; const me=currentPlayer(); $('#p1label').textContent=gameState.p1.name; $('#p2label').textContent=gameState.p2.name; $('#p1h').style.width=`${Math.max(0,gameState.p1.hp)}%`; $('#p2h').style.width=`${Math.max(0,gameState.p2.hp)}%`; $('#p1DeckCount').textContent=gameState.p1.deck.length; $('#p2DeckCount').textContent=gameState.p2.deck.length; $('#p1HandCount').textContent=gameState.p1.hand.length; $('#p2HandCount').textContent=gameState.p2.hand.length; $('#p1Rating').textContent=gameState.p1.rating; $('#p2Rating').textContent=gameState.p2.rating; renderEnergy($('#p1Energy'),gameState.p1.energy,gameState.p1.maxEnergy); renderEnergy($('#p2Energy'),gameState.p2.energy,gameState.p2.maxEnergy); $('#s-atk').textContent=me.atk; $('#s-def').textContent=me.def; $('#s-spd').textContent=me.spd; $('#s-bld').textContent=me.bleed; $('#s-crs').textContent=me.curse; $('#s-eng').textContent=me.energy; $('#s-cmb').textContent=me.combo||0; $('#fc1 .fcard-name').textContent=gameState.p1.name; $('#fc2 .fcard-name').textContent=gameState.p2.name; renderHand(); updateButtons()}
-function renderHand(){const handEl=$('#hand'); handEl.innerHTML=''; if(!gameState) return; const me=currentPlayer(), isTurn=gameState.turn===myRole && !gameOver; me.hand.forEach((c,i)=>{const suit=gSuit(c.suit), d=document.createElement('div'); d.className=`hc${selectedIndex===i?' sel':''}${suit.red?' suit-red':''}${isTurn?'':' disabled-card'}`; d.innerHTML=`<div class="hctop">${c.val}</div><div class="hccost">${c.cost}</div><div class="hcs">${suit.g}</div><div class="hcv">${c.val}</div><div class="hct">${suit.desc}</div><div class="hcrare">${c.rarity}</div><div class="hcbot">${c.val}</div>`; if(isTurn){d.onclick=()=>{selectedIndex=selectedIndex===i?null:i; renderHand(); updateButtons()}} handEl.appendChild(d)})}
-function updateButtons(){const me=currentPlayer(), myTurn=!!gameState && gameState.turn===myRole && !gameOver, selected=selectedIndex!==null ? me?.hand[selectedIndex] : null; $('#playbtn').disabled=!(myTurn && selected && canPlayCard(me,selected)); $('#drawbtn').disabled=!myTurn; $('#discardBtn').disabled=!(myTurn && selectedIndex!==null); if(myTurn){if(selected) $('#hint').textContent=`${selected.val} of ${selected.suit.toUpperCase()} - cost ${selected.cost}`; else $('#hint').textContent='-- choose a card, draw, or discard --'}}
+function renderGame(){
+  if(!gameState) return;
+  const me=currentPlayer();
+  $('#p1label').textContent=gameState.p1.name; $('#p2label').textContent=gameState.p2.name||'OPEN';
+  $('#p1h').style.width=`${Math.max(0,gameState.p1.hp)}%`; $('#p2h').style.width=`${Math.max(0,gameState.p2.hp||0)}%`;
+  $('#p1DeckCount').textContent=gameState.p1.deck.length; $('#p2DeckCount').textContent=gameState.p2.deck.length;
+  $('#p1HandCount').textContent=gameState.p1.hand.length; $('#p2HandCount').textContent=gameState.p2.hand.length;
+  $('#p1Rating').textContent=gameState.p1.elo||1000; $('#p2Rating').textContent=gameState.p2.elo||1000;
+  renderEnergy($('#p1Energy'),gameState.p1.energy,gameState.p1.maxEnergy); renderEnergy($('#p2Energy'),gameState.p2.energy,gameState.p2.maxEnergy);
+  $('#fc1 .fcard-name').textContent=gameState.p1.name; $('#fc2 .fcard-name').textContent=gameState.p2.name||'OPEN';
+  if(me){$('#s-atk').textContent=me.atk; $('#s-def').textContent=me.def; $('#s-spd').textContent=me.spd; $('#s-bld').textContent=me.bleed; $('#s-crs').textContent=me.curse; $('#s-eng').textContent=me.energy; $('#s-cmb').textContent=me.combo||0}
+  $('#s-seq').textContent=gameState.seq||0;
+  renderHand(); updateButtons()
+}
+function renderHand(){
+  const handEl=$('#hand'); handEl.innerHTML=''; if(!gameState) return;
+  const me=currentPlayer(), isTurn=gameState.turn===myRole && !gameOver && gameState.status==='playing';
+  me.hand.forEach((c,i)=>{const suit=gSuit(c.suit), d=document.createElement('div'); d.className=`hc${selectedIndex===i?' sel':''}${suit.red?' suit-red':''}${isTurn?'':' disabled-card'}`; d.innerHTML=`<div class="hctop">${c.val}</div><div class="hccost">${c.cost}</div><div class="hcs">${suit.g}</div><div class="hcv">${c.val}</div><div class="hct">${suit.desc}</div><div class="hcrare">${c.rarity}</div><div class="hcbot">${c.val}</div>`; if(isTurn){d.onclick=()=>{selectedIndex=selectedIndex===i?null:i; renderHand(); updateButtons()}} handEl.appendChild(d)})
+}
+function updateButtons(){
+  const me=currentPlayer(), myTurn=!!gameState && gameState.turn===myRole && !gameOver && gameState.status==='playing', selected=selectedIndex!==null ? me?.hand[selectedIndex] : null;
+  $('#playbtn').disabled=!(myTurn && selected && canPlayCard(me,selected)); $('#drawbtn').disabled=!myTurn; $('#discardBtn').disabled=!(myTurn && selectedIndex!==null);
+  if(myTurn){$('#hint').textContent=selected?`${selected.val} of ${selected.suit.toUpperCase()} - cost ${selected.cost}`:'-- choose a card, draw, or discard --'}
+}
 function setNetStatus(cls, txt){const el=$('#net-status'); el.className=cls; el.textContent=txt}
-function startTurnTimer(){clearInterval(timerInt); let t=TURN_TIME; $('#tmr').textContent=t; $('#tmr').classList.remove('urgent'); $('#tmr-bar').style.transition='none'; $('#tmr-bar').style.width='100%'; setTimeout(()=>{$('#tmr-bar').style.transition=`width ${TURN_TIME}s linear`; $('#tmr-bar').style.width='0%'},50); timerInt=setInterval(()=>{if(gameOver || !gameState || gameState.turn!==myRole) return; t--; $('#tmr').textContent=t; if(t<=5) $('#tmr').classList.add('urgent'); if(t<=0){clearInterval(timerInt); handleAction('draw')}},1000)}
+function startTurnTimer(){clearInterval(timerInt); let t=TURN_TIME; $('#tmr').textContent=t; $('#tmr').classList.remove('urgent'); $('#tmr-bar').style.transition='none'; $('#tmr-bar').style.width='100%'; setTimeout(()=>{$('#tmr-bar').style.transition=`width ${TURN_TIME}s linear`; $('#tmr-bar').style.width='0%'},50); timerInt=setInterval(()=>{if(gameOver || !gameState || gameState.turn!==myRole || gameState.status!=='playing') return; t--; $('#tmr').textContent=t; if(t<=5) $('#tmr').classList.add('urgent'); if(t<=0){clearInterval(timerInt); handleAction('draw')}},1000)}
 function pauseTimer(){clearInterval(timerInt); $('#tmr').classList.remove('urgent')}
-function finishGame(winner){if(gameOver) return; gameOver=true; clearInterval(timerInt); clearAITimeout(); const won=winner===myRole, label=won?'K.O. - YOU WIN':'K.O. - YOU LOSE'; showBanner(label); logText(label); if(gameState?.ranked){const delta=won?20:-18; setRating(Math.max(600,getRating()+delta))}}
-function initCanvas(){canvas=$('#fx-canvas'); if(!canvas) return; canvas.width=canvas.offsetWidth; canvas.height=canvas.offsetHeight; ctx=canvas.getContext('2d'); requestAnimationFrame(animLoop)}
-function animLoop(){if(!ctx || !canvas){requestAnimationFrame(animLoop); return} ctx.clearRect(0,0,canvas.width,canvas.height); particles=particles.filter(p=>p.life>0); for(const p of particles){ctx.save(); ctx.globalAlpha=p.life; ctx.fillStyle=p.color; ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fill(); ctx.restore(); p.x+=p.vx; p.y+=p.vy; p.vx*=.94; p.vy*=.94; p.life-=p.decay} requestAnimationFrame(animLoop)}
+function beginTurnIfNeeded(){
+  if(!gameState || gameOver) return;
+  const whose=gameState.turn;
+  if(gameState.status==='waiting'){setNetStatus('waiting',`● ROOM ${roomId} WAITING`); pauseTimer(); $('#opp-indicator').style.display='none'; $('#hint').textContent='-- waiting for player 2 to join --'; updateButtons(); return}
+  if(whose===myRole){setNetStatus('myturn','● YOUR TURN'); $('#opp-indicator').style.display='none'; $('#hint').textContent='-- choose a card, draw, or discard --'; startTurnTimer()}
+  else {setNetStatus('connected',mode==='local'?'● AI THINKING':'● ONLINE'); $('#opp-indicator').style.display='block'; pauseTimer(); $('#hint').textContent=mode==='local'?'-- ember ai is thinking --':'-- opponent is playing --'; if(mode==='local' && whose==='p2'){clearAITimeout(); aiTimeout=setTimeout(aiTakeTurn,900)}}
+  updateButtons()
+}
 
-$('#offlineBtn').onclick=()=>startLocalGame();
+async function applyOnlineAction(actionType){
+  if(!roomId) return;
+  const roomRef=ref(db,`rooms/${roomId}`);
+  let newLog = '';
+  const result = await runTransaction(roomRef, cur=>{
+    if(!cur) return cur;
+    if(cur.status!=='playing') return cur;
+    const actor = myRole;
+    const actorSeat = cur[actor];
+    if(!actorSeat) return cur;
+    if(actorSeat.seatToken !== seatToken) return cur;
+    if(cur.turn !== actor) return cur;
+    const state = deepClone(cur);
+    if(actionType==='draw'){
+      newLog = [`${state[actor].name} draws and ends the turn.`, ...drawCardAndEndTurn(state, actor, 'draw')].filter(Boolean).join(' | ');
+    }else if(actionType==='discard'){
+      if(selectedIndex===null) return cur;
+      discardCardForEnergy(state, actor, selectedIndex);
+      newLog = `${state[actor].name} discards to recover energy.`;
+    }else if(actionType==='play'){
+      if(selectedIndex===null) return cur;
+      const res = resolveCardPlay(state, actor, selectedIndex);
+      newLog = [res.text, ...res.passed].filter(Boolean).join(' | ');
+    }else{
+      return cur;
+    }
+    checkForWinner(state);
+    state.lastLog = newLog;
+    return state;
+  });
+  if(result.committed){
+    selectedIndex=null;
+    if(newLog) logText(newLog);
+  }
+}
+function handleAction(type){
+  if(mode==='local') return performLocalAction(type);
+  if(mode==='online') return applyOnlineAction(type);
+}
+function performLocalAction(type){
+  if(!gameState || gameOver || gameState.turn!==myRole || gameState.status!=='playing') return;
+  const state=deepClone(gameState); let logParts=[];
+  if(type==='draw'){logParts.push(`${state[myRole].name} draws and ends the turn.`); logParts.push(...drawCardAndEndTurn(state,myRole,'draw'))}
+  else if(type==='discard'){if(selectedIndex===null) return; discardCardForEnergy(state,myRole,selectedIndex); selectedIndex=null; logParts.push(`${state[myRole].name} discards to recover energy.`)}
+  else if(type==='play'){if(selectedIndex===null) return; const res=resolveCardPlay(state,myRole,selectedIndex); selectedIndex=null; logParts.push(res.text); logParts.push(...res.passed)}
+  checkForWinner(state); gameState=state; logText(logParts.filter(Boolean).join(' | ')); renderGame(); if(state.status==='gameover') finishGame(state.winner); else beginTurnIfNeeded()
+}
+
+function scoreAICard(state, card){
+  const ai=state.p2, me=state.p1; let score=card.pw*0.8-(card.cost||1)*1.2; const base=gSuit(card.suit).base;
+  if(base==='strike') score+=(100-me.hp)*0.06+ai.atk*0.4;
+  if(base==='mend') score+=(100-ai.hp)*0.18;
+  if(base==='brace') score+=(10-ai.def)*1.2;
+  if(base==='curse') score+=(me.curse<4?5:2);
+  if(base==='wound') score+=(me.bleed<4?5:1.5);
+  if(base==='drain') score+=(100-ai.hp)*0.08;
+  if(base==='void') score+=((me.bleed+me.curse)>2?10:1);
+  if(base==='mirror') score+=(ai.hp<45?8:3);
+  if(card.val==='A') score+=(me.hp<38?16:9);
+  if(card.val==='Q') score+=(ai.hp<55?11:3);
+  if(card.val==='K') score+=7;
+  if(card.val==='J') score+=(me.atk>ai.atk?8:4);
+  return score+rr()
+}
+function aiTakeTurn(){
+  if(mode!=='local' || !gameState || gameOver || gameState.turn!=='p2' || gameState.status!=='playing') return;
+  const state=deepClone(gameState), ai=state.p2; const playable=ai.hand.map((card,i)=>({card,i})).filter(x=>canPlayCard(ai,x.card)); let logParts=[];
+  if(!playable.length){logParts.push('EMBER AI draws and passes.'); logParts.push(...drawCardAndEndTurn(state,'p2','draw'))}
+  else {playable.sort((a,b)=>scoreAICard(state,a.card)-scoreAICard(state,b.card)); const choice=playable[playable.length-1]; const res=resolveCardPlay(state,'p2',choice.i); logParts.push(`EMBER AI: ${res.text}`); logParts.push(...res.passed)}
+  checkForWinner(state); gameState=state; logText(logParts.filter(Boolean).join(' | ')); renderGame(); if(state.status==='gameover') finishGame(state.winner); else beginTurnIfNeeded()
+}
+
+async function createRoom(){
+  clearInterval(timerInt); clearOnlineListeners();
+  mode='online'; onlineType='casual'; myRole='p1'; gameOver=false; selectedIndex=null; roomId=roomCode();
+  const base={mode:'online',ranked:false,maxPlayers:2,turn:'p1',round:1,status:'waiting',created:Date.now(),lastSuit:null,lastLog:'',lastAction:null,p1:newFighter(currentProfile.name,getDeck(),currentProfile.elo,seatToken),p2:newFighter('',getDeck(),1000,''),presence:{p1:sessionToken,p2:null}};
+  const state=initializeMatchState(base);
+  await set(ref(db,`rooms/${roomId}`),state);
+  enterGame(); renderGame(); listenToRoom(roomId); logText(`Room ${roomId} created. Waiting for player 2.`)
+}
+async function joinRoom(code){
+  clearInterval(timerInt); clearOnlineListeners();
+  mode='online'; onlineType='casual'; myRole='p2'; gameOver=false; selectedIndex=null;
+  const roomRef=ref(db,`rooms/${code}`);
+  const res = await runTransaction(roomRef, cur=>{
+    if(cur===null) return cur;
+    if(cur.maxPlayers!==2) cur.maxPlayers=2;
+    const occupied = [!!cur.p1?.name, !!cur.p2?.name].filter(Boolean).length;
+    if(occupied>=2) return;
+    if(cur.p2 && cur.p2.name) return;
+    cur.p2 = newFighter(currentProfile.name, getDeck(), currentProfile.elo, seatToken);
+    cur.presence = cur.presence || {};
+    cur.presence.p2 = sessionToken;
+    cur.status='playing';
+    return cur;
+  });
+  if(!res.committed || !res.snapshot.exists()){msg('Room not found or join failed.'); mode='menu'; return}
+  const room = res.snapshot.val();
+  if(!(room.p2 && room.p2.seatToken===seatToken)){msg('Room is already full.'); mode='menu'; return}
+  roomId=code;
+  enterGame(); listenToRoom(code)
+}
+async function joinRankedQueue(){
+  msg('Searching ranked queue...');
+  clearOnlineListeners();
+  mode='online'; onlineType='ranked'; myRole='p1';
+  const me={name:currentProfile.name, elo:currentProfile.elo, deck:getDeck(), seatToken, joined:Date.now()};
+  const myTicketRef = push(ref(db,'rankedQueue'));
+  const myTicketId = myTicketRef.key;
+  await set(myTicketRef, me);
+
+  const q = await get(ref(db,'rankedQueue'));
+  const all = q.val() || {};
+  const others = Object.entries(all).filter(([id])=>id!==myTicketId).map(([id,v])=>({id,...v})).sort((a,b)=>Math.abs(a.elo-me.elo)-Math.abs(b.elo-me.elo));
+  if(others.length){
+    const opp = others[0];
+    roomId = roomCode();
+    const base={mode:'online',ranked:true,maxPlayers:2,turn:'p1',round:1,status:'playing',created:Date.now(),lastSuit:null,lastLog:'',lastAction:null,p1:newFighter(currentProfile.name,getDeck(),currentProfile.elo,seatToken),p2:newFighter(opp.name,opp.deck,opp.elo,opp.seatToken),presence:{p1:sessionToken,p2:'ranked'}};
+    const state=initializeMatchState(base);
+    await set(ref(db,`rooms/${roomId}`), state);
+    await remove(ref(db,`rankedQueue/${opp.id}`));
+    await remove(ref(db,`rankedQueue/${myTicketId}`));
+    myRole='p1';
+    enterGame(); listenToRoom(roomId); return;
+  }
+  queuePoll=setInterval(async()=>{
+    const meSnap=await get(ref(db,`rankedQueue/${myTicketId}`));
+    if(!meSnap.exists()){clearInterval(queuePoll); return}
+    const roomsSnap=await get(ref(db,'rooms'));
+    const rooms=roomsSnap.val()||{};
+    for(const [rid,room] of Object.entries(rooms)){
+      if(room.ranked && room.p2?.seatToken===seatToken){
+        roomId=rid; myRole='p2'; await remove(ref(db,`rankedQueue/${myTicketId}`)); clearInterval(queuePoll); enterGame(); listenToRoom(rid); return;
+      }
+    }
+  },1400);
+}
+function enterGame(){setScreen('game'); initCanvas()}
+function leaveMatch(){
+  clearInterval(timerInt); clearAITimeout(); clearOnlineListeners();
+  mode='menu'; onlineType=null; roomId=null; gameState=null; gameOver=false; selectedIndex=null;
+  $('#opp-indicator').style.display='none'; setScreen('menu'); renderHome(); msg('')
+}
+async function finishGame(winner){
+  if(gameOver) return;
+  gameOver=true;
+  clearInterval(timerInt); clearAITimeout();
+  const won = winner===myRole;
+  showBanner(won?'K.O. - YOU WIN':'K.O. - YOU LOSE');
+  logText(won?'K.O. - YOU WIN':'K.O. - YOU LOSE');
+  if(gameState?.ranked){
+    const oppRole=myRole==='p1'?'p2':'p1';
+    await updateProfileAfterRanked(won, gameState[oppRole].elo||1000);
+  }
+}
+
+function initCanvas(){canvas=$('#fx-canvas'); if(!canvas) return; canvas.width=canvas.offsetWidth; canvas.height=canvas.offsetHeight; ctx=canvas.getContext('2d'); requestAnimationFrame(animLoop)}
+function animLoop(){if(!ctx||!canvas){requestAnimationFrame(animLoop); return} ctx.clearRect(0,0,canvas.width,canvas.height); particles=particles.filter(p=>p.life>0); for(const p of particles){ctx.save(); ctx.globalAlpha=p.life; ctx.fillStyle=p.color; ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fill(); ctx.restore(); p.x+=p.vx; p.y+=p.vy; p.vx*=.94; p.vy*=.94; p.life-=p.decay} requestAnimationFrame(animLoop)}
+
+function bootFromStoredName(){
+  const saved=getStoredName();
+  if(saved){ ensureProfile(saved).then(()=>setScreen('menu')).catch(()=>setScreen('login')) }
+  else setScreen('login')
+}
+
+$('#loginBtn').onclick=async()=>{const name=($('#loginName').value||'').trim().toUpperCase(); if(name.length<2){loginMsg('Use at least 2 characters.'); return} loginMsg('Loading profile...'); await ensureProfile(name); setScreen('menu')};
+$('#offlineBtn').onclick=()=>{ mode='local'; onlineType=null; myRole='p1'; gameOver=false; selectedIndex=null; const base={mode:'local',ranked:false,maxPlayers:2,turn:'p1',round:1,status:'playing',created:Date.now(),lastSuit:null,lastLog:'',lastAction:null,p1:newFighter(currentProfile.name,getDeck(),currentProfile.elo,seatToken),p2:newFighter('EMBER AI',['spade_7','spade_7','spade_9','spade_K','heart_4','heart_7','heart_Q','club_5','club_8','club_8','diamond_5','diamond_8','diamond_8','drain_6','drain_6','drain_J','wound_6','wound_6','wound_A','void_8','mirror_9','mirror_A','heart_4','spade_5'],1200,'AI')}; gameState=initializeMatchState(base); enterGame(); renderGame(); logText('The AI studies your opening hand.'); beginTurnIfNeeded() };
+$('#createRoomBtn').onclick=()=>createRoom().catch(e=>msg(`Create failed: ${e.message}`));
+$('#joinRoomMenuBtn').onclick=()=>{const code=($('#joinCodeHome').value||'').trim().toUpperCase(); if(!code){msg('Enter a room code first.'); return} joinRoom(code).catch(e=>msg(`Join failed: ${e.message}`))};
 $('#rankedBtn').onclick=()=>joinRankedQueue().catch(e=>msg(`Ranked failed: ${e.message}`));
-$('#createRoomBtn').onclick=()=>createCasualRoom().catch(e=>msg(`Create failed: ${e.message}`));
-$('#joinRoomMenuBtn').onclick=()=>{const code=($('#joinCodeHome').value||'').trim().toUpperCase(); if(!code){msg('Enter a room code first.'); return} joinCasualRoom(code).catch(e=>msg(`Join failed: ${e.message}`))};
 $('#openBuilderBtn').onclick=()=>{setScreen('builder'); renderBuilder()};
 $('#backHomeBtn').onclick=()=>{setScreen('menu'); renderHome()};
 $('#saveDeckBtn').onclick=()=>{const deck=getDeck(); if(deck.length!==DECK_SIZE){msg('Deck must be exactly 24 cards.'); return} setScreen('menu'); renderHome(); msg('Deck saved.')};
 $('#resetDeckBtn').onclick=()=>{saveDeck(getDefaultDeck()); renderBuilder()};
 $('#libraryGrid').onclick=e=>{const add=e.target.getAttribute('data-add'), rem=e.target.getAttribute('data-remove'); if(add) mutateDeck('add',add); if(rem) mutateDeck('remove',rem)};
 $('#deckList').onclick=e=>{const rem=e.target.getAttribute('data-remove'); if(rem) mutateDeck('remove',rem)};
-$('#leaveMatchBtn').onclick=()=>leaveMatchToMenu();
+$('#leaveMatchBtn').onclick=()=>leaveMatch();
 $('#playbtn').onclick=()=>handleAction('play');
 $('#drawbtn').onclick=()=>handleAction('draw');
 $('#discardBtn').onclick=()=>handleAction('discard');
-$('#playerNameHome').addEventListener('change', e=>{setStoredName((e.target.value||'PLAYER').trim().toUpperCase()); renderHome()});
 
 renderHome();
-setScreen('menu');
+bootFromStoredName();
 requestAnimationFrame(animLoop);
 </script>
-
-<!-- LOGIN SCREEN -->
-<div id="login-screen" style="position:absolute;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:999;">
-  <div style="background:#111;padding:30px;border:2px solid #444;text-align:center;">
-    <h2 style="color:#c49a35;margin-bottom:10px;">Enter Name</h2>
-    <input id="loginName" style="padding:8px;margin-bottom:10px;" placeholder="Your Name"/>
-    <br/>
-    <button onclick="saveLogin()">Enter</button>
-  </div>
-</div>
-<script>
-function saveLogin(){
-  const name = document.getElementById('loginName').value.trim() || 'PLAYER';
-  localStorage.setItem('ck_name_v3', name);
-  document.getElementById('login-screen').style.display='none';
-}
-window.onload = () => {
-  const saved = localStorage.getItem('ck_name_v3');
-  if(saved){
-    document.getElementById('login-screen').style.display='none';
-  }
-};
-</script>
-
 </body>
 </html>
