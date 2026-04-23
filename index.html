@@ -131,7 +131,7 @@ button,input{font-family:inherit}
 .fsuit{font-size:28px}.fp,.fpb{position:absolute;font-size:9px;font-family:'Special Elite',serif}.fp{top:3px;left:5px}.fpb{bottom:3px;right:5px;transform:rotate(180deg)}
 .fcard-name{font-size:7px;max-width:56px;text-align:center}
 #bnr,#combo-flash,#opp-indicator{position:absolute;left:50%;transform:translateX(-50%);background:#0a0906;border:1px solid var(--line);padding:5px 12px;letter-spacing:3px;font-size:11px;z-index:30}
-#bnr{top:32px;display:none} #combo-flash{bottom:42px;display:none} #opp-indicator{top:10px;display:none}
+#bnr{top:32px;display:none} #combo-flash{bottom:42px;display:none;border-radius:4px} #opp-indicator{top:10px;display:none;border-radius:4px;font-size:10px}
 #fx-canvas{position:absolute;inset:0;pointer-events:none;z-index:25}.floatxt{position:absolute;font-size:12px;pointer-events:none;z-index:50;text-shadow:1px 1px 0 #000}
 #status-bar{display:grid;grid-template-columns:repeat(8,1fr);padding:6px 12px;background:#100d08;border-bottom:1px solid var(--line);gap:10px;font-size:10px}
 #status-bar span{display:flex;justify-content:space-between;color:var(--gold)} #status-bar span b{color:var(--paper2)}
@@ -148,11 +148,24 @@ button,input{font-family:inherit}
 #hand.energy-empty{animation:energyWarn 1s ease-in-out infinite}
 .hc.unaffordable{opacity:.32;pointer-events:none;filter:grayscale(0.6)}
 .energy-critical .energy-pip.on{animation:blink .5s step-end infinite}
+/* ── User combo (gold/amber) ── */
 @keyframes comboGlow{0%,100%{box-shadow:inset 0 0 8px rgba(255,210,40,.15),0 0 0 1px rgba(255,200,0,.25)}50%{box-shadow:inset 0 0 18px rgba(255,210,40,.35),0 0 0 2px rgba(255,200,0,.6)}}
 #hand.combo-active{animation:comboGlow .7s ease-in-out infinite;border-top:2px solid rgba(255,200,40,.5)}
 .hc.combo-suit{border-color:#c8a020!important;box-shadow:0 0 10px rgba(255,200,40,.45),1px 1px 0 #000!important}
 .hc.combo-suit:hover{transform:translateY(-10px);box-shadow:0 0 18px rgba(255,200,40,.7),1px 1px 0 #000!important}
-#combo-flash{color:#e8c840;border-color:#9a7a10;font-family:'Special Elite',serif;letter-spacing:4px}
+/* User combo flash — gold, bottom-center, points up */
+#combo-flash{color:#e8c840;border-color:#9a7a10;font-family:'Special Elite',serif;letter-spacing:4px;bottom:42px;top:auto;background:#1a1500;border-width:2px}
+/* Opponent combo flash — red/crimson, top-center, points down */
+#opp-combo-flash{position:absolute;left:50%;transform:translateX(-50%);padding:5px 14px;letter-spacing:3px;font-size:11px;z-index:31;display:none;top:62px;color:#e84040;border:2px solid #7a1010;background:#1a0000;font-family:'Special Elite',serif;letter-spacing:4px;border-radius:4px}
+/* Opponent combo — makes opponent fcard pulse red */
+@keyframes oppComboWarning{0%,100%{box-shadow:2px 2px 0 #000,inset 0 0 10px rgba(42,31,14,.14)}40%{box-shadow:0 0 22px 6px rgba(220,40,40,.65),inset 0 0 14px rgba(200,30,30,.3)}}
+#fc2.opp-comboing{animation:oppComboWarning 0.6s ease-in-out infinite}
+/* Arena tint when opponent is comboing */
+@keyframes oppComboArenaTint{0%,100%{background:radial-gradient(circle at 50% 24%,rgba(199,144,53,.09),transparent 32%),repeating-linear-gradient(90deg,transparent 0,transparent 72px,rgba(58,45,16,.06) 72px,rgba(58,45,16,.06) 73px),linear-gradient(180deg,#120e08,#0b0805 62%,#0a0705 100%)}50%{background:radial-gradient(circle at 50% 24%,rgba(200,40,40,.14),transparent 32%),repeating-linear-gradient(90deg,transparent 0,transparent 72px,rgba(58,45,16,.06) 72px,rgba(58,45,16,.06) 73px),linear-gradient(180deg,#170808,#0b0505 62%,#0a0505 100%)}}
+#arena.opp-combo-active{animation:oppComboArenaTint 0.8s ease-in-out infinite}
+/* User combo label in hint area */
+#hint.user-combo-hint{color:#e8c840!important;animation:comboHintPulse .6s step-end infinite}
+@keyframes comboHintPulse{50%{opacity:.5}}
 .hc.playing{animation:cardPlay .35s ease-out forwards}
 @keyframes cardPlay{0%{transform:translateY(-12px) scale(1)}40%{transform:translateY(-60px) scale(1.15) rotate(-3deg)}100%{transform:translateY(-120px) scale(0) rotate(8deg);opacity:0}}
 /* hp flash */
@@ -313,7 +326,7 @@ button,input{font-family:inherit}
   <div id="arena"><div id="arena-grid"></div><canvas id="fx-canvas"></canvas>
     <div id="p1z"><div class="fcard" id="fc1"><div class="fp">1</div><div class="fsuit">♠</div><div class="fcard-name">YOU</div><div class="fpb">1</div></div><div class="fname-tag">P1</div></div>
     <div id="p2z"><div class="fcard" id="fc2" style="transform:scaleX(-1)"><div class="fp">2</div><div class="fsuit">♦</div><div class="fcard-name">FOE</div><div class="fpb">2</div></div><div class="fname-tag" style="transform:scaleX(-1)">P2</div></div>
-    <div id="floor"></div><div id="bnr"></div><div id="combo-flash"></div><div id="opp-indicator">OPPONENT IS THINKING...</div>
+    <div id="floor"></div><div id="bnr"></div><div id="combo-flash"></div><div id="opp-combo-flash"></div><div id="opp-indicator">OPPONENT IS THINKING...</div>
   </div>
   <div id="status-bar"><span>ATK <b id="s-atk">0</b></span><span>DEF <b id="s-def">0</b></span><span>SPD <b id="s-spd">0</b></span><span>BLEED <b id="s-bld">0</b></span><span>CURSE <b id="s-crs">0</b></span><span>ENERGY <b id="s-eng">0</b></span><span>COMBO <b id="s-cmb">0</b></span><span>SEQ <b id="s-seq">0</b></span></div>
   <div id="log">Awaiting duel...</div>
@@ -641,16 +654,25 @@ function resolveCardPlay(state, role, handIndex, localRitualHistory){
   applySuitMastery(me, card.suit);
   const ritual=detectRitual(card, localRitualHistory);
 
-  // ── Combo system: same suit as last played = COMBO TURN (no turn end) ──
+  // ── Combo system: same suit as last played AND a same-suit card still exists = COMBO TURN ──
+  // After splicing the card from hand, check if another same-suit card remains in hand or deck.
+  // If none exists, the combo cannot continue — treat as a normal (turn-ending) play.
   let comboBonus=0, isCombo=false;
   if(state.lastSuit===card.suit){
-    me.combo=(me.combo||0)+1;
-    isCombo=true;
-    comboBonus=Math.min(me.combo*2,8);
-    showCombo(`COMBO x${me.combo} — PLAY AGAIN!`);
-    addPressure(me,1);
-    // Mark combo turn — turn will NOT pass after this play
-    state[role+'_comboTurn']=true;
+    // Inline check: does the player still have a same-suit card in hand or deck?
+    // (after the card was already spliced from hand above)
+    const canExtend = me.hand.some(c=>c.suit===card.suit) || me.deck.some(c=>c.suit===card.suit);
+    if(canExtend){
+      me.combo=(me.combo||0)+1;
+      isCombo=true;
+      comboBonus=Math.min(me.combo*2,8);
+      addPressure(me,1);
+      state[role+'_comboTurn']=true;
+    } else {
+      // Same suit but no more same-suit cards — combo fizzles, turn ends normally
+      me.combo=0;
+      state[role+'_comboTurn']=false;
+    }
   } else {
     // Different suit breaks the combo and ends the turn
     me.combo=0;
@@ -737,12 +759,12 @@ function resolveCardPlay(state, role, handIndex, localRitualHistory){
 
   if((me.suitMastery[card.suit]||0)>=4) text.push(`${card.suit.toUpperCase()} MASTERY ONLINE`);
   state.lastSuit=card.suit;
-  state.lastAction={by:role,type:'play',cardId:card.id,suit:card.suit,val:card.val,text:text.join(' | '),ritual:ritual?.name||'',combo:me.combo||0,comboTurn:isCombo,_seen:false};
+  state.lastAction={by:role,type:'play',cardId:card.id,suit:card.suit,val:card.val,text:text.join(' | '),ritual:ritual?.name||'',combo:me.combo||0,comboTurn:isCombo,comboRole:isCombo?role:null,_seen:false};
   state.seq=(state.seq||0)+1;
 
   // ── Combo turn: DON'T pass the turn — player gets another action ──
   if(isCombo){
-    if(isCombo) text.push(`⚡ COMBO — play ${card.suit.toUpperCase()} again to extend!`);
+    text.push(`⚡ COMBO x${me.combo} — play ${card.suit.toUpperCase()} again to extend!`);
     return {text:text.join(' | '), passed:[], comboTurn:true}
   }
   // Normal play: pass the turn
@@ -839,6 +861,9 @@ function renderHand(){
   const allUnaffordable = isTurn && me.hand.every(c=>!canPlayCard(me,c));
   handEl.classList.toggle('energy-empty', isTurn && allUnaffordable && !isComboTurn);
   handEl.classList.toggle('combo-active', isComboTurn);
+  // Clear/set user combo hint style on hint element
+  const hintEl=$('#hint');
+  if(hintEl) hintEl.classList.toggle('user-combo-hint', isTurn && isComboTurn);
   me.hand.forEach((c,i)=>{
     const suit=gSuit(c.suit), d=document.createElement('div');
     const affordable = !isTurn || canPlayCard(me, c);
@@ -864,11 +889,14 @@ function updateButtons(){
     if(selected){
       const energyLeft = (me?.energy||0) - (selected.cost||1);
       const isComboCard = selected.suit === lastSuit;
-      const comboTag = isComboTurn && isComboCard ? ' ⚡ COMBO CONTINUE' : isComboTurn && !isComboCard ? ' ✗ breaks combo' : '';
+      const comboTag = isComboTurn && isComboCard ? ' ⚡ COMBO CONTINUE' : isComboTurn && !isComboCard ? ' ✗ ENDS COMBO' : '';
+      if(isComboTurn && isComboCard) $('#hint').classList.add('user-combo-hint');
+      else $('#hint').classList.remove('user-combo-hint');
       $('#hint').textContent=`${selected.val} of ${selected.suit.toUpperCase()} — ${selected.cost} energy${cantAffordReason} — ${energyLeft>=0?energyLeft+' left':'CANNOT AFFORD'}${comboTag}${ritualHistory.length?` — chain ${ritualHistory.map(x=>x.split(':')[0][0].toUpperCase()).join('/')}`:''}`
     } else {
       const e=me?.energy||0;
-      if(isComboTurn) $('#hint').textContent=`⚡ COMBO x${me?.combo||1} — play ${lastSuit?.toUpperCase()} again to extend, or end with draw/discard`;
+      if(isComboTurn){ $('#hint').textContent=`⚡ COMBO x${me?.combo||1} — play ${lastSuit?.toUpperCase()} again to extend, or draw/discard to end`; $('#hint').classList.add('user-combo-hint'); }
+      else { $('#hint').classList.remove('user-combo-hint'); }
       else if(e===0) $('#hint').textContent='⚠ NO ENERGY — discard a card (+2 energy) or draw to end turn';
       else if(e===1) $('#hint').textContent=`⚡ 1 energy left — ${me?.maxEnergy} max — regen +1/turn`;
       else $('#hint').textContent=`-- ${e}/${me?.maxEnergy} energy — play, draw (end turn), or discard (+2 energy) --`;
@@ -879,7 +907,27 @@ function updateButtons(){
 function setNetStatus(cls, txt){ const el=$('#net-status'); el.className=cls; el.textContent=txt }
 function logText(t){ $('#log').textContent=t }
 function showBanner(t){ const b=$('#bnr'); b.textContent=t; b.style.display='block'; setTimeout(()=>b.style.display='none',1600) }
-function showCombo(t){ const c=$('#combo-flash'); c.textContent=t; c.style.display='block'; setTimeout(()=>c.style.display='none',1200) }
+function showCombo(t){ const c=$('#combo-flash'); c.textContent='⚡ '+t; c.style.display='block'; setTimeout(()=>c.style.display='none',1400) }
+function showOppCombo(comboCount, suit){
+  const c=$('#opp-combo-flash');
+  c.textContent='☠ OPPONENT COMBO x'+comboCount+' — CHAINING '+suit.toUpperCase()+'!';
+  c.style.display='block';
+  const arena=$('#arena'), fc=$('#fc2');
+  if(arena) arena.classList.add('opp-combo-active');
+  if(fc) fc.classList.add('opp-comboing');
+  clearTimeout(showOppCombo._timer);
+  showOppCombo._timer=setTimeout(()=>{
+    c.style.display='none';
+    if(arena) arena.classList.remove('opp-combo-active');
+    if(fc) fc.classList.remove('opp-comboing');
+  }, 1800);
+}
+showOppCombo._timer=null;
+function hasSameSuitInDeck(player, suit){
+  for(const c of player.hand){ if(c.suit===suit) return true; }
+  for(const c of player.deck){ if(c.suit===suit) return true; }
+  return false;
+}
 
 function duelMoment(text,intensity=1){
   const arena=$('#arena');
@@ -958,11 +1006,25 @@ function beginTurnIfNeeded(){
       startTurnTimer(); // still time-limited on combo turns
     }
   } else {
-    setNetStatus('connected', mode==='local'?'● AI THINKING':'● ONLINE');
+    const oppIsCombo = gameState[whose+'_comboTurn']===true;
+    const oppComboSuit = gameState.lastSuit;
+    setNetStatus('connected', oppIsCombo ? '☠ OPP COMBOING' : (mode==='local'?'● AI THINKING':'● ONLINE'));
     $('#opp-indicator').style.display='block';
+    $('#opp-indicator').textContent = oppIsCombo
+      ? `☠ OPPONENT CHAINING ${oppComboSuit?.toUpperCase()||''} COMBOS!`
+      : (mode==='local' ? 'EMBER AI IS THINKING...' : 'OPPONENT IS PLAYING...');
+    if(oppIsCombo){
+      // Visually flag the arena and opponent card when we know they have a combo turn
+      const arena=$('#arena'), fc=$('#fc2');
+      if(arena) arena.classList.add('opp-combo-active');
+      if(fc) fc.classList.add('opp-comboing');
+      setTimeout(()=>{ if(arena) arena.classList.remove('opp-combo-active'); if(fc) fc.classList.remove('opp-comboing'); }, 2000);
+    }
     pauseTimer();
-    $('#hint').textContent=mode==='local'?'-- ember ai is thinking --':'-- opponent is playing --';
-    if(mode==='local'&&whose==='p2'){ clearAITimeout(); aiTimeout=setTimeout(aiTakeTurn,900) }
+    $('#hint').textContent = oppIsCombo
+      ? `☠ Opponent has a COMBO x${gameState[whose]?.combo||1} — brace yourself!`
+      : (mode==='local'?'-- ember ai is thinking --':'-- opponent is playing --');
+    if(mode==='local'&&whose==='p2'){ clearAITimeout(); aiTimeout=setTimeout(aiTakeTurn,oppIsCombo?700:900) }
   }
   updateButtons()
 }
@@ -1030,6 +1092,10 @@ function listenToRoom(rid){
       if(data.lastAction&&!data.lastAction._seen&&data.lastAction.by!==myRole&&data.lastAction.type==='play'){
         const a=data.lastAction, oppRole=myRole==='p1'?'p2':'p1';
         triggerCardFX(a.suit,a.val,oppRole,myRole,0,0);
+        // Show opponent combo warning if they just earned a combo turn
+        if(a.comboTurn && a.comboRole && a.comboRole!==myRole){
+          showOppCombo(a.combo||1, a.suit);
+        }
       }
       if(data.lastLog) logText(data.lastLog);
     }
@@ -1249,8 +1315,13 @@ function performLocalAction(type){
       if(card.val==='A') duelMoment('ACE STRIKE',1.8);
       if(card.val==='K') duelMoment('ROYAL EXECUTION',1.45);
       if(state.lastAction?.ritual) duelMoment(state.lastAction.ritual,2);
-      if(res.comboTurn) duelMoment(`COMBO x${state[myRole].combo} — PLAY AGAIN`,1.35);
-      else if((state[myRole]?.combo||0)>=3) duelMoment('COMBO CHAIN COMPLETE',1.35);
+      if(res.comboTurn){
+        // User just earned a combo turn — gold flash
+        showCombo(`COMBO x${state[myRole].combo} — PLAY AGAIN!`);
+        duelMoment(`⚡ COMBO x${state[myRole].combo} — PLAY AGAIN`,1.35);
+      } else if((state[myRole]?.combo||0)>=3){
+        duelMoment('⚡ COMBO CHAIN COMPLETE',1.35);
+      }
     }
   }
   checkForWinner(state); gameState=state;
@@ -1345,8 +1416,13 @@ async function applyOnlineAction(actionType){
     if(la?.val==='A') duelMoment('ACE STRIKE',1.8);
     if(la?.val==='K') duelMoment('ROYAL EXECUTION',1.45);
     if(la?.ritual) duelMoment(la.ritual,2);
-    if(la?.comboTurn) duelMoment(`COMBO x${gameState[myRole]?.combo||1} — PLAY AGAIN`,1.35);
-    else if((gameState?.[myRole]?.combo||0)>=3) duelMoment('COMBO CHAIN COMPLETE',1.35);
+    if(la?.comboTurn && la?.comboRole===myRole){
+      // My own combo — show gold user combo flash + duel moment
+      showCombo(`COMBO x${gameState[myRole]?.combo||1} — PLAY AGAIN!`);
+      duelMoment(`⚡ COMBO x${gameState[myRole]?.combo||1} — PLAY AGAIN`,1.35);
+    } else if((gameState?.[myRole]?.combo||0)>=3 && !la?.comboTurn){
+      duelMoment('⚡ COMBO CHAIN COMPLETE',1.35);
+    }
     renderGame();
     if(gameState.status==='gameover') finishGame(gameState.winner);
     else beginTurnIfNeeded();
@@ -1401,7 +1477,7 @@ function aiTakeTurn(){
     logParts.push(`EMBER CHAINS: ${res.text}`); logParts.push(...res.passed);
     const dmgM=res.text.match(/(?:deals|strikes?|crashes?)\s+(\d+)/i);
     setTimeout(()=>triggerCardFX(card.suit,card.val,'p2','p1',dmgM?parseInt(dmgM[1]):0,0),200);
-    if(res.comboTurn) duelMoment(`EMBER COMBO x${state.p2.combo}`,1.2);
+    if(res.comboTurn){ duelMoment(`☠ EMBER COMBO x${state.p2.combo}`,1.2); showOppCombo(state.p2.combo||1, card.suit); }
     checkForWinner(state); gameState=state;
     logText(logParts.filter(Boolean).join(' | '));
     renderGame();
@@ -1449,11 +1525,12 @@ function aiTakeTurn(){
     if(card.val==='A') duelMoment('EMBER UNLEASHES AN ACE',1.8);
     if(state.lastAction?.ritual) duelMoment(state.lastAction.ritual,2);
     if(res.comboTurn){
-      // AI got a combo — schedule next action
+      // AI got a combo — show opponent combo warning to the player and schedule next action
+      showOppCombo(state.p2.combo||1, card.suit);
       checkForWinner(state); gameState=state;
       logText(logParts.filter(Boolean).join(' | ')); renderGame();
       if(state.status==='gameover'){ finishGame(state.winner); return; }
-      clearAITimeout(); aiTimeout=setTimeout(aiTakeTurn,800);
+      clearAITimeout(); aiTimeout=setTimeout(aiTakeTurn,900);
       return;
     }
   }
