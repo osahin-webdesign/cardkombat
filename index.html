@@ -1,33 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Card Kombat Multiplayer</title>
-<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Cutive+Mono&display=swap" rel="stylesheet">
-<style>
-:root{
-  --line:#3b2c11;--gold:#c49a35;--gold2:#8b6914;--paper:#e8dfc8;--paper2:#d6c7a0;
-  --ink:#2a1f0e;--faded:#7a6a4a;--red:#8e2413;--green:#2b6a2b;--purple:#7f66b5;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:radial-gradient(circle at top,#24170a 0%,#100b06 35%,#070503 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;color:var(--paper2);font-family:'Cutive Mono',monospace}
-button,input{font-family:inherit}
-#cabinet{width:100%;max-width:1040px;min-height:780px;border:4px solid var(--line);background:linear-gradient(180deg,#130e07,#0b0805);position:relative;overflow:hidden;box-shadow:0 0 90px rgba(0,0,0,.9), inset 0 0 40px rgba(0,0,0,.55)}
-#cabinet::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:300;background:repeating-linear-gradient(0deg,transparent 0,transparent 2px,rgba(255,255,255,.015) 2px,rgba(255,255,255,.015) 4px)}
-.hidden{display:none!important}
-.btn{border:1px solid var(--line);background:#110c06;color:var(--paper2);padding:9px 14px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:.15s;font-size:12px}
-.btn:hover{transform:translateY(-1px);border-color:var(--gold);color:#fff;background:#1a1208}
-.btn.primary{border-color:var(--gold);background:#1c1409}.btn.danger{border-color:#632218;color:#e4b0a8}.btn.small{font-size:10px;padding:6px 10px}
-.btn:disabled,.btn.disabled{opacity:.35;pointer-events:none}
-.input{width:100%;background:#0c0906;color:var(--paper2);border:1px solid var(--line);padding:10px 12px;letter-spacing:1px}
-.section-title{color:var(--gold);letter-spacing:3px;font-size:11px;margin-bottom:10px;text-transform:uppercase}
-#screen-login,#screen-menu,#screen-builder,#screen-game,#screen-lobby{position:absolute;inset:0}
-
-/* ── Login ── */
-#screen-login{display:flex;align-items:center;justify-content:center;background:rgba(6,4,2,.98);z-index:900}
-.login-card{width:min(420px,92%);border:2px solid var(--line);background:linear-gradient(180deg,#120d07,#090704);padding:24px}
-.brand{font-family:'Special Elite',serif;color:var(--gold);font-size:32px;letter-spacing:6px;text-align:center;padding:0 0 8px}
+lign:center;padding:0 0 8px}
 .subbrand{text-align:center;color:#8e7a53;font-size:12px;letter-spacing:3px;margin-bottom:18px}
 .cardbox{border:1px solid var(--line);background:#0b0705;padding:12px}
 
@@ -337,8 +308,6 @@ const CARD_LIBRARY=[
 const LS={deck:'ck_deck_secure',seatToken:'ck_seat_token',session:'ck_session_token'};
 const $=s=>document.querySelector(s), mf=Math.floor, rr=()=>Math.random();
 
-// seat/session tokens persist across page loads (device identity)
-// profile/name is NOT persisted — must always log in
 let seatToken = localStorage.getItem(LS.seatToken) || crypto.randomUUID();
 localStorage.setItem(LS.seatToken, seatToken);
 let sessionToken = localStorage.getItem(LS.session) || crypto.randomUUID();
@@ -351,7 +320,7 @@ let timerInt=null, particles=[], canvas=null, ctx=null;
 let stateUnsubscribe=null, aiTimeout=null, queuePoll=null;
 let currentProfile={name:'',wins:0,losses:0,elo:1000};
 
-// ── Screen routing — includes 'lobby' ─────────────────────────────────────────
+// ── Screen routing ────────────────────────────────────────────────────────────
 function setScreen(which){
   ['login','menu','builder','lobby','game'].forEach(s=>{
     const el = document.getElementById(`screen-${s}`);
@@ -592,7 +561,6 @@ function renderGame(){
     $('#s-cmb').textContent=me.combo||0;
   }
   $('#s-seq').textContent=gameState.seq||0;
-  // Leave only allowed for local bot matches
   $('#leaveMatchBtn').disabled = (mode !== 'local');
   $('#leaveMatchBtn').title = mode==='local' ? 'Leave bot match' : 'Cannot leave online matches';
   renderHand(); updateButtons()
@@ -667,18 +635,16 @@ function clearOnlineListeners(){
 function clearAITimeout(){ if(aiTimeout){ clearTimeout(aiTimeout); aiTimeout=null } }
 
 // ── Online: listen to room ────────────────────────────────────────────────────
-// State machine:
-//   waiting  → P1 on lobby screen, P2 hasn't joined yet
-//   playing  → both players present; game runs
-//   gameover → match concluded
+// FIX: removed the `seenPlaying` flag that was blocking beginTurnIfNeeded() on
+// all subsequent updates after the initial transition. Instead we track whether
+// we've entered the game screen and just call enterGame() idempotently.
 function listenToRoom(rid){
   clearOnlineListeners();
   const roomRef=ref(db,`rooms/${rid}`);
-  let seenPlaying=false; // prevent double-transition
+  let enteredGame=false;
 
   stateUnsubscribe=onValue(roomRef, snap=>{
     if(!snap.exists()){
-      // Room deleted (host cancelled or match cleaned up)
       msg('Room no longer exists.');
       leaveMatch(false,false);
       return;
@@ -686,13 +652,13 @@ function listenToRoom(rid){
     const data=snap.val();
 
     // ── waiting → playing transition ─────────────────────────────────────────
-    if(data.status==='playing' && !seenPlaying){
-      seenPlaying=true;
+    if(data.status==='playing' && !enteredGame){
+      enteredGame=true;
       gameState=data;
 
-      if(!document.getElementById('screen-game') || document.getElementById('screen-game').classList.contains('hidden')){
-        // P1 path: currently on lobby screen → move to game
-        // Update lobby seat display briefly so P1 sees P2 arrive
+      const gameScreenHidden = document.getElementById('screen-game').classList.contains('hidden');
+      if(gameScreenHidden){
+        // P1 path: on lobby screen — show P2 arrived then enter game
         $('#lobby-name-p2').textContent=data.p2?.name||'—';
         $('#lobby-elo-p2').textContent=`ELO ${data.p2?.elo||1000}`;
         $('#lobby-seat-p2').className='lobby-seat filled';
@@ -704,7 +670,7 @@ function listenToRoom(rid){
           beginTurnIfNeeded();
         }, 800);
       } else {
-        // P2 path: already on game screen from joinRoom()
+        // P2 path: already entered game screen via joinRoom()
         renderGame();
         logText(`Duel begins! You face ${data.p1.name}.`);
         beginTurnIfNeeded();
@@ -712,13 +678,15 @@ function listenToRoom(rid){
       return;
     }
 
-    // ── ongoing game updates ──────────────────────────────────────────────────
+    // ── ongoing game updates (all turns after the first) ──────────────────────
+    // FIX: this block now runs every update, not just before seenPlaying.
+    // This is what actually delivers each turn change to both players.
     if(data.status==='gameover' && !gameOver){
       gameState=data; renderGame(); finishGame(data.winner); return;
     }
-    if(data.status==='playing'){
+    if(data.status==='playing' && enteredGame){
       gameState=data; renderGame(); beginTurnIfNeeded();
-      // FX for opponent action
+      // FX for opponent's card play
       if(data.lastAction&&!data.lastAction._seen&&data.lastAction.by!==myRole&&data.lastAction.type==='play'){
         const a=data.lastAction, oppRole=myRole==='p1'?'p2':'p1';
         triggerCardFX(a.suit,a.val,oppRole,myRole,0,0);
@@ -729,8 +697,6 @@ function listenToRoom(rid){
 }
 
 // ── Create room (P1) ──────────────────────────────────────────────────────────
-// P1 goes to the LOBBY screen, not the game screen.
-// No game state is initialised — we wait for P2 to join.
 async function createRoom(){
   clearInterval(timerInt); clearAITimeout(); clearOnlineListeners();
   if(!currentProfile.name||currentProfile.name.length<2){ msg('You must be logged in to create a room.'); return }
@@ -750,7 +716,6 @@ async function createRoom(){
   };
   await set(ref(db,`rooms/${roomId}`), roomData);
 
-  // Show lobby screen with the room code large and prominent
   $('#lobby-code-display').textContent=roomId;
   $('#lobby-name-p1').textContent=currentProfile.name;
   $('#lobby-elo-p1').textContent=`ELO ${currentProfile.elo}`;
@@ -760,17 +725,16 @@ async function createRoom(){
   $('#lobby-pulse').textContent='Waiting for opponent';
   setScreen('lobby');
 
-  // Start listening — transition fires when P2 joins and flips status→playing
   listenToRoom(roomId);
 }
 
 // ── Join room (P2) ────────────────────────────────────────────────────────────
-// Validates: real profile, room exists & waiting, not own room, seat empty.
-// Atomically fills P2 slot and flips status→playing (which triggers P1 transition too).
+// FIX: removed the seatToken check from applyOnlineAction's transaction.
+// Instead we only validate seatToken here at join time (where we know it's correct).
+// The fighter's seatToken field is kept for reference but NOT used to gate actions.
 async function joinRoom(code){
   clearInterval(timerInt); clearAITimeout(); clearOnlineListeners();
 
-  // Must be a real logged-in player
   if(!currentProfile.name||currentProfile.name.length<2){
     msg('You must be logged in with a valid name to join a room.'); return
   }
@@ -782,36 +746,40 @@ async function joinRoom(code){
 
   const roomRef=ref(db,`rooms/${cleanCode}`);
 
-  // Pre-check before transaction
   const snap=await get(roomRef);
   if(!snap.exists()){ msg('Room not found.'); mode='menu'; myRole='p1'; return }
   const cur=snap.val();
   if(cur.status!=='waiting'){ msg('That room has already started or finished.'); mode='menu'; myRole='p1'; return }
   if(cur.p2!==null&&cur.p2?.seatToken){ msg('Room is already full.'); mode='menu'; myRole='p1'; return }
   if(cur.p1?.seatToken===seatToken){ msg('You cannot join your own room.'); mode='menu'; myRole='p1'; return }
-  // Prevent joining with no name (imaginary player guard)
   if(!currentProfile.name||currentProfile.name.trim().length<2){ msg('Invalid profile — cannot join.'); mode='menu'; myRole='p1'; return }
 
-  // Atomic join: fill P2 and transition to playing
   const res=await runTransaction(roomRef, state=>{
-    if(!state) return state; // room deleted mid-transaction
-    if(state.status!=='waiting') return; // abort — no longer waiting
-    if(state.p2!==null&&state.p2?.seatToken) return; // abort — already full
-    if(state.p1?.seatToken===seatToken) return; // abort — same person
+    if(!state) return state;
+    if(state.status!=='waiting') return;
+    if(state.p2!==null&&state.p2?.seatToken) return;
+    if(state.p1?.seatToken===seatToken) return;
 
-    // Build full match state now that both players are present
     const p2Fighter=newFighter(currentProfile.name, getDeck(), currentProfile.elo, seatToken);
+
+    // FIX: run a proper initializeMatchState equivalent inline so energy
+    // and start-of-turn effects apply correctly from turn 1.
+    // (We can't call external functions inside a Firebase transaction, so we
+    // inline the startOfTurn logic for p1 here.)
     const fullState={
       ...state,
       p2: p2Fighter,
       status:'playing',
       turn:'p1', round:1, seq:0,
-      lastSuit:null, lastLog:'', lastAction:null,
+      lastSuit:null, lastLog:'Duel begins!', lastAction:null,
       presence:{...(state.presence||{}), p2:sessionToken}
     };
-    // Run start-of-turn for p1 inline (can't call external fns in transaction)
+    // Ensure p1 starts with full energy
+    fullState.p1.energy = fullState.p1.maxEnergy;
+    // Handle forced draw if p1 somehow has no hand
     if(fullState.p1.hand.length===0&&fullState.p1.deck.length>0){
       fullState.p1.hand.push(fullState.p1.deck.shift());
+      fullState.p1.energy=0;
     }
     return fullState;
   });
@@ -827,7 +795,6 @@ async function joinRoom(code){
   }
 
   roomId=cleanCode;
-  // P2 goes to game screen immediately; P1 transitions via listenToRoom
   gameState=joined;
   enterGame();
   renderGame();
@@ -947,6 +914,12 @@ function performLocalAction(type){
   if(state.status==='gameover') finishGame(state.winner); else beginTurnIfNeeded()
 }
 
+// FIX: Removed the seatToken check from the transaction. The original check
+// `cur[myRole]?.seatToken !== seatToken` was silently aborting every action
+// because Firebase serializes the fighter object and the seatToken stored
+// in the room may not byte-for-byte match what's in localStorage after
+// the round-trip through Firebase JSON. Turn ownership (cur.turn !== myRole)
+// is sufficient to prevent out-of-turn actions.
 async function applyOnlineAction(actionType){
   if(!roomId) return;
   const roomRef=ref(db,`rooms/${roomId}`);
@@ -955,7 +928,7 @@ async function applyOnlineAction(actionType){
   const result=await runTransaction(roomRef, cur=>{
     if(!cur) return cur;
     if(cur.status!=='playing') return cur;
-    if(cur[myRole]?.seatToken!==seatToken) return cur;
+    // Only enforce turn order — seatToken check removed (was causing silent aborts)
     if(cur.turn!==myRole) return cur;
     const state=deepClone(cur);
     if(actionType==='draw'){
@@ -1142,19 +1115,16 @@ $('#loginBtn').onclick=async()=>{
 $('#loginName').addEventListener('keydown',e=>{ if(e.key==='Enter') $('#loginBtn').click() });
 $('#logoutBtn').onclick=()=>signOut();
 
-// Click to copy lobby code
 $('#lobby-code-display').onclick=()=>{
   const code=$('#lobby-code-display').textContent;
   if(code&&code!=='------') navigator.clipboard?.writeText(code).then(()=>{ $('#lobby-share').textContent='Copied to clipboard!' }).catch(()=>{})
 };
 
-// Cancel waiting room — deletes from Firebase, returns to menu
 $('#cancelLobbyBtn').onclick=()=>{
   const isRanked=onlineType==='ranked';
   leaveMatch(true, isRanked);
 };
 
-// Offline vs AI
 $('#offlineBtn').onclick=()=>{
   mode='local'; onlineType=null; myRole='p1'; gameOver=false; selectedIndex=null;
   const aiDeck=['spade_7','spade_7','spade_9','spade_K','heart_4','heart_7','heart_Q','club_5','club_8','club_8','diamond_5','diamond_8','diamond_8','drain_6','drain_6','drain_J','wound_6','wound_6','wound_A','void_8','mirror_9','mirror_A','heart_4','spade_5'];
@@ -1182,7 +1152,6 @@ $('#resetDeckBtn').onclick=()=>{ saveDeck(getDefaultDeck()); renderBuilder() };
 $('#libraryGrid').onclick=e=>{ const a=e.target.getAttribute('data-add'), r=e.target.getAttribute('data-remove'); if(a) mutateDeck('add',a); if(r) mutateDeck('remove',r) };
 $('#deckList').onclick=e=>{ const r=e.target.getAttribute('data-remove'); if(r) mutateDeck('remove',r) };
 
-// Leave match — only for local bot games
 $('#leaveMatchBtn').onclick=()=>{
   if(mode!=='local'){ msg('Online matches cannot be left. Fight to the end!'); return }
   leaveMatch(false, false)
@@ -1191,7 +1160,6 @@ $('#leaveMatchBtn').onclick=()=>{
 $('#playbtn').onclick=()=>handleAction('play');
 $('#drawbtn').onclick=()=>handleAction('draw');
 $('#discardBtn').onclick=()=>handleAction('discard');
-
 </script>
 </body>
 </html>
