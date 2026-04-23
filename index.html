@@ -896,10 +896,9 @@ function updateButtons(){
     } else {
       const e=me?.energy||0;
       if(isComboTurn){ $('#hint').textContent=`⚡ COMBO x${me?.combo||1} — play ${lastSuit?.toUpperCase()} again to extend, or draw/discard to end`; $('#hint').classList.add('user-combo-hint'); }
-      else { $('#hint').classList.remove('user-combo-hint'); }
-      else if(e===0) $('#hint').textContent='⚠ NO ENERGY — discard a card (+2 energy) or draw to end turn';
-      else if(e===1) $('#hint').textContent=`⚡ 1 energy left — ${me?.maxEnergy} max — regen +1/turn`;
-      else $('#hint').textContent=`-- ${e}/${me?.maxEnergy} energy — play, draw (end turn), or discard (+2 energy) --`;
+      else if(e===0){ $('#hint').classList.remove('user-combo-hint'); $('#hint').textContent='⚠ NO ENERGY — discard a card (+2 energy) or draw to end turn'; }
+      else if(e===1){ $('#hint').classList.remove('user-combo-hint'); $('#hint').textContent=`⚡ 1 energy left — ${me?.maxEnergy} max — regen +1/turn`; }
+      else { $('#hint').classList.remove('user-combo-hint'); $('#hint').textContent=`-- ${e}/${me?.maxEnergy} energy — play, draw (end turn), or discard (+2 energy) --`; }
     }
   }
 }
