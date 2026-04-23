@@ -194,8 +194,8 @@ function enterGame(){setScreen('game'); initCanvas()}
 function leaveMatchToMenu(){clearInterval(timerInt); clearAITimeout(); clearOnlineListeners(); mode='menu'; onlineType=null; roomId=null; gameState=null; gameOver=false; selectedIndex=null; $('#opp-indicator').style.display='none'; setScreen('menu'); renderHome(); msg('')}
 function getAIDeck(){return ['spade_7','spade_7','spade_9','spade_K','heart_4','heart_7','heart_Q','club_5','club_8','club_8','diamond_5','diamond_8','diamond_8','drain_6','drain_6','drain_J','wound_6','wound_6','wound_A','void_8','mirror_9','mirror_A','heart_4','spade_5']}
 function startLocalGame(){const name=getLocalPlayerName(); setStoredName(name); clearInterval(timerInt); clearAITimeout(); mode='local'; onlineType=null; myRole='p1'; gameOver=false; selectedIndex=null; const base={mode:'local',ranked:false,turn:'p1',round:1,status:'playing',lastSuit:null,p1:newFighter(name,getDeck(),getRating()),p2:newFighter('EMBER AI',getAIDeck(),1200),lastAction:null}; gameState=initializeMatchState(base); enterGame(); renderGame(); showBanner('OFFLINE VS AI'); logText('The AI studies your opening hand.'); beginTurnIfNeeded()}
-async function createCasualRoom(){const name=getLocalPlayerName(); setStoredName(name); clearInterval(timerInt); clearOnlineListeners(); mode='online'; onlineType='casual'; myRole='p1'; gameOver=false; selectedIndex=null; roomId=roomCode(); const base={mode:'online',ranked:false,turn:'p1',round:1,status:'waiting',created:Date.now(),lastSuit:null,p1:newFighter(name,getDeck(),getRating()),p2:newFighter('FOE',getDeck(),1000),lastAction:null}; const state=initializeMatchState(base); await set(ref(db,`rooms/${roomId}`),state); enterGame(); renderGame(); setNetStatus('waiting',`● ROOM ${roomId} WAITING`); listenToRoom(roomId); logText(`Room ${roomId} is waiting for an opponent.`)}
-async function joinCasualRoom(code){const name=getLocalPlayerName(); setStoredName(name); const snap=await get(ref(db,`rooms/${code}`)); if(!snap.exists()){msg('Room not found.'); return} const state=snap.val(); if(state.status==='playing'){msg('That room is already full.'); return} mode='online'; onlineType='casual'; myRole='p2'; roomId=code; gameOver=false; selectedIndex=null; state.p2=newFighter(name,getDeck(),getRating()); state.status='playing'; await set(ref(db,`rooms/${code}`),state); enterGame(); listenToRoom(code)}
+async function createCasualRoom(){const name=getLocalPlayerName(); setStoredName(name); clearInterval(timerInt); clearOnlineListeners(); mode='online'; onlineType='casual'; myRole='p1'; gameOver=false; selectedIndex=null; roomId=roomCode(); const base={mode:'online',ranked:false,turn:'p1',round:1,status:'waiting', ready:false,created:Date.now(),lastSuit:null,p1:newFighter(name,getDeck(),getRating()),p2:newFighter('FOE',getDeck(),1000),lastAction:null}; const state=initializeMatchState(base); await set(ref(db,`rooms/${roomId}`),state); enterGame(); renderGame(); setNetStatus('waiting',`● ROOM ${roomId} WAITING`); listenToRoom(roomId); logText(`Room ${roomId} is waiting for an opponent.`)}
+async function joinCasualRoom(code){const name=getLocalPlayerName(); setStoredName(name); const snap=await get(ref(db,`rooms/${code}`)); if(!snap.exists()){msg('Room not found.'); return} const state=snap.val(); if(state.status==='playing' && state.p2 && state.p2.name){msg('That room is already full.'); return} mode='online'; onlineType='casual'; myRole='p2'; roomId=code; gameOver=false; selectedIndex=null; state.p2=newFighter(name,getDeck(),getRating()); state.status='playing'; await set(ref(db,`rooms/${code}`),state); enterGame(); listenToRoom(code)}
 async function joinRankedQueue(){const name=getLocalPlayerName(); setStoredName(name); msg('Searching ranked queue...'); mode='online'; onlineType='ranked'; myRole='p1'; const me={name,rating:getRating(),deck:getDeck(),joined:Date.now()}, myTicketRef=push(ref(db,'rankedQueue')), myTicketId=myTicketRef.key; await set(myTicketRef,me); const queueSnap=await get(ref(db,'rankedQueue')), all=queueSnap.val()||{}; const others=Object.entries(all).filter(([id])=>id!==myTicketId).map(([id,v])=>({id,...v})).sort((a,b)=>Math.abs(a.rating-me.rating)-Math.abs(b.rating-me.rating)); if(others.length){const opp=others[0]; roomId=roomCode(); const base={mode:'online',ranked:true,turn:'p1',round:1,status:'playing',created:Date.now(),lastSuit:null,p1:newFighter(name,me.deck,me.rating),p2:newFighter(opp.name,opp.deck,opp.rating),lastAction:null}; const roomState=initializeMatchState(base); await set(ref(db,`rooms/${roomId}`),roomState); await remove(ref(db,`rankedQueue/${opp.id}`)); await remove(ref(db,`rankedQueue/${myTicketId}`)); myRole='p1'; enterGame(); listenToRoom(roomId); msg('Ranked match found.'); return} queuePoll=setInterval(async()=>{const meSnap=await get(ref(db,`rankedQueue/${myTicketId}`)); if(!meSnap.exists()){clearInterval(queuePoll); return} const qs=await get(ref(db,'rooms')), rooms=qs.val()||{}; for(const [rid,room] of Object.entries(rooms)){if(room.ranked && room.status==='playing' && room.p2 && room.p2.name===name && room.p2.rating===me.rating){roomId=rid; myRole='p2'; await remove(ref(db,`rankedQueue/${myTicketId}`)); clearInterval(queuePoll); enterGame(); listenToRoom(rid); msg('Ranked match found.'); return}}},1400); setScreen('menu')}
 function listenToRoom(id){clearOnlineListeners(); roomId=id; const roomRef=ref(db,`rooms/${id}`); stateUnsubscribe=onValue(roomRef,snap=>{if(!snap.exists()) return; const state=snap.val(); gameState=state; renderGame(); if(state.status==='waiting'){setNetStatus('waiting',`● ROOM ${id} WAITING`); logText(`Room ${id} is open. Share the code.`); return} if(state.status==='playing') beginTurnIfNeeded(); if(state.status==='gameover' && !gameOver) finishGame(state.winner)})}
 function beginTurnIfNeeded(){if(!gameState || gameOver) return; const whose=gameState.turn; if(mode==='online' && gameState.status!=='playing') return; if(whose===myRole){setNetStatus('myturn','● YOUR TURN'); $('#opp-indicator').style.display='none'; $('#hint').textContent='-- choose a card, draw, or discard --'; startTurnTimer()} else {setNetStatus('connected',mode==='local'?'● AI THINKING':'● ONLINE'); $('#opp-indicator').style.display='block'; pauseTimer(); $('#hint').textContent=mode==='local'?'-- ember ai is thinking --':'-- opponent is playing --'; if(mode==='local' && whose==='p2'){clearAITimeout(); aiTimeout=setTimeout(aiTakeTurn,900)}} updateButtons()}
@@ -236,5 +236,29 @@ renderHome();
 setScreen('menu');
 requestAnimationFrame(animLoop);
 </script>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen" style="position:absolute;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:999;">
+  <div style="background:#111;padding:30px;border:2px solid #444;text-align:center;">
+    <h2 style="color:#c49a35;margin-bottom:10px;">Enter Name</h2>
+    <input id="loginName" style="padding:8px;margin-bottom:10px;" placeholder="Your Name"/>
+    <br/>
+    <button onclick="saveLogin()">Enter</button>
+  </div>
+</div>
+<script>
+function saveLogin(){
+  const name = document.getElementById('loginName').value.trim() || 'PLAYER';
+  localStorage.setItem('ck_name_v3', name);
+  document.getElementById('login-screen').style.display='none';
+}
+window.onload = () => {
+  const saved = localStorage.getItem('ck_name_v3');
+  if(saved){
+    document.getElementById('login-screen').style.display='none';
+  }
+};
+</script>
+
 </body>
 </html>
