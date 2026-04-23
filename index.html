@@ -611,7 +611,7 @@ function renderHand(){
 function updateButtons(){
   const me=currentPlayer(), myTurn=!!gameState&&gameState.turn===myRole&&!gameOver&&gameState.status==='playing';
   const selected=selectedIndex!==null?me?.hand[selectedIndex]:null;
-  $('#playbtn').disabled = false;
+  $('#playbtn').disabled=!(myTurn&&selected&&canPlayCard(me,selected));
   $('#drawbtn').disabled=!myTurn;
   $('#discardBtn').disabled=!(myTurn&&selectedIndex!==null);
   if(myTurn){$('#hint').textContent=selected?`${selected.val} of ${selected.suit.toUpperCase()} — cost ${selected.cost}`:'-- choose a card, draw, or discard --'}
@@ -911,17 +911,10 @@ async function finishGame(winner){
 
 // ── Action dispatch ───────────────────────────────────────────────────────────
 function handleAction(type){
-  if(mode === 'online'){
-    applyOnlineAction({
-      type,
-      index: selectedIndex
-    });
-    selectedIndex = null;
-    return;
-  }
-
-  // existing offline logic stays below this
+  if(mode==='local') return performLocalAction(type);
+  if(mode==='online') return applyOnlineAction(type);
 }
+
 function performLocalAction(type){
   if(!gameState||gameOver||gameState.turn!==myRole||gameState.status!=='playing') return;
   const state=deepClone(gameState); let logParts=[];
@@ -956,42 +949,33 @@ function performLocalAction(type){
 // in the room may not byte-for-byte match what's in localStorage after
 // the round-trip through Firebase JSON. Turn ownership (cur.turn !== myRole)
 // is sufficient to prevent out-of-turn actions.
-async function applyOnlineAction(action){
+async function applyOnlineAction(actionType){
   if(!roomId) return;
-
-  const roomRef = ref(db, `rooms/${roomId}`);
-
-  await runTransaction(roomRef, (state)=>{
-    if(!state || state.status !== 'playing') return;
-
-    // ✅ Only allow action if it's YOUR turn
-    if(state.turn !== myRole) return state;
-
-    const me = state[myRole];
-    if(!me) return state;
-
-    let result;
-
-    if(action.type === 'play'){
-      result = resolveCardPlay(state, myRole, action.index);
-    }
-    else if(action.type === 'draw'){
-      const logs = drawCardAndEndTurn(state, myRole);
-      result = { text: 'Draw', passed: logs };
-    }
-    else if(action.type === 'discard'){
-      discardCardForEnergy(state, myRole, action.index);
-      result = { text: 'Discarded for energy', passed: [] };
-    }
-
-    // ✅ CRITICAL: force update so Firebase syncs
-    state.lastLog = result.text || '';
-    state.seq = (state.seq || 0) + 1;
-
+  const roomRef=ref(db,`rooms/${roomId}`);
+  let newLog='';
+  const actionIndex=selectedIndex;
+  const result=await runTransaction(roomRef, cur=>{
+    if(!cur) return cur;
+    if(cur.status!=='playing') return cur;
+    // Only enforce turn order — seatToken check removed (was causing silent aborts)
+    if(cur.turn!==myRole) return cur;
+    const state=deepClone(cur);
+    if(actionType==='draw'){
+      newLog=[`${state[myRole].name} draws and ends the turn.`, ...drawCardAndEndTurn(state,myRole)].filter(Boolean).join(' | ');
+    } else if(actionType==='discard'){
+      if(actionIndex===null) return cur;
+      discardCardForEnergy(state,myRole,actionIndex);
+      newLog=`${state[myRole].name} discards to recover energy.`;
+    } else if(actionType==='play'){
+      if(actionIndex===null) return cur;
+      const res=resolveCardPlay(state,myRole,actionIndex);
+      newLog=[res.text,...res.passed].filter(Boolean).join(' | ');
+    } else { return cur }
     checkForWinner(state);
-
+    state.lastLog=newLog;
     return state;
   });
+  if(result.committed){ selectedIndex=null; if(newLog) logText(newLog) }
 }
 
 // ── AI ────────────────────────────────────────────────────────────────────────
@@ -1202,26 +1186,9 @@ $('#leaveMatchBtn').onclick=()=>{
   leaveMatch(false, false)
 };
 
-$('#playbtn').onclick = () => {
-  if(selectedIndex !== null){
-    handleAction('play');
-  }
-};
+$('#playbtn').onclick=()=>handleAction('play');
 $('#drawbtn').onclick=()=>handleAction('draw');
 $('#discardBtn').onclick=()=>handleAction('discard');
-  
-window.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('playbtn').onclick = () => {
-    console.log("PLAY BUTTON CLICKED", selectedIndex, gameState?.turn, myRole);
-
-    if(selectedIndex === null){
-      console.log("NO CARD SELECTED");
-      return;
-    }
-
-    handleAction('play');
-  };
-});
 </script>
 </body>
 </html>
