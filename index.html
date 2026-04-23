@@ -162,6 +162,15 @@ button,input{font-family:inherit}
 @keyframes bleedDrip{0%{box-shadow:2px 2px 0 #000,inset 0 0 10px rgba(42,31,14,.14)}50%{box-shadow:0 0 14px 3px rgba(180,20,20,.55),inset 0 0 12px rgba(200,30,30,.25)}100%{box-shadow:2px 2px 0 #000,inset 0 0 10px rgba(42,31,14,.14)}}
 .fcard.bleeding{animation:bleedDrip 1.8s ease-in-out infinite}
 
+
+@keyframes screenPulse{0%{transform:scale(1)}50%{transform:scale(1.015)}100%{transform:scale(1)}}
+@keyframes cabinetShake{0%{transform:translate(0,0)}25%{transform:translate(-4px,2px)}50%{transform:translate(4px,-2px)}75%{transform:translate(-3px,1px)}100%{transform:translate(0,0)}}
+@keyframes duelFlash{0%{opacity:0}20%{opacity:.2}100%{opacity:0}}
+#arena.duel-moment::after{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at center,rgba(255,244,210,.18),transparent 60%);animation:duelFlash .45s ease;z-index:22}
+.flavor{font-size:7px;opacity:.58;text-align:center;line-height:1.15;max-width:58px;min-height:16px;font-style:italic;margin-top:2px}
+.hc.legendary-card{box-shadow:0 0 0 1px rgba(191,166,104,.25),1px 1px 0 #000}
+.hc .ritual-chip{position:absolute;left:50%;top:-8px;transform:translateX(-50%);font-size:7px;padding:1px 5px;border:1px solid rgba(191,166,104,.35);border-radius:999px;background:#17120d;color:#d6c59e;letter-spacing:1px}
+
 #logoutBtn{font-size:10px;padding:5px 10px;border-color:#4a3820}
 @media (max-width:880px){.menu-shell,.builder-shell{grid-template-columns:1fr}.fireplace-wrap{min-height:340px}}
 </style>
@@ -336,24 +345,24 @@ const SUITS={
 const VAL_POWER={2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,10:10,J:11,Q:12,K:13,A:14};
 const RARITY_RULES={common:{copies:4,cost:1},uncommon:{copies:3,cost:1},rare:{copies:2,cost:2},legendary:{copies:1,cost:3}};
 const CARD_LIBRARY=[
-  {id:'spade_5',suit:'spade',val:'5',rarity:'common'},
-  {id:'spade_7',suit:'spade',val:'7',rarity:'common'},
-  {id:'spade_9',suit:'spade',val:'9',rarity:'uncommon'},
-  {id:'heart_4',suit:'heart',val:'4',rarity:'common'},
-  {id:'heart_7',suit:'heart',val:'7',rarity:'common'},
-  {id:'heart_Q',suit:'heart',val:'Q',rarity:'rare'},
-  {id:'club_5',suit:'club',val:'5',rarity:'common'},
-  {id:'club_8',suit:'club',val:'8',rarity:'uncommon'},
-  {id:'diamond_5',suit:'diamond',val:'5',rarity:'common'},
-  {id:'diamond_8',suit:'diamond',val:'8',rarity:'uncommon'},
-  {id:'drain_6',suit:'drain',val:'6',rarity:'uncommon'},
-  {id:'wound_6',suit:'wound',val:'6',rarity:'uncommon'},
-  {id:'void_8',suit:'void',val:'8',rarity:'rare'},
-  {id:'mirror_9',suit:'mirror',val:'9',rarity:'rare'},
-  {id:'spade_K',suit:'spade',val:'K',rarity:'rare'},
-  {id:'drain_J',suit:'drain',val:'J',rarity:'rare'},
-  {id:'wound_A',suit:'wound',val:'A',rarity:'legendary'},
-  {id:'mirror_A',suit:'mirror',val:'A',rarity:'legendary'}
+  {id:'spade_5',suit:'spade',val:'5',rarity:'common',flavor:'A neat cut in candlelight.'},
+  {id:'spade_7',suit:'spade',val:'7',rarity:'common',flavor:'Steel speaks plainly.'},
+  {id:'spade_9',suit:'spade',val:'9',rarity:'uncommon',flavor:'The sharper answer.'},
+  {id:'heart_4',suit:'heart',val:'4',rarity:'common',flavor:'A measured breath.'},
+  {id:'heart_7',suit:'heart',val:'7',rarity:'common',flavor:'Warmth in the smoke.'},
+  {id:'heart_Q',suit:'heart',val:'Q',rarity:'rare',flavor:'Mercy before fury.'},
+  {id:'club_5',suit:'club',val:'5',rarity:'common',flavor:'Set your stance.'},
+  {id:'club_8',suit:'club',val:'8',rarity:'uncommon',flavor:'Brace the floorboards.'},
+  {id:'diamond_5',suit:'diamond',val:'5',rarity:'common',flavor:'A whisper of malice.'},
+  {id:'diamond_8',suit:'diamond',val:'8',rarity:'uncommon',flavor:'The room turns colder.'},
+  {id:'drain_6',suit:'drain',val:'6',rarity:'uncommon',flavor:'Borrowed strength.'},
+  {id:'wound_6',suit:'wound',val:'6',rarity:'uncommon',flavor:'Leave the mark.'},
+  {id:'void_8',suit:'void',val:'8',rarity:'rare',flavor:'Extinguish the trick.'},
+  {id:'mirror_9',suit:'mirror',val:'9',rarity:'rare',flavor:'Let them meet themselves.'},
+  {id:'spade_K',suit:'spade',val:'K',rarity:'rare',flavor:'Royal steel falls hard.'},
+  {id:'drain_J',suit:'drain',val:'J',rarity:'rare',flavor:'A thief in velvet gloves.'},
+  {id:'wound_A',suit:'wound',val:'A',rarity:'legendary',flavor:'The finishing scar.'},
+  {id:'mirror_A',suit:'mirror',val:'A',rarity:'legendary',flavor:'Fate returns the blow.'}
 ];
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -371,6 +380,8 @@ let gameState=null, selectedIndex=null, gameOver=false;
 let timerInt=null, particles=[], canvas=null, ctx=null;
 let stateUnsubscribe=null, aiTimeout=null, queuePoll=null;
 let currentProfile={name:'',wins:0,losses:0,elo:1000};
+let aiStyle='aggressive';
+let ritualHistory=[];
 
 // ── Screen routing ────────────────────────────────────────────────────────────
 function setScreen(which){
@@ -541,8 +552,10 @@ function resolveCardPlay(state, role, handIndex){
   const me=state[role], oppRole=role==='p1'?'p2':'p1', foe=state[oppRole], card=me.hand[handIndex];
   if(!card||!canPlayCard(me,card)) return {text:'Cannot play that card.',passed:[]};
   me.hand.splice(handIndex,1); me.discard.push(card); me.energy-=(card.cost||1);
+  const ritual=detectRitual(card);
   let comboBonus=0;
   if(state.lastSuit===card.suit){me.combo=(me.combo||0)+1; comboBonus=Math.min(me.combo*2,8); showCombo(`COMBO x${me.combo}`)} else me.combo=0;
+  if(ritual?.bonus?.damage) comboBonus += ritual.bonus.damage/2;
   const suit=gSuit(card.suit), basePow=card.pw+comboBonus; let text=[];
   if(card.val==='J'){const steal=mf(2+rr()*3); me.atk=Math.min(20,me.atk+steal); foe.atk=Math.max(1,foe.atk-steal); text.push(`KNAVE steals ${steal} ATK`)}
   else if(card.val==='Q'){const heal=mf(7+rr()*6); me.hp=Math.min(STARTING_HP,me.hp+heal); me.queenBuff=true; foe.curse=Math.min(8,foe.curse+2); text.push(`QUEEN heals ${heal} and empowers the next hit`)}
@@ -558,8 +571,13 @@ function resolveCardPlay(state, role, handIndex){
     if(suit.base==='void'){foe.bleed=0; foe.curse=0; const dmg=mf(basePow*0.36+rr()*4); foe.hp=Math.max(0,foe.hp-dmg); text.push(`VOID purges debuffs and hits for ${dmg}`)}
     if(suit.base==='mirror'){me.mirror=true; text.push(`MIRROR readies a reflection`)}
   }
+  if(ritual){
+    if(ritual.bonus.damage){foe.hp=Math.max(0,foe.hp-ritual.bonus.damage); text.push(`${ritual.name} deals ${ritual.bonus.damage}`)}
+    if(ritual.bonus.heal){me.hp=Math.min(STARTING_HP,me.hp+ritual.bonus.heal); text.push(`${ritual.name} restores ${ritual.bonus.heal}`)}
+    if(ritual.bonus.energy){me.energy=Math.min(me.maxEnergy,me.energy+ritual.bonus.energy); text.push(`${ritual.name} grants +${ritual.bonus.energy} energy`)}
+  }
   state.lastSuit=card.suit;
-  state.lastAction={by:role,type:'play',cardId:card.id,suit:card.suit,val:card.val,text:text.join(' | '),_seen:false};
+  state.lastAction={by:role,type:'play',cardId:card.id,suit:card.suit,val:card.val,text:text.join(' | '),ritual:ritual?.name||'',combo:me.combo||0,_seen:false};
   return {text:text.join(' | '),passed:passTurn(state)}
 }
 
@@ -622,10 +640,11 @@ function renderHand(){
   const handEl=$('#hand'); handEl.innerHTML='';
   if(!gameState) return;
   const me=currentPlayer(), isTurn=gameState.turn===myRole&&!gameOver&&gameState.status==='playing';
+  const ritualHint=ritualHistory.length?ritualHistory.map(x=>x.split(':')[0][0].toUpperCase()).join(' · '):'';
   me.hand.forEach((c,i)=>{
     const suit=gSuit(c.suit), d=document.createElement('div');
-    d.className=`hc${selectedIndex===i?' sel':''}${suit.red?' suit-red':''}${isTurn?'':' disabled-card'}`;
-    d.innerHTML=`<div class="hctop">${c.val}</div><div class="hccost">${c.cost}</div><div class="hcs">${suit.g}</div><div class="hcv">${c.val}</div><div class="hct">${suit.desc}</div><div class="hcrare">${c.rarity}</div><div class="hcbot">${c.val}</div>`;
+    d.className=`hc${selectedIndex===i?' sel':''}${suit.red?' suit-red':''}${isTurn?'':' disabled-card'}${c.rarity==='legendary'?' legendary-card':''}`;
+    d.innerHTML=`${i===selectedIndex&&ritualHint?`<div class="ritual-chip">${ritualHint}</div>`:''}<div class="hctop">${c.val}</div><div class="hccost">${c.cost}</div><div class="hcs">${suit.g}</div><div class="hcv">${c.val}</div><div class="hct">${suit.desc}</div><div class="flavor">${c.flavor||''}</div><div class="hcrare">${c.rarity}</div><div class="hcbot">${c.val}</div>`;
     if(isTurn){ d.onclick=()=>{selectedIndex=selectedIndex===i?null:i; renderHand(); updateButtons()} }
     handEl.appendChild(d)
   })
@@ -637,13 +656,48 @@ function updateButtons(){
   $('#playbtn').disabled=!(myTurn&&selected&&canPlayCard(me,selected));
   $('#drawbtn').disabled=!myTurn;
   $('#discardBtn').disabled=!(myTurn&&selectedIndex!==null);
-  if(myTurn){$('#hint').textContent=selected?`${selected.val} of ${selected.suit.toUpperCase()} — cost ${selected.cost}`:'-- choose a card, draw, or discard --'}
+  if(myTurn){$('#hint').textContent=selected?`${selected.val} of ${selected.suit.toUpperCase()} — cost ${selected.cost}${ritualHistory.length?` — ritual chain ${ritualHistory.map(x=>x.split(':')[0][0].toUpperCase()).join('/')}`:''}`:'-- choose a card, draw, or discard --'}
 }
 
 function setNetStatus(cls, txt){ const el=$('#net-status'); el.className=cls; el.textContent=txt }
 function logText(t){ $('#log').textContent=t }
 function showBanner(t){ const b=$('#bnr'); b.textContent=t; b.style.display='block'; setTimeout(()=>b.style.display='none',1600) }
 function showCombo(t){ const c=$('#combo-flash'); c.textContent=t; c.style.display='block'; setTimeout(()=>c.style.display='none',1200) }
+
+function duelMoment(text,intensity=1){
+  const arena=$('#arena');
+  if(arena){ arena.classList.add('duel-moment'); arena.style.animation=`screenPulse ${Math.max(.24,.34*intensity)}s ease`; setTimeout(()=>{arena.style.animation=''; arena.classList.remove('duel-moment');}, Math.max(260,340*intensity)); }
+  document.body.style.filter='brightness(1.12) contrast(1.1)';
+  setTimeout(()=>document.body.style.filter='',180);
+  showBanner(text);
+}
+
+function screenShake(power=1){
+  const cab=$('#cabinet');
+  if(!cab) return;
+  cab.style.animation=`cabinetShake ${Math.max(.16,.24*power)}s ease`;
+  setTimeout(()=>cab.style.animation='', Math.max(180,260*power));
+}
+
+function detectRitual(card){
+  ritualHistory.push(`${card.suit}:${card.val}`);
+  if(ritualHistory.length>3) ritualHistory.shift();
+  const suits=ritualHistory.map(x=>x.split(':')[0]);
+  const vals=ritualHistory.map(x=>x.split(':')[1]);
+  if(suits.length===3 && suits.every(s=>s===suits[0])) return {name:`RITUAL: ${suits[0].toUpperCase()} TRINITY`, bonus:{damage:10}};
+  const nums=vals.map(v=>VAL_POWER[v]||0);
+  if(nums.length===3 && nums[0]<nums[1]<nums[2]) return {name:'RITUAL: ASCENDANT RUN', bonus:{heal:8}};
+  if(suits.length===3 && new Set(suits).size===3) return {name:'RITUAL: THREE HOUSES', bonus:{energy:1}};
+  return null;
+}
+
+function scoreAICardByStyle(state, card){
+  const base=scoreAICard(state, card);
+  const kind=gSuit(card.suit).base;
+  if(aiStyle==='aggressive') return base + (kind==='strike'||kind==='wound'||kind==='drain'?5:0) + (card.val==='A'?8:0);
+  if(aiStyle==='defensive') return base + (kind==='mend'||kind==='brace'||kind==='mirror'?5:0) + (card.val==='Q'?5:0);
+  return base + (kind==='curse'||kind==='mirror'||kind==='void'?6:0) + (card.val==='J'?4:0);
+}
 
 function startTurnTimer(){
   clearInterval(timerInt);
@@ -896,7 +950,7 @@ async function joinRankedQueue(){
 }
 
 // ── Enter game screen ─────────────────────────────────────────────────────────
-function enterGame(){ setScreen('game'); initCanvas() }
+function enterGame(){ setScreen('game'); ritualHistory=[]; initCanvas() }
 
 // ── Leave match ───────────────────────────────────────────────────────────────
 async function leaveMatch(deleteRoomData=false, applyEloLoss=false){
@@ -958,6 +1012,10 @@ function performLocalAction(type){
       const dmgM=res.text.match(/(?:deals|strikes?|crashes?|steals?\s+\d+\s+life from)\s+(\d+)/i);
       const healM=res.text.match(/(?:restores?|heals?|grants?.*?and\s+)(\d+)/i);
       setTimeout(()=>triggerCardFX(card.suit,card.val,myRole,oppRole,dmgM?parseInt(dmgM[1]):0,healM?parseInt(healM[1]):0),80);
+      if(card.val==='A') duelMoment('ACE STRIKE',1.8);
+      if(card.val==='K') duelMoment('ROYAL EXECUTION',1.45);
+      if(state.lastAction?.ritual) duelMoment(state.lastAction.ritual,2);
+      if((state[myRole].combo||0)>=3) duelMoment('COMBO BREAKER',1.35);
     }
   }
   checkForWinner(state); gameState=state;
@@ -1043,6 +1101,10 @@ async function applyOnlineAction(actionType){
     selectedIndex=null;
     gameState=result.snapshot.val();
     if(newLog) logText(newLog);
+    if(gameState?.lastAction?.val==='A') duelMoment('ACE STRIKE',1.8);
+    if(gameState?.lastAction?.val==='K') duelMoment('ROYAL EXECUTION',1.45);
+    if(gameState?.lastAction?.ritual) duelMoment(gameState.lastAction.ritual,2);
+    if((gameState?.[myRole]?.combo||0)>=3) duelMoment('COMBO BREAKER',1.35);
     renderGame();
     if(gameState.status==='gameover') finishGame(gameState.winner);
     else beginTurnIfNeeded();
@@ -1077,13 +1139,15 @@ function aiTakeTurn(){
     logParts.push('EMBER AI draws and passes.');
     logParts.push(...drawCardAndEndTurn(state,'p2'));
   } else {
-    playable.sort((a,b)=>scoreAICard(state,a.card)-scoreAICard(state,b.card));
+    playable.sort((a,b)=>scoreAICardByStyle(state,a.card)-scoreAICardByStyle(state,b.card));
     const choice=playable[playable.length-1], card=choice.card;
     const res=resolveCardPlay(state,'p2',choice.i);
     logParts.push(`EMBER AI: ${res.text}`); logParts.push(...res.passed);
     const dmgM=res.text.match(/(?:deals|strikes?|crashes?)\s+(\d+)/i);
     const healM=res.text.match(/(?:restores?|heals?)\s+(\d+)/i);
     setTimeout(()=>triggerCardFX(card.suit,card.val,'p2','p1',dmgM?parseInt(dmgM[1]):0,healM?parseInt(healM[1]):0),200);
+    if(card.val==='A') duelMoment('EMBER UNLEASHES AN ACE',1.8);
+    if(state.lastAction?.ritual) duelMoment(state.lastAction.ritual,2);
   }
   checkForWinner(state); gameState=state;
   logText(logParts.filter(Boolean).join(' | '));
@@ -1199,6 +1263,7 @@ function triggerCardFX(suit, val, attackerRole, defenderRole, dmg, heal){
   if(dmg>0){const bar=$('#'+(defenderRole==='p1'?'p1h':'p2h')); if(bar){bar.classList.remove('flash-dmg'); void bar.offsetWidth; bar.classList.add('flash-dmg'); setTimeout(()=>bar.classList.remove('flash-dmg'),500)}}
   if(heal>0){const bar=$('#'+(attackerRole==='p1'?'p1h':'p2h')); if(bar){bar.classList.remove('flash-heal'); void bar.offsetWidth; bar.classList.add('flash-heal'); setTimeout(()=>bar.classList.remove('flash-heal'),500)}}
   if(dmg>0){const fc=$('#'+(defenderRole==='p1'?'fc1':'fc2')); if(fc){fc.classList.remove('shake'); void fc.offsetWidth; fc.classList.add('shake'); setTimeout(()=>fc.classList.remove('shake'),500)}}
+  if(dmg>=10) screenShake(Math.min(1.8, .9 + dmg/20));
   if(suit==='mirror'){const fc=$('#'+(attackerRole==='p1'?'fc1':'fc2')); if(fc){fc.classList.add('mirrored'); setTimeout(()=>fc.classList.remove('mirrored'),3000)}}
   if(suit==='wound'){const fc=$('#'+(defenderRole==='p1'?'fc1':'fc2')); if(fc){fc.classList.add('bleeding'); setTimeout(()=>fc.classList.remove('bleeding'),4000)}}
 }
@@ -1230,9 +1295,11 @@ $('#cancelLobbyBtn').onclick=()=>{
 $('#offlineBtn').onclick=()=>{
   mode='local'; onlineType=null; myRole='p1'; gameOver=false; selectedIndex=null;
   const aiDeck=['spade_7','spade_7','spade_9','spade_K','heart_4','heart_7','heart_Q','club_5','club_8','club_8','diamond_5','diamond_8','diamond_8','drain_6','drain_6','drain_J','wound_6','wound_6','wound_A','void_8','mirror_9','mirror_A','heart_4','spade_5'];
-  const base={mode:'local',ranked:false,maxPlayers:2,turn:'p1',round:1,status:'playing',created:Date.now(),lastSuit:null,lastLog:'',lastAction:null,p1:newFighter(currentProfile.name,getDeck(),currentProfile.elo,seatToken),p2:newFighter('EMBER AI',aiDeck,1200,'AI')};
+  aiStyle=['aggressive','defensive','trickster'][mf(rr()*3)];
+  ritualHistory=[];
+  const base={mode:'local',ranked:false,maxPlayers:2,turn:'p1',round:1,status:'playing',created:Date.now(),lastSuit:null,lastLog:'',lastAction:null,p1:newFighter(currentProfile.name,getDeck(),currentProfile.elo,seatToken),p2:newFighter(`EMBER AI · ${aiStyle.toUpperCase()}`,aiDeck,1200,'AI')};
   gameState=initializeMatchState(base);
-  enterGame(); renderGame(); logText('The AI studies your opening hand.'); beginTurnIfNeeded()
+  enterGame(); renderGame(); logText(`The AI studies your opening hand. Temperament: ${aiStyle}.`); beginTurnIfNeeded()
 };
 
 $('#createRoomBtn').onclick=()=>createRoom().catch(e=>msg(`Create failed: ${e.message}`));
