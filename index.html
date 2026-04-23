@@ -611,7 +611,7 @@ function renderHand(){
 function updateButtons(){
   const me=currentPlayer(), myTurn=!!gameState&&gameState.turn===myRole&&!gameOver&&gameState.status==='playing';
   const selected=selectedIndex!==null?me?.hand[selectedIndex]:null;
-  $('#playbtn').disabled=!(myTurn&&selected&&canPlayCard(me,selected));
+  $('#playbtn').disabled = false;
   $('#drawbtn').disabled=!myTurn;
   $('#discardBtn').disabled=!(myTurn&&selectedIndex!==null);
   if(myTurn){$('#hint').textContent=selected?`${selected.val} of ${selected.suit.toUpperCase()} — cost ${selected.cost}`:'-- choose a card, draw, or discard --'}
@@ -1209,6 +1209,19 @@ $('#playbtn').onclick = () => {
 };
 $('#drawbtn').onclick=()=>handleAction('draw');
 $('#discardBtn').onclick=()=>handleAction('discard');
+  
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('playbtn').onclick = () => {
+    console.log("PLAY BUTTON CLICKED", selectedIndex, gameState?.turn, myRole);
+
+    if(selectedIndex === null){
+      console.log("NO CARD SELECTED");
+      return;
+    }
+
+    handleAction('play');
+  };
+});
 </script>
 </body>
 </html>
