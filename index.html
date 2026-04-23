@@ -7,28 +7,32 @@
 <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Cutive+Mono&display=swap" rel="stylesheet">
 <style>
 :root{
-  --line:#3b2c11;--gold:#c49a35;--gold2:#8b6914;--paper:#e8dfc8;--paper2:#d6c7a0;
-  --ink:#2a1f0e;--faded:#7a6a4a;--red:#8e2413;--green:#2b6a2b;--purple:#7f66b5;
+  --line:#46382b;--gold:#9f8a63;--gold2:#7f6c4b;--paper:#d7ccb5;--paper2:#b9ac93;
+  --ink:#2a231b;--faded:#7c715f;--red:#7a4a41;--green:#576557;--purple:#72697d;
+  --shadow:rgba(0,0,0,.42);--panel:#16120e;--panel2:#100d0a;--velvet:#1a1511;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:radial-gradient(circle at top,#24170a 0%,#100b06 35%,#070503 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;color:var(--paper2);font-family:'Cutive Mono',monospace}
+body{background:radial-gradient(circle at top,#2f261d 0%,#17120e 42%,#0b0907 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;color:var(--paper2);font-family:'Cutive Mono',monospace;overflow:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 15% 20%,rgba(255,248,230,.035),transparent 30%),radial-gradient(circle at 82% 16%,rgba(255,248,230,.025),transparent 24%),radial-gradient(circle at 50% 120%,rgba(255,248,230,.04),transparent 42%);opacity:.9}
 button,input{font-family:inherit}
-#cabinet{width:100%;max-width:1040px;min-height:780px;border:4px solid var(--line);background:linear-gradient(180deg,#130e07,#0b0805);position:relative;overflow:hidden;box-shadow:0 0 90px rgba(0,0,0,.9), inset 0 0 40px rgba(0,0,0,.55)}
-#cabinet::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:300;background:repeating-linear-gradient(0deg,transparent 0,transparent 2px,rgba(255,255,255,.015) 2px,rgba(255,255,255,.015) 4px)}
+#cabinet{width:100%;max-width:1120px;min-height:780px;border:1px solid #5b4a39;background:linear-gradient(180deg,#17120f,#0c0a08 70%,#090705);position:relative;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.58), inset 0 0 60px rgba(0,0,0,.45), 0 0 0 6px rgba(83,67,49,.22);border-radius:18px}
+#cabinet::before{content:'';position:absolute;inset:14px;border:1px solid rgba(176,154,115,.18);border-radius:12px;pointer-events:none;z-index:2}
+#cabinet::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:300;background:repeating-linear-gradient(0deg,transparent 0,transparent 2px,rgba(255,255,255,.012) 2px,rgba(255,255,255,.012) 4px),linear-gradient(180deg,rgba(255,255,255,.02),transparent 18%,transparent 78%,rgba(0,0,0,.18));mix-blend-mode:screen}
 .hidden{display:none!important}
-.btn{border:1px solid var(--line);background:#110c06;color:var(--paper2);padding:9px 14px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:.15s;font-size:12px}
-.btn:hover{transform:translateY(-1px);border-color:var(--gold);color:#fff;background:#1a1208}
-.btn.primary{border-color:var(--gold);background:#1c1409}.btn.danger{border-color:#632218;color:#e4b0a8}.btn.small{font-size:10px;padding:6px 10px}
+.btn{border:1px solid #5a4a38;background:linear-gradient(180deg,#191511,#0f0c09);color:var(--paper2);padding:10px 14px;cursor:pointer;letter-spacing:1.6px;text-transform:uppercase;transition:transform .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease,color .18s ease;font-size:11px;border-radius:10px;box-shadow:inset 0 1px 0 rgba(255,255,255,.03),0 6px 14px rgba(0,0,0,.22)}
+.btn:hover{transform:translateY(-2px);border-color:var(--gold);color:#efe6d3;background:linear-gradient(180deg,#211b15,#13100c);box-shadow:0 10px 20px rgba(0,0,0,.28)}
+.btn.primary{border-color:#8d7a58;background:linear-gradient(180deg,#221c15,#15110d)}.btn.danger{border-color:#69483f;color:#d4b0a6}.btn.small{font-size:10px;padding:6px 10px}
 .btn:disabled,.btn.disabled{opacity:.35;pointer-events:none}
-.input{width:100%;background:#0c0906;color:var(--paper2);border:1px solid var(--line);padding:10px 12px;letter-spacing:1px}
-.section-title{color:var(--gold);letter-spacing:3px;font-size:11px;margin-bottom:10px;text-transform:uppercase}
+.input{width:100%;background:#0f0d0a;color:var(--paper2);border:1px solid #514436;padding:11px 12px;letter-spacing:2px;border-radius:10px;box-shadow:inset 0 1px 10px rgba(0,0,0,.25)}
+.input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 2px rgba(159,138,99,.12), inset 0 1px 10px rgba(0,0,0,.25)}
+.section-title{color:var(--gold);letter-spacing:3px;font-size:10px;margin-bottom:10px;text-transform:uppercase}
 #screen-login,#screen-menu,#screen-builder,#screen-game,#screen-lobby{position:absolute;inset:0}
 
 /* ── Login ── */
 #screen-login{display:flex;align-items:center;justify-content:center;background:rgba(6,4,2,.98);z-index:900}
-.login-card{width:min(420px,92%);border:2px solid var(--line);background:linear-gradient(180deg,#120d07,#090704);padding:24px}
+.login-card{width:min(420px,92%);border:1px solid #5b4b3a;background:linear-gradient(180deg,#17120f,#0b0907);padding:26px;border-radius:18px;box-shadow:0 18px 40px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.03)}
 .brand{font-family:'Special Elite',serif;color:var(--gold);font-size:32px;letter-spacing:6px;text-align:center;padding:0 0 8px}
-.subbrand{text-align:center;color:#8e7a53;font-size:12px;letter-spacing:3px;margin-bottom:18px}
+.subbrand{text-align:center;color:#8d8069;font-size:12px;letter-spacing:3px;margin-bottom:18px}
 .cardbox{border:1px solid var(--line);background:#0b0705;padding:12px}
 
 /* ── Lobby / Waiting Room ── */
@@ -49,31 +53,42 @@ button,input{font-family:inherit}
 .lobby-note{font-size:11px;color:#6a5a3a;text-align:center;line-height:1.6;letter-spacing:1px}
 
 /* ── Menu ── */
-#screen-menu{display:flex;align-items:center;justify-content:center;padding:20px}
-.menu-shell{width:100%;height:100%;display:grid;grid-template-columns:1.1fr .9fr;gap:18px}
-.fireplace-wrap{border:2px solid var(--line);background:linear-gradient(180deg,#151008,#0a0704);position:relative;overflow:hidden;min-height:700px}
-.parlor{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.15),rgba(0,0,0,.35)),repeating-linear-gradient(90deg,rgba(95,70,35,.08) 0,rgba(95,70,35,.08) 12px,transparent 12px,transparent 24px),linear-gradient(180deg,#24170c 0%,#170f08 50%,#100b06 100%)}
-.mantel{position:absolute;left:10%;right:10%;top:12%;height:18px;background:#2a1d0c;border:2px solid #4d3715}
-.frame{position:absolute;left:22%;right:22%;top:5%;height:92px;border:3px solid #4b3614;background:rgba(12,9,5,.4);display:flex;align-items:center;justify-content:center;color:var(--gold);font-family:'Special Elite',serif;font-size:24px;letter-spacing:4px;text-align:center}
-.hearth{position:absolute;left:18%;right:18%;bottom:17%;height:230px;border:4px solid #523816;background:#090704;box-shadow:inset 0 0 40px rgba(0,0,0,.65)}
-.fire-bricks{position:absolute;inset:8px;background:repeating-linear-gradient(0deg,rgba(133,88,46,.18) 0,rgba(133,88,46,.18) 18px,transparent 18px,transparent 36px),repeating-linear-gradient(90deg,rgba(133,88,46,.14) 0,rgba(133,88,46,.14) 52px,transparent 52px,transparent 104px),#130d08}
-.log{position:absolute;bottom:34px;width:118px;height:18px;background:#4c3317;border-radius:8px;box-shadow:inset 0 0 8px rgba(0,0,0,.35)}
+#screen-menu{display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(circle at 30% 20%,rgba(190,170,135,.04),transparent 20%),linear-gradient(180deg,rgba(255,255,255,.015),transparent 18%,transparent 70%,rgba(0,0,0,.16))}
+.menu-shell{width:100%;height:100%;display:grid;grid-template-columns:1.12fr .88fr;gap:22px;position:relative}
+.fireplace-wrap{border:1px solid #5b4b3a;background:linear-gradient(180deg,#1a1410,#0d0a08 76%);position:relative;overflow:hidden;min-height:700px;border-radius:18px;box-shadow:inset 0 1px 0 rgba(255,255,255,.03),0 18px 40px rgba(0,0,0,.24)}
+.fireplace-wrap::before{content:'';position:absolute;inset:18px;border:1px solid rgba(176,154,115,.12);border-radius:12px;pointer-events:none}
+.fireplace-wrap::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.025),transparent 28%,transparent 74%,rgba(0,0,0,.18)),radial-gradient(circle at 50% 20%,rgba(159,138,99,.08),transparent 30%);pointer-events:none}
+.parlor{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.08),rgba(0,0,0,.34)),repeating-linear-gradient(90deg,rgba(95,70,35,.045) 0,rgba(95,70,35,.045) 10px,transparent 10px,transparent 24px),linear-gradient(180deg,#2b2219 0%,#1a140f 46%,#120e0b 100%)}
+.mantel{position:absolute;left:10%;right:10%;top:12%;height:16px;background:#32271c;border:1px solid #5d4931;border-radius:3px}
+.frame{position:absolute;left:21%;right:21%;top:6%;height:96px;border:1px solid #645139;background:linear-gradient(180deg,rgba(37,29,22,.9),rgba(21,16,12,.72));display:flex;align-items:center;justify-content:center;color:#c7b28b;font-family:'Special Elite',serif;font-size:25px;letter-spacing:5px;text-align:center;border-radius:14px;box-shadow:inset 0 0 18px rgba(0,0,0,.28),0 10px 30px rgba(0,0,0,.2);animation:frameBreath 6s ease-in-out infinite}
+.hearth{position:absolute;left:18%;right:18%;bottom:17%;height:236px;border:1px solid #5a432a;background:#0b0806;box-shadow:inset 0 0 40px rgba(0,0,0,.65),0 12px 30px rgba(0,0,0,.28);border-radius:12px}
+.fire-bricks{position:absolute;inset:8px;background:repeating-linear-gradient(0deg,rgba(133,88,46,.12) 0,rgba(133,88,46,.12) 16px,transparent 16px,transparent 34px),repeating-linear-gradient(90deg,rgba(133,88,46,.09) 0,rgba(133,88,46,.09) 48px,transparent 48px,transparent 100px),#130d08;border-radius:8px}
+.log{position:absolute;bottom:34px;width:118px;height:18px;background:#59402a;border-radius:999px;box-shadow:inset 0 0 8px rgba(0,0,0,.35)}
 .log.l1{left:30%;transform:rotate(-8deg)} .log.l2{right:30%;transform:rotate(10deg)}
-.flame{position:absolute;bottom:48px;width:48px;height:86px;border-radius:50% 50% 42% 42%;filter:blur(.5px);animation:flicker 1.8s ease-in-out infinite;transform-origin:bottom center}
-.flame.f1{left:41%;background:radial-gradient(circle at 50% 68%,#fff6b0 0,#ffd25d 22%,#ff8f2e 52%,rgba(255,94,20,.15) 74%,transparent 76%);animation-delay:.1s}
-.flame.f2{left:48%;height:102px;width:56px;background:radial-gradient(circle at 50% 68%,#fff4a0 0,#ffcf47 20%,#ff7f1e 52%,rgba(255,94,20,.12) 74%,transparent 76%);animation-delay:.6s}
-.flame.f3{left:55%;width:44px;height:78px;background:radial-gradient(circle at 50% 68%,#fff8b7 0,#ffd86f 18%,#ff9b38 53%,rgba(255,94,20,.14) 74%,transparent 76%);animation-delay:1.1s}
-.ember{position:absolute;bottom:56px;width:6px;height:6px;border-radius:50%;background:#ffb547;box-shadow:0 0 10px #ff9a24;animation:emberUp linear infinite}
-.ember.e1{left:44%;animation-duration:3.1s}.ember.e2{left:50%;animation-duration:2.6s;animation-delay:.7s}.ember.e3{left:54%;animation-duration:3.6s;animation-delay:1.4s}.ember.e4{left:47%;animation-duration:2.9s;animation-delay:1.2s}
-.rug{position:absolute;left:14%;right:14%;bottom:4%;height:90px;background:linear-gradient(180deg,#381d12,#24110b);border:2px solid #583718}
-.fire-note{position:absolute;left:0;right:0;bottom:0;padding:12px 18px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.55));color:#ccb88f;font-size:12px;line-height:1.6}
-@keyframes flicker{0%,100%{transform:scaleY(1) translateY(0) rotate(-1deg);opacity:.92}25%{transform:scaleY(1.08) translateY(-3px) rotate(2deg);opacity:1}50%{transform:scaleY(.94) translateY(2px) rotate(-2deg);opacity:.86}75%{transform:scaleY(1.12) translateY(-4px) rotate(1deg);opacity:1}}
-@keyframes emberUp{0%{transform:translateY(0) translateX(0) scale(1);opacity:.95}100%{transform:translateY(-150px) translateX(20px) scale(.2);opacity:0}}
-.menu-panel{border:2px solid var(--line);background:linear-gradient(180deg,#120d07,#090704);padding:18px;display:flex;flex-direction:column;gap:14px}
-.menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.rating-box{display:flex;justify-content:space-between;align-items:center;font-size:12px}
-.panel-note{font-size:11px;color:#a99164;line-height:1.55}
-#home-message{min-height:16px;color:#d8bca0;font-size:11px}
+.flame{position:absolute;bottom:48px;width:48px;height:86px;border-radius:50% 50% 42% 42%;filter:blur(1px) saturate(.7);animation:flicker 2.6s ease-in-out infinite;transform-origin:bottom center;opacity:.78}
+.flame.f1{left:41%;background:radial-gradient(circle at 50% 68%,rgba(242,224,176,.72) 0,rgba(182,148,95,.66) 24%,rgba(119,89,52,.32) 55%,transparent 76%);animation-delay:.1s}
+.flame.f2{left:48%;height:102px;width:56px;background:radial-gradient(circle at 50% 68%,rgba(240,228,192,.74) 0,rgba(170,139,88,.6) 22%,rgba(113,86,54,.3) 54%,transparent 76%);animation-delay:.6s}
+.flame.f3{left:55%;width:44px;height:78px;background:radial-gradient(circle at 50% 68%,rgba(234,219,181,.68) 0,rgba(164,134,87,.56) 20%,rgba(105,80,48,.28) 53%,transparent 76%);animation-delay:1.1s}
+.ember{position:absolute;bottom:56px;width:5px;height:5px;border-radius:50%;background:#aa8753;box-shadow:0 0 8px rgba(170,135,83,.5);animation:emberUp linear infinite;opacity:.65}
+.ember.e1{left:44%;animation-duration:4.3s}.ember.e2{left:50%;animation-duration:3.8s;animation-delay:.7s}.ember.e3{left:54%;animation-duration:4.8s;animation-delay:1.4s}.ember.e4{left:47%;animation-duration:3.9s;animation-delay:1.2s}
+.rug{position:absolute;left:14%;right:14%;bottom:4%;height:92px;background:linear-gradient(180deg,#2f251d,#1a1410);border:1px solid #5c4634;border-radius:999px;box-shadow:inset 0 0 18px rgba(0,0,0,.28)}
+.fire-note{position:absolute;left:0;right:0;bottom:0;padding:16px 20px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.62));color:#ae9b7b;font-size:11px;line-height:1.7;letter-spacing:1.2px}
+@keyframes flicker{0%,100%{transform:scaleY(1) translateY(0) rotate(-1deg);opacity:.72}25%{transform:scaleY(1.04) translateY(-2px) rotate(1deg);opacity:.84}50%{transform:scaleY(.96) translateY(1px) rotate(-1deg);opacity:.66}75%{transform:scaleY(1.08) translateY(-3px) rotate(1deg);opacity:.86}}
+@keyframes emberUp{0%{transform:translateY(0) translateX(0) scale(1);opacity:.72}100%{transform:translateY(-140px) translateX(16px) scale(.2);opacity:0}}
+@keyframes frameBreath{0%,100%{transform:translateY(0)}50%{transform:translateY(2px)}}
+@keyframes softPulse{0%,100%{opacity:.9}50%{opacity:1}}
+@keyframes driftIn{0%{transform:translateY(10px);opacity:0}100%{transform:translateY(0);opacity:1}}
+.menu-panel{border:1px solid #5b4b3a;background:linear-gradient(180deg,rgba(22,17,13,.96),rgba(10,8,6,.97));padding:22px;display:flex;flex-direction:column;gap:16px;border-radius:18px;box-shadow:inset 0 1px 0 rgba(255,255,255,.03),0 18px 40px rgba(0,0,0,.24);position:relative;overflow:hidden;animation:driftIn .5s ease}
+.menu-panel::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at top right,rgba(159,138,99,.08),transparent 30%);pointer-events:none}
+.menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.rating-box{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:6px 0;border-bottom:1px solid rgba(176,154,115,.09)}
+.panel-note{font-size:11px;color:#9f9178;line-height:1.68}
+#home-message{min-height:18px;color:#d7c2a2;font-size:11px;padding:10px 12px;border:1px dashed rgba(159,138,99,.28);border-radius:10px;background:rgba(255,255,255,.018);animation:softPulse 4s ease-in-out infinite}
+.menu-heading{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.home-brand{font-size:24px;letter-spacing:5px;text-shadow:0 0 18px rgba(159,138,99,.12)}
+.menu-kicker{text-align:left;margin:0;color:#8d8069;letter-spacing:4px}
+.cardbox{border:1px solid rgba(91,75,58,.92);background:linear-gradient(180deg,rgba(16,13,10,.92),rgba(11,9,7,.98));padding:14px;border-radius:14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.02)}
+.home-action-stack{margin-top:12px;display:grid;gap:10px}
 
 /* ── Builder ── */
 #screen-builder{padding:18px;background:rgba(6,4,3,.98)}
@@ -178,37 +193,45 @@ button,input{font-family:inherit}
       <div class="parlor"></div><div class="frame">CARD<br>KOMBAT</div><div class="mantel"></div>
       <div class="hearth"><div class="fire-bricks"></div><div class="log l1"></div><div class="log l2"></div><div class="flame f1"></div><div class="flame f2"></div><div class="flame f3"></div><div class="ember e1"></div><div class="ember e2"></div><div class="ember e3"></div><div class="ember e4"></div></div>
       <div class="rug"></div>
-      <div class="fire-note">Room joins use Firebase transactions — max two real players, seat-token validation, profile stats. Bot matches only can be left mid-game.</div>
+      <div class="fire-note">Step into the parlor, choose your mode, and let the cards decide the rest. Room joins stay secure, profile stats persist, and the whole cabinet keeps a low-lit, late-night arcade mood.</div>
     </div>
     <div class="menu-panel">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div class="brand" style="font-size:22px;letter-spacing:4px">CARD KOMBAT</div>
+      <div class="menu-heading">
+        <div>
+          <div class="brand home-brand">CARD KOMBAT</div>
+          <div class="subbrand menu-kicker">ASHWOOD PARLOR BUILD</div>
+        </div>
         <button class="btn" id="logoutBtn">Sign Out</button>
       </div>
-      <div class="subbrand" style="text-align:left;margin:0">MULTIPLAYER HARDENED BUILD</div>
       <div class="cardbox">
-        <div class="section-title">Profile</div>
+        <div class="section-title">Duelist Profile</div>
         <div class="rating-box"><span>Name</span><strong id="homeName">-</strong></div>
-        <div class="rating-box" style="margin-top:8px"><span>ELO</span><strong id="homeRating">1000</strong></div>
-        <div class="rating-box" style="margin-top:8px"><span>Wins</span><strong id="homeWins">0</strong></div>
-        <div class="rating-box" style="margin-top:8px"><span>Losses</span><strong id="homeLosses">0</strong></div>
+        <div class="rating-box"><span>ELO</span><strong id="homeRating">1000</strong></div>
+        <div class="rating-box"><span>Wins</span><strong id="homeWins">0</strong></div>
+        <div class="rating-box" style="border-bottom:none"><span>Losses</span><strong id="homeLosses">0</strong></div>
       </div>
       <div class="cardbox">
-        <div class="section-title">Play</div>
+        <div class="section-title">Play Modes</div>
         <div class="menu-grid">
           <button class="btn primary" id="offlineBtn">Offline vs AI</button>
           <button class="btn" id="rankedBtn">Ranked Queue</button>
           <button class="btn" id="createRoomBtn">Create Room</button>
           <button class="btn" id="joinRoomMenuBtn">Join Room</button>
         </div>
-        <div style="margin-top:10px;display:grid;gap:8px">
-          <input class="input" id="joinCodeHome" maxlength="6" placeholder="ROOM CODE" autocomplete="off" style="text-transform:uppercase">
-          <button class="btn" id="openBuilderBtn">Deck Builder</button>
+        <div class="home-action-stack">
+          <input class="input" id="joinCodeHome" maxlength="6" placeholder="ENTER ROOM CODE" autocomplete="off" style="text-transform:uppercase">
+          <button class="btn" id="openBuilderBtn">Open Deck Builder</button>
         </div>
-        <div id="home-message" style="margin-top:10px"></div>
+        <div id="home-message" style="margin-top:12px">Choose a mode to begin.</div>
       </div>
-      <div class="cardbox"><div class="section-title">Current Deck</div><div class="panel-note" id="deckSummary">24 cards loaded.</div></div>
-      <div class="cardbox"><div class="section-title">Networking Notes</div><div class="panel-note">- Only two real, named players can occupy a room.<br>- Seat tokens prevent impersonation or ghost joins.<br>- Online/ranked matches cannot be left — resign is not available mid-game.<br>- Room code appears prominently while waiting for your opponent.</div></div>
+      <div class="cardbox">
+        <div class="section-title">Current Deck</div>
+        <div class="panel-note" id="deckSummary">24 cards loaded.</div>
+      </div>
+      <div class="cardbox">
+        <div class="section-title">House Notes</div>
+        <div class="panel-note">- Two named duelists per room.<br>- Room presence and seat tokens stay enforced.<br>- Online matches flow straight into the arena once both seats are filled.<br>- Muted cabinet styling keeps the focus on atmosphere instead of glare.</div>
+      </div>
     </div>
   </div>
 </section>
