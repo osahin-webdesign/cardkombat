@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Card Kombat Multiplayer Hardened</title>
+<title>Card Kombat Multiplayer</title>
 <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Cutive+Mono&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -23,12 +23,19 @@ button,input{font-family:inherit}
 .input{width:100%;background:#0c0906;color:var(--paper2);border:1px solid var(--line);padding:10px 12px;letter-spacing:1px}
 .section-title{color:var(--gold);letter-spacing:3px;font-size:11px;margin-bottom:10px;text-transform:uppercase}
 #screen-login,#screen-menu,#screen-builder,#screen-game,#screen-lobby{position:absolute;inset:0}
+
+/* ── Login ── */
 #screen-login{display:flex;align-items:center;justify-content:center;background:rgba(6,4,2,.98);z-index:900}
+.login-card{width:min(420px,92%);border:2px solid var(--line);background:linear-gradient(180deg,#120d07,#090704);padding:24px}
+.brand{font-family:'Special Elite',serif;color:var(--gold);font-size:32px;letter-spacing:6px;text-align:center;padding:0 0 8px}
+.subbrand{text-align:center;color:#8e7a53;font-size:12px;letter-spacing:3px;margin-bottom:18px}
+.cardbox{border:1px solid var(--line);background:#0b0705;padding:12px}
+
 /* ── Lobby / Waiting Room ── */
 #screen-lobby{display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 38%,#1a1007,#0a0705 70%);z-index:800}
 .lobby-card{width:min(520px,94%);border:2px solid var(--line);background:linear-gradient(180deg,#120d07,#090704);padding:32px;display:flex;flex-direction:column;align-items:center;gap:20px}
 .lobby-code-label{font-size:11px;letter-spacing:4px;color:var(--faded);text-transform:uppercase}
-.lobby-code{font-family:'Special Elite',serif;font-size:64px;letter-spacing:16px;color:var(--gold);text-shadow:0 0 40px rgba(196,154,53,.45),0 0 80px rgba(196,154,53,.18);text-align:center;padding:8px 0}
+.lobby-code{font-family:'Special Elite',serif;font-size:64px;letter-spacing:16px;color:var(--gold);text-shadow:0 0 40px rgba(196,154,53,.45),0 0 80px rgba(196,154,53,.18);text-align:center;padding:8px 0;user-select:all;cursor:copy}
 .lobby-share{font-size:11px;color:#8e7a53;letter-spacing:2px;text-align:center}
 .lobby-pulse{font-size:12px;letter-spacing:4px;color:var(--faded);animation:blink 1.4s step-end infinite;text-align:center}
 .lobby-players{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%}
@@ -40,10 +47,8 @@ button,input{font-family:inherit}
 .lobby-seat.empty .seat-name{color:var(--faded);font-size:11px}
 .lobby-divider{width:100%;height:1px;background:var(--line)}
 .lobby-note{font-size:11px;color:#6a5a3a;text-align:center;line-height:1.6;letter-spacing:1px}
-.login-card{width:min(420px,92%);border:2px solid var(--line);background:linear-gradient(180deg,#120d07,#090704);padding:24px}
-.brand{font-family:'Special Elite',serif;color:var(--gold);font-size:32px;letter-spacing:6px;text-align:center;padding:0 0 8px}
-.subbrand{text-align:center;color:#8e7a53;font-size:12px;letter-spacing:3px;margin-bottom:18px}
-.cardbox{border:1px solid var(--line);background:#0b0705;padding:12px}
+
+/* ── Menu ── */
 #screen-menu{display:flex;align-items:center;justify-content:center;padding:20px}
 .menu-shell{width:100%;height:100%;display:grid;grid-template-columns:1.1fr .9fr;gap:18px}
 .fireplace-wrap{border:2px solid var(--line);background:linear-gradient(180deg,#151008,#0a0704);position:relative;overflow:hidden;min-height:700px}
@@ -69,6 +74,8 @@ button,input{font-family:inherit}
 .rating-box{display:flex;justify-content:space-between;align-items:center;font-size:12px}
 .panel-note{font-size:11px;color:#a99164;line-height:1.55}
 #home-message{min-height:16px;color:#d8bca0;font-size:11px}
+
+/* ── Builder ── */
 #screen-builder{padding:18px;background:rgba(6,4,3,.98)}
 .builder-shell{width:100%;height:100%;border:2px solid var(--line);background:linear-gradient(180deg,#120d07,#090704);display:grid;grid-template-columns:300px 1fr;gap:16px;padding:16px}
 .builder-left,.builder-right{border:1px solid var(--line);background:#0b0705;padding:14px;overflow:auto}
@@ -80,6 +87,8 @@ button,input{font-family:inherit}
 .lib-card{border:1px solid var(--line);background:var(--paper);color:var(--ink);min-height:128px;padding:7px;display:flex;flex-direction:column;justify-content:space-between}
 .lib-card .top{display:flex;justify-content:space-between;font-size:10px}.lib-card .glyph{text-align:center;font-size:30px}.lib-card .name{text-align:center;font-size:11px;font-weight:bold}.lib-card .meta{font-size:10px;color:#4e3b17;line-height:1.4}.lib-card .controls{display:flex;gap:6px;margin-top:8px}
 .statline{display:flex;justify-content:space-between;border-bottom:1px solid #2a1d0d;padding:6px 0;font-size:12px}
+
+/* ── Game ── */
 #screen-game{display:flex;flex-direction:column}
 #game-topbar{display:flex;justify-content:space-between;align-items:center;background:#080705;border-bottom:2px double var(--line);padding:8px 12px}
 #title-text{font-family:'Special Elite',serif;font-size:18px;letter-spacing:4px;color:var(--gold)}
@@ -108,14 +117,17 @@ button,input{font-family:inherit}
 #bnr,#combo-flash,#opp-indicator{position:absolute;left:50%;transform:translateX(-50%);background:#0a0906;border:1px solid var(--line);padding:5px 12px;letter-spacing:3px;font-size:11px;z-index:30}
 #bnr{top:32px;display:none} #combo-flash{bottom:42px;display:none} #opp-indicator{top:10px;display:none}
 #fx-canvas{position:absolute;inset:0;pointer-events:none;z-index:25}.floatxt{position:absolute;font-size:12px;pointer-events:none;z-index:50;text-shadow:1px 1px 0 #000}
-/* waiting overlay */
-#waiting-overlay{position:absolute;inset:0;z-index:200;background:rgba(6,3,1,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px}
-#waiting-overlay.hidden{display:none!important}
-#waiting-room-code{font-family:'Special Elite',serif;font-size:48px;letter-spacing:12px;color:var(--gold);text-shadow:0 0 30px rgba(196,154,53,.4)}
-#waiting-pulse{font-size:11px;letter-spacing:4px;color:var(--faded);animation:blink 1.4s step-end infinite}
-#waiting-dots span{animation:blink 1.4s step-end infinite}
-#waiting-dots span:nth-child(2){animation-delay:.3s}
-#waiting-dots span:nth-child(3){animation-delay:.6s}
+#status-bar{display:grid;grid-template-columns:repeat(8,1fr);padding:6px 12px;background:#100d08;border-bottom:1px solid var(--line);gap:10px;font-size:10px}
+#status-bar span{display:flex;justify-content:space-between;color:var(--gold)} #status-bar span b{color:var(--paper2)}
+#log{min-height:50px;max-height:50px;padding:8px 12px;background:#090704;border-bottom:1px solid var(--line);font-size:11px;color:var(--paper2);line-height:1.5;overflow:hidden}
+#hand{display:flex;justify-content:center;gap:8px;padding:12px 10px;flex-wrap:wrap;min-height:138px;background:#0f0c08;border-bottom:1px solid var(--line)}
+.hc{width:72px;height:102px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;position:relative;box-shadow:1px 1px 0 #000;transition:.15s}
+.hc:hover{transform:translateY(-8px)} .hc.sel{transform:translateY(-12px);border:2px solid var(--gold2);box-shadow:0 7px 16px rgba(0,0,0,.5)} .hc.disabled-card{opacity:.45;pointer-events:none}
+.hctop,.hcbot{position:absolute;font-size:9px;font-family:'Special Elite',serif}.hctop{top:3px;left:4px}.hcbot{bottom:3px;right:4px;transform:rotate(180deg)}
+.hcs{font-size:22px}.hcv{font-size:10px}.hct{font-size:8px;text-align:center}.hccost{position:absolute;top:3px;right:4px;font-size:8px;border:1px solid #6a5a39;padding:1px 3px;background:#efe0b9}.hcrare{position:absolute;bottom:4px;left:4px;font-size:7px}.suit-red .hcs,.suit-red .hcv,.suit-red .hctop,.suit-red .hcbot{color:var(--red)}
+#controls{background:#0b0906;padding:10px 12px} #hint{font-size:10px;color:var(--faded);text-align:center;letter-spacing:2px;min-height:14px;margin-bottom:8px}
+#btns{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+
 /* card play animation */
 .hc.playing{animation:cardPlay .35s ease-out forwards}
 @keyframes cardPlay{0%{transform:translateY(-12px) scale(1)}40%{transform:translateY(-60px) scale(1.15) rotate(-3deg)}100%{transform:translateY(-120px) scale(0) rotate(8deg);opacity:0}}
@@ -132,26 +144,17 @@ button,input{font-family:inherit}
 /* mirror shimmer */
 @keyframes mirrorShimmer{0%,100%{box-shadow:2px 2px 0 #000,inset 0 0 10px rgba(42,31,14,.14)}50%{box-shadow:0 0 18px 4px rgba(180,220,255,.55),inset 0 0 14px rgba(140,190,255,.3)}}
 .fcard.mirrored{animation:mirrorShimmer 1.2s ease-in-out infinite}
-/* bleed drip css anim on fcard */
 @keyframes bleedDrip{0%{box-shadow:2px 2px 0 #000,inset 0 0 10px rgba(42,31,14,.14)}50%{box-shadow:0 0 14px 3px rgba(180,20,20,.55),inset 0 0 12px rgba(200,30,30,.25)}100%{box-shadow:2px 2px 0 #000,inset 0 0 10px rgba(42,31,14,.14)}}
 .fcard.bleeding{animation:bleedDrip 1.8s ease-in-out infinite}
-#status-bar{display:grid;grid-template-columns:repeat(8,1fr);padding:6px 12px;background:#100d08;border-bottom:1px solid var(--line);gap:10px;font-size:10px}
-#status-bar span{display:flex;justify-content:space-between;color:var(--gold)} #status-bar span b{color:var(--paper2)}
-#log{min-height:50px;max-height:50px;padding:8px 12px;background:#090704;border-bottom:1px solid var(--line);font-size:11px;color:var(--paper2);line-height:1.5;overflow:hidden}
-#hand{display:flex;justify-content:center;gap:8px;padding:12px 10px;flex-wrap:wrap;min-height:138px;background:#0f0c08;border-bottom:1px solid var(--line)}
-.hc{width:72px;height:102px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;position:relative;box-shadow:1px 1px 0 #000;transition:.15s}
-.hc:hover{transform:translateY(-8px)} .hc.sel{transform:translateY(-12px);border:2px solid var(--gold2);box-shadow:0 7px 16px rgba(0,0,0,.5)} .hc.disabled-card{opacity:.45;pointer-events:none}
-.hctop,.hcbot{position:absolute;font-size:9px;font-family:'Special Elite',serif}.hctop{top:3px;left:4px}.hcbot{bottom:3px;right:4px;transform:rotate(180deg)}
-.hcs{font-size:22px}.hcv{font-size:10px}.hct{font-size:8px;text-align:center}.hccost{position:absolute;top:3px;right:4px;font-size:8px;border:1px solid #6a5a39;padding:1px 3px;background:#efe0b9}.hcrare{position:absolute;bottom:4px;left:4px;font-size:7px}.suit-red .hcs,.suit-red .hcv,.suit-red .hctop,.suit-red .hcbot{color:var(--red)}
-#controls{background:#0b0906;padding:10px 12px} #hint{font-size:10px;color:var(--faded);text-align:center;letter-spacing:2px;min-height:14px;margin-bottom:8px}
-#btns{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
-/* logout button in menu */
+
 #logoutBtn{font-size:10px;padding:5px 10px;border-color:#4a3820}
 @media (max-width:880px){.menu-shell,.builder-shell{grid-template-columns:1fr}.fireplace-wrap{min-height:340px}}
 </style>
 </head>
 <body>
 <div id="cabinet">
+
+<!-- ── Login ── -->
 <section id="screen-login">
   <div class="login-card">
     <div class="brand">CARD KOMBAT</div>
@@ -159,7 +162,7 @@ button,input{font-family:inherit}
     <div class="cardbox">
       <div class="section-title">Enter your duelist name</div>
       <input class="input" id="loginName" maxlength="16" placeholder="DUELIST NAME" autocomplete="off">
-      <div class="panel-note" style="margin-top:10px">Stats are tied to this exact name and saved in Firebase. Use the same name to keep your wins, losses, and ELO.</div>
+      <div class="panel-note" style="margin-top:10px">Stats are tied to this name and saved in Firebase. Use the same name to keep your wins, losses, and ELO.</div>
       <div style="display:flex;gap:8px;margin-top:14px">
         <button class="btn primary" id="loginBtn">Enter</button>
       </div>
@@ -168,12 +171,14 @@ button,input{font-family:inherit}
   </div>
 </section>
 
+<!-- ── Menu ── -->
 <section id="screen-menu" class="hidden">
   <div class="menu-shell">
     <div class="fireplace-wrap">
       <div class="parlor"></div><div class="frame">CARD<br>KOMBAT</div><div class="mantel"></div>
       <div class="hearth"><div class="fire-bricks"></div><div class="log l1"></div><div class="log l2"></div><div class="flame f1"></div><div class="flame f2"></div><div class="flame f3"></div><div class="ember e1"></div><div class="ember e2"></div><div class="ember e3"></div><div class="ember e4"></div></div>
-      <div class="rug"></div><div class="fire-note">Room joins use Firebase transactions — max two players, seat-token turn validation, profile stats, consistent state transitions. Bot matches only can be left mid-game.</div>
+      <div class="rug"></div>
+      <div class="fire-note">Room joins use Firebase transactions — max two real players, seat-token validation, profile stats. Bot matches only can be left mid-game.</div>
     </div>
     <div class="menu-panel">
       <div style="display:flex;justify-content:space-between;align-items:center">
@@ -197,17 +202,18 @@ button,input{font-family:inherit}
           <button class="btn" id="joinRoomMenuBtn">Join Room</button>
         </div>
         <div style="margin-top:10px;display:grid;gap:8px">
-          <input class="input" id="joinCodeHome" maxlength="6" placeholder="ROOM CODE" autocomplete="off">
+          <input class="input" id="joinCodeHome" maxlength="6" placeholder="ROOM CODE" autocomplete="off" style="text-transform:uppercase">
           <button class="btn" id="openBuilderBtn">Deck Builder</button>
         </div>
         <div id="home-message" style="margin-top:10px"></div>
       </div>
       <div class="cardbox"><div class="section-title">Current Deck</div><div class="panel-note" id="deckSummary">24 cards loaded.</div></div>
-      <div class="cardbox"><div class="section-title">Networking Notes</div><div class="panel-note">- Room joins use Firebase transactions and stop at two seats.<br>- All actions are applied through a state reducer guarded by actor seat token + turn checks.<br>- Profiles are loaded from Firebase by name and updated on ranked results.<br>- Online/ranked matches cannot be left — resign is not available mid-game.</div></div>
+      <div class="cardbox"><div class="section-title">Networking Notes</div><div class="panel-note">- Only two real, named players can occupy a room.<br>- Seat tokens prevent impersonation or ghost joins.<br>- Online/ranked matches cannot be left — resign is not available mid-game.<br>- Room code appears prominently while waiting for your opponent.</div></div>
     </div>
   </div>
 </section>
 
+<!-- ── Deck Builder ── -->
 <section id="screen-builder" class="hidden">
   <div class="builder-shell">
     <div class="builder-left">
@@ -233,9 +239,9 @@ button,input{font-family:inherit}
 <!-- ── Lobby: shown to P1 while waiting for P2 ── -->
 <section id="screen-lobby" class="hidden">
   <div class="lobby-card">
-    <div class="lobby-code-label">Room Code</div>
-    <div class="lobby-code" id="lobby-code-display">------</div>
-    <div class="lobby-share">Share this code with your opponent to start the duel</div>
+    <div class="lobby-code-label">Room Code — share with your opponent</div>
+    <div class="lobby-code" id="lobby-code-display" title="Click to copy">------</div>
+    <div class="lobby-share">Tap the code above to copy it, then send it to your opponent</div>
     <div class="lobby-players">
       <div class="lobby-seat filled" id="lobby-seat-p1">
         <div class="seat-label">Player 1 · Host</div>
@@ -248,13 +254,14 @@ button,input{font-family:inherit}
         <div class="seat-elo" id="lobby-elo-p2"></div>
       </div>
     </div>
-    <div class="lobby-pulse" id="lobby-pulse">Waiting for opponent<span id="lobby-dots"><span>.</span><span>.</span><span>.</span></span></div>
+    <div class="lobby-pulse" id="lobby-pulse">Waiting for opponent<span>.</span><span style="animation-delay:.3s">.</span><span style="animation-delay:.6s">.</span></div>
     <div class="lobby-divider"></div>
-    <div class="lobby-note">The game will begin automatically once your opponent enters the room code and joins.</div>
+    <div class="lobby-note">The game begins automatically once your opponent enters this code and joins the room.</div>
     <button class="btn danger" id="cancelLobbyBtn" style="margin-top:4px;width:100%">Cancel Room</button>
   </div>
 </section>
 
+<!-- ── Game ── -->
 <section id="screen-game" class="hidden">
   <div id="game-topbar"><div id="title-text">CARD KOMBAT</div><div style="display:flex;gap:8px;align-items:center"><button class="btn small danger" id="leaveMatchBtn">Leave Match</button><div id="net-status">● OFFLINE</div></div></div>
   <div id="game-info">
@@ -262,63 +269,97 @@ button,input{font-family:inherit}
     <div id="tmr-wrap"><div id="tmr-label">TURN</div><div id="tmr">18</div><div id="tmr-bar-wrap"><div id="tmr-bar"></div></div></div>
     <div class="hw" style="text-align:right"><div class="hlbl" id="p2label" style="text-align:right">FOE</div><div class="ho"><div class="hi" id="p2h" style="width:100%"></div></div><div class="meta-row" style="justify-content:flex-end"><span>DECK <b id="p2DeckCount">0</b></span><span>HAND <b id="p2HandCount">0</b></span><span>ELO <b id="p2Rating">-</b></span></div><div class="energy-row" id="p2Energy" style="justify-content:flex-end"></div></div>
   </div>
-  <div id="arena"><div id="arena-grid"></div><canvas id="fx-canvas"></canvas><div id="p1z"><div class="fcard" id="fc1"><div class="fp">1</div><div class="fsuit">♠</div><div class="fcard-name">YOU</div><div class="fpb">1</div></div><div class="fname-tag">P1</div></div><div id="p2z"><div class="fcard" id="fc2" style="transform:scaleX(-1)"><div class="fp">2</div><div class="fsuit">♦</div><div class="fcard-name">FOE</div><div class="fpb">2</div></div><div class="fname-tag" style="transform:scaleX(-1)">P2</div></div><div id="floor"></div><div id="bnr"></div><div id="combo-flash"></div><div id="opp-indicator">OPPONENT IS THINKING...</div></div>
+  <div id="arena"><div id="arena-grid"></div><canvas id="fx-canvas"></canvas>
+    <div id="p1z"><div class="fcard" id="fc1"><div class="fp">1</div><div class="fsuit">♠</div><div class="fcard-name">YOU</div><div class="fpb">1</div></div><div class="fname-tag">P1</div></div>
+    <div id="p2z"><div class="fcard" id="fc2" style="transform:scaleX(-1)"><div class="fp">2</div><div class="fsuit">♦</div><div class="fcard-name">FOE</div><div class="fpb">2</div></div><div class="fname-tag" style="transform:scaleX(-1)">P2</div></div>
+    <div id="floor"></div><div id="bnr"></div><div id="combo-flash"></div><div id="opp-indicator">OPPONENT IS THINKING...</div>
+  </div>
   <div id="status-bar"><span>ATK <b id="s-atk">0</b></span><span>DEF <b id="s-def">0</b></span><span>SPD <b id="s-spd">0</b></span><span>BLEED <b id="s-bld">0</b></span><span>CURSE <b id="s-crs">0</b></span><span>ENERGY <b id="s-eng">0</b></span><span>COMBO <b id="s-cmb">0</b></span><span>SEQ <b id="s-seq">0</b></span></div>
-  <div id="log">Awaiting duel...</div><div id="hand"></div>
+  <div id="log">Awaiting duel...</div>
+  <div id="hand"></div>
   <div id="controls"><div id="hint">-- choose an action --</div><div id="btns"><button class="btn" id="discardBtn">Discard (+1 energy)</button><button class="btn primary" id="playbtn">Play Card</button><button class="btn" id="drawbtn">Draw (end turn)</button></div></div>
 </section>
-</div>
+
+</div><!-- #cabinet -->
 
 <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, set, get, onValue, push, remove, runTransaction, update, off } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getDatabase, ref, set, get, onValue, push, remove, runTransaction, off } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-const firebaseConfig = {apiKey:"AIzaSyBGXQGsslxSl1AwSu83SMkFi5_aJ-Qhqk4",authDomain:"cardkombat.firebaseapp.com",projectId:"cardkombat",storageBucket:"cardkombat.firebasestorage.app",messagingSenderId:"616844059072",appId:"1:616844059072:web:ba1e4897308e9e9ab8e825",databaseURL:"https://cardkombat-default-rtdb.firebaseio.com"};
+const firebaseConfig = {
+  apiKey:"AIzaSyBGXQGsslxSl1AwSu83SMkFi5_aJ-Qhqk4",
+  authDomain:"cardkombat.firebaseapp.com",
+  projectId:"cardkombat",
+  storageBucket:"cardkombat.firebasestorage.app",
+  messagingSenderId:"616844059072",
+  appId:"1:616844059072:web:ba1e4897308e9e9ab8e825",
+  databaseURL:"https://cardkombat-default-rtdb.firebaseio.com"
+};
 const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+const db  = getDatabase(app);
 
+// ── Constants ─────────────────────────────────────────────────────────────────
 const TURN_TIME=18, STARTING_HP=100, MAX_ENERGY=3, DECK_SIZE=24;
-const SUITS={spade:{g:'♠',desc:'Strike',red:false,base:'strike'},heart:{g:'♥',desc:'Mend',red:true,base:'mend'},club:{g:'♣',desc:'Brace',red:false,base:'brace'},diamond:{g:'♦',desc:'Curse',red:true,base:'curse'},drain:{g:'◆',desc:'Drain',red:true,base:'drain'},wound:{g:'✠',desc:'Wound',red:false,base:'wound'},void:{g:'◇',desc:'Void',red:false,base:'void'},mirror:{g:'◈',desc:'Mirror',red:false,base:'mirror'}};
+const SUITS={
+  spade:{g:'♠',desc:'Strike',red:false,base:'strike'},
+  heart:{g:'♥',desc:'Mend',red:true,base:'mend'},
+  club:{g:'♣',desc:'Brace',red:false,base:'brace'},
+  diamond:{g:'♦',desc:'Curse',red:true,base:'curse'},
+  drain:{g:'◆',desc:'Drain',red:true,base:'drain'},
+  wound:{g:'✠',desc:'Wound',red:false,base:'wound'},
+  void:{g:'◇',desc:'Void',red:false,base:'void'},
+  mirror:{g:'◈',desc:'Mirror',red:false,base:'mirror'}
+};
 const VAL_POWER={2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,10:10,J:11,Q:12,K:13,A:14};
 const RARITY_RULES={common:{copies:4,cost:1},uncommon:{copies:3,cost:1},rare:{copies:2,cost:2},legendary:{copies:1,cost:3}};
 const CARD_LIBRARY=[
-  {id:'spade_5', suit:'spade', val:'5', rarity:'common'},
-  {id:'spade_7', suit:'spade', val:'7', rarity:'common'},
-  {id:'spade_9', suit:'spade', val:'9', rarity:'uncommon'},
-  {id:'heart_4', suit:'heart', val:'4', rarity:'common'},
-  {id:'heart_7', suit:'heart', val:'7', rarity:'common'},
-  {id:'heart_Q', suit:'heart', val:'Q', rarity:'rare'},
-  {id:'club_5', suit:'club', val:'5', rarity:'common'},
-  {id:'club_8', suit:'club', val:'8', rarity:'uncommon'},
-  {id:'diamond_5', suit:'diamond', val:'5', rarity:'common'},
-  {id:'diamond_8', suit:'diamond', val:'8', rarity:'uncommon'},
-  {id:'drain_6', suit:'drain', val:'6', rarity:'uncommon'},
-  {id:'wound_6', suit:'wound', val:'6', rarity:'uncommon'},
-  {id:'void_8', suit:'void', val:'8', rarity:'rare'},
-  {id:'mirror_9', suit:'mirror', val:'9', rarity:'rare'},
-  {id:'spade_K', suit:'spade', val:'K', rarity:'rare'},
-  {id:'drain_J', suit:'drain', val:'J', rarity:'rare'},
-  {id:'wound_A', suit:'wound', val:'A', rarity:'legendary'},
-  {id:'mirror_A', suit:'mirror', val:'A', rarity:'legendary'}
+  {id:'spade_5',suit:'spade',val:'5',rarity:'common'},
+  {id:'spade_7',suit:'spade',val:'7',rarity:'common'},
+  {id:'spade_9',suit:'spade',val:'9',rarity:'uncommon'},
+  {id:'heart_4',suit:'heart',val:'4',rarity:'common'},
+  {id:'heart_7',suit:'heart',val:'7',rarity:'common'},
+  {id:'heart_Q',suit:'heart',val:'Q',rarity:'rare'},
+  {id:'club_5',suit:'club',val:'5',rarity:'common'},
+  {id:'club_8',suit:'club',val:'8',rarity:'uncommon'},
+  {id:'diamond_5',suit:'diamond',val:'5',rarity:'common'},
+  {id:'diamond_8',suit:'diamond',val:'8',rarity:'uncommon'},
+  {id:'drain_6',suit:'drain',val:'6',rarity:'uncommon'},
+  {id:'wound_6',suit:'wound',val:'6',rarity:'uncommon'},
+  {id:'void_8',suit:'void',val:'8',rarity:'rare'},
+  {id:'mirror_9',suit:'mirror',val:'9',rarity:'rare'},
+  {id:'spade_K',suit:'spade',val:'K',rarity:'rare'},
+  {id:'drain_J',suit:'drain',val:'J',rarity:'rare'},
+  {id:'wound_A',suit:'wound',val:'A',rarity:'legendary'},
+  {id:'mirror_A',suit:'mirror',val:'A',rarity:'legendary'}
 ];
 
-// ── Session-only storage: no auto sign-in between page loads ─────────────────
-// We deliberately do NOT persist the logged-in name across sessions.
-// seatToken and session token persist (they are device identifiers, not login state).
+// ── Helpers ───────────────────────────────────────────────────────────────────
 const LS={deck:'ck_deck_secure',seatToken:'ck_seat_token',session:'ck_session_token'};
 const $=s=>document.querySelector(s), mf=Math.floor, rr=()=>Math.random();
 
-let mode='menu', onlineType=null, roomId=null, myRole='p1', gameState=null, selectedIndex=null, gameOver=false, timerInt=null, particles=[], canvas=null, ctx=null, stateUnsubscribe=null, aiTimeout=null, queuePoll=null;
-let currentProfile={name:'',wins:0,losses:0,elo:1000};
-
-// Seat token and session token persist across page loads (device identity)
-// but profile/name is NOT persisted — user must always sign in
+// seat/session tokens persist across page loads (device identity)
+// profile/name is NOT persisted — must always log in
 let seatToken = localStorage.getItem(LS.seatToken) || crypto.randomUUID();
 localStorage.setItem(LS.seatToken, seatToken);
 let sessionToken = localStorage.getItem(LS.session) || crypto.randomUUID();
 localStorage.setItem(LS.session, sessionToken);
 
+// ── App state ─────────────────────────────────────────────────────────────────
+let mode='menu', onlineType=null, roomId=null, myRole='p1';
+let gameState=null, selectedIndex=null, gameOver=false;
+let timerInt=null, particles=[], canvas=null, ctx=null;
+let stateUnsubscribe=null, aiTimeout=null, queuePoll=null;
+let currentProfile={name:'',wins:0,losses:0,elo:1000};
+
+// ── Screen routing — includes 'lobby' ─────────────────────────────────────────
+function setScreen(which){
+  ['login','menu','builder','lobby','game'].forEach(s=>{
+    const el = document.getElementById(`screen-${s}`);
+    if(el) el.classList.toggle('hidden', which !== s);
+  });
+}
+
+// ── Room code generator ───────────────────────────────────────────────────────
 function roomCode(){
   const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let code='';
@@ -326,56 +367,58 @@ function roomCode(){
   return code;
 }
 
+// ── Profile helpers ───────────────────────────────────────────────────────────
 function profileKey(name){ return name.trim().toUpperCase().replace(/[^A-Z0-9_ -]/g,'').replace(/\s+/g,'_') }
 function msg(t){$('#home-message').textContent=t}
 function loginMsg(t){$('#loginMsg').textContent=t}
 function gSuit(s){return SUITS[s]||SUITS.spade}
-function getDeck(){const raw=localStorage.getItem(LS.deck); if(!raw) return getDefaultDeck(); try{const parsed=JSON.parse(raw); return Array.isArray(parsed)&&parsed.length===DECK_SIZE?parsed:getDefaultDeck()}catch{return getDefaultDeck()}}
-function saveDeck(deck){localStorage.setItem(LS.deck,JSON.stringify(deck)); renderHome()}
-function getDefaultDeck(){return ['spade_5','spade_5','spade_7','spade_7','spade_9','heart_4','heart_4','heart_7','heart_7','heart_Q','club_5','club_5','club_8','club_8','diamond_5','diamond_5','diamond_8','diamond_8','drain_6','drain_J','wound_6','wound_A','void_8','mirror_9']}
-function shuffle(arr){const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=mf(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]} return a}
-function makeDeckFromList(list){return shuffle(list.map(id=>{const base=CARD_LIBRARY.find(c=>c.id===id); if(!base){console.warn(`Unknown card id: ${id}`); return null} return {...base,pw:VAL_POWER[base.val],cost:RARITY_RULES[base.rarity].cost}}).filter(Boolean))}
-function deepClone(v){return JSON.parse(JSON.stringify(v))}
-function setScreen(which){
-  ['login','menu','builder','lobby','game'].forEach(s=>
-    document.getElementById(`screen-${s}`).classList.toggle('hidden', which!==s)
-  );
-}
 
-function clearOnlineListeners(){
-  if(stateUnsubscribe){stateUnsubscribe(); stateUnsubscribe=null}
-  if(queuePoll){clearInterval(queuePoll); queuePoll=null}
+// ── Deck helpers ──────────────────────────────────────────────────────────────
+function getDeck(){
+  const raw=localStorage.getItem(LS.deck);
+  if(!raw) return getDefaultDeck();
+  try{ const p=JSON.parse(raw); return Array.isArray(p)&&p.length===DECK_SIZE?p:getDefaultDeck() }
+  catch{ return getDefaultDeck() }
 }
-function clearAITimeout(){if(aiTimeout){clearTimeout(aiTimeout); aiTimeout=null}}
-function logText(t){$('#log').textContent=t}
-function showBanner(t){const b=$('#bnr'); b.textContent=t; b.style.display='block'; setTimeout(()=>b.style.display='none',1600)}
-function showCombo(t){const c=$('#combo-flash'); c.textContent=t; c.style.display='block'; setTimeout(()=>c.style.display='none',1200)}
-function getLocalPlayerName(){return currentProfile.name}
-function canPlayCard(player, card){return !!card && player.energy >= (card.cost||1)}
+function saveDeck(deck){ localStorage.setItem(LS.deck,JSON.stringify(deck)); renderHome() }
+function getDefaultDeck(){
+  return ['spade_5','spade_5','spade_7','spade_7','spade_9','heart_4','heart_4','heart_7','heart_7','heart_Q','club_5','club_5','club_8','club_8','diamond_5','diamond_5','diamond_8','diamond_8','drain_6','drain_J','wound_6','wound_A','void_8','mirror_9']
+}
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=mf(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]}
+  return a
+}
+function makeDeckFromList(list){
+  return shuffle(list.map(id=>{
+    const base=CARD_LIBRARY.find(c=>c.id===id);
+    if(!base){console.warn(`Unknown card id: ${id}`); return null}
+    return {...base,pw:VAL_POWER[base.val],cost:RARITY_RULES[base.rarity].cost}
+  }).filter(Boolean))
+}
+function deepClone(v){ return JSON.parse(JSON.stringify(v)) }
 
+// ── Profile ───────────────────────────────────────────────────────────────────
 async function ensureProfile(name){
   const key=profileKey(name);
-  if(!key || key.length < 2){ throw new Error('Invalid name'); }
+  if(!key||key.length<2) throw new Error('Invalid name');
   const profileRef=ref(db,`profiles/${key}`);
-  const res = await runTransaction(profileRef, cur=>{
-    if(cur===null){
-      return {name:name.trim().toUpperCase(), wins:0, losses:0, elo:1000, updatedAt:Date.now()}
-    }
+  const res=await runTransaction(profileRef, cur=>{
+    if(cur===null) return {name:name.trim().toUpperCase(),wins:0,losses:0,elo:1000,updatedAt:Date.now()}
     return cur
   });
-  currentProfile = res.snapshot.val();
+  currentProfile=res.snapshot.val();
   renderHome();
 }
 
 async function updateProfileAfterRanked(win, oppElo=1000){
-  const name=currentProfile.name;
-  if(!name) return;
+  const name=currentProfile.name; if(!name) return;
   const key=profileKey(name);
-  const expected = 1 / (1 + Math.pow(10, (oppElo - currentProfile.elo)/400));
-  const score = win ? 1 : 0;
-  const newElo = Math.max(600, Math.round(currentProfile.elo + 24*(score - expected)));
-  currentProfile = {...currentProfile, elo:newElo, wins:currentProfile.wins + (win?1:0), losses:currentProfile.losses + (win?0:1)};
-  await set(ref(db,`profiles/${key}`), {...currentProfile, updatedAt:Date.now()});
+  const expected=1/(1+Math.pow(10,(oppElo-currentProfile.elo)/400));
+  const score=win?1:0;
+  const newElo=Math.max(600,Math.round(currentProfile.elo+24*(score-expected)));
+  currentProfile={...currentProfile,elo:newElo,wins:currentProfile.wins+(win?1:0),losses:currentProfile.losses+(win?0:1)};
+  await set(ref(db,`profiles/${key}`),{...currentProfile,updatedAt:Date.now()});
   renderHome();
 }
 
@@ -384,15 +427,19 @@ function renderHome(){
   $('#homeRating').textContent=currentProfile.elo||1000;
   $('#homeWins').textContent=currentProfile.wins||0;
   $('#homeLosses').textContent=currentProfile.losses||0;
-  const deck=getDeck();
-  const rareCounts={common:0,uncommon:0,rare:0,legendary:0};
-  deck.forEach(id=>{
-    const card=CARD_LIBRARY.find(c=>c.id===id);
-    if(card) rareCounts[card.rarity]++;
-  });
+  const deck=getDeck(), rareCounts={common:0,uncommon:0,rare:0,legendary:0};
+  deck.forEach(id=>{const card=CARD_LIBRARY.find(c=>c.id===id); if(card) rareCounts[card.rarity]++});
   $('#deckSummary').textContent=`${deck.length} cards ready. Common ${rareCounts.common}, Uncommon ${rareCounts.uncommon}, Rare ${rareCounts.rare}, Legendary ${rareCounts.legendary}.`
 }
 
+function signOut(){
+  currentProfile={name:'',wins:0,losses:0,elo:1000};
+  setScreen('login');
+  $('#loginName').value='';
+  loginMsg('');
+}
+
+// ── Deck Builder ──────────────────────────────────────────────────────────────
 function renderBuilder(){
   const deck=getDeck(), counts={}, rarityTotals={common:0,uncommon:0,rare:0,legendary:0};
   deck.forEach(id=>{
@@ -400,28 +447,52 @@ function renderBuilder(){
     const card=CARD_LIBRARY.find(c=>c.id===id);
     if(card) rarityTotals[card.rarity]++;
   });
-  $('#deckCount').textContent=`${deck.length} / ${DECK_SIZE}`; $('#countCommon').textContent=rarityTotals.common; $('#countUncommon').textContent=rarityTotals.uncommon; $('#countRare').textContent=rarityTotals.rare; $('#countLegendary').textContent=rarityTotals.legendary;
-  const deckList=$('#deckList'), grid=$('#libraryGrid'); deckList.innerHTML=''; grid.innerHTML='';
-  Object.entries(counts).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([id,count])=>{const c=CARD_LIBRARY.find(x=>x.id===id); if(!c) return; const row=document.createElement('div'); row.className='deck-row'; row.innerHTML=`<div><strong>${gSuit(c.suit).g} ${gSuit(c.suit).desc} ${c.val}</strong><span class="badge ${c.rarity}" style="margin-left:8px">${c.rarity}</span></div><div style="display:flex;align-items:center;gap:8px"><span>x${count}</span><button class="btn small danger" data-remove="${id}">-1</button></div>`; deckList.appendChild(row)});
-  CARD_LIBRARY.forEach(c=>{const copies=counts[c.id]||0, limit=RARITY_RULES[c.rarity].copies, canAdd=copies<limit && deck.length<DECK_SIZE; const card=document.createElement('div'); card.className='lib-card'; card.innerHTML=`<div class="top"><span>${c.val}</span><span class="badge ${c.rarity}">${c.rarity}</span></div><div class="glyph">${gSuit(c.suit).g}</div><div class="name">${gSuit(c.suit).desc}</div><div class="meta">Cost: ${RARITY_RULES[c.rarity].cost}<br>Copies: ${copies}/${limit}<br>Base suit: ${c.suit}</div><div class="controls"><button class="btn small" data-add="${c.id}" ${canAdd?'':'disabled'}>Add</button><button class="btn small danger" data-remove="${c.id}" ${copies?'':'disabled'}>Remove</button></div>`; grid.appendChild(card)})
+  $('#deckCount').textContent=`${deck.length} / ${DECK_SIZE}`;
+  $('#countCommon').textContent=rarityTotals.common;
+  $('#countUncommon').textContent=rarityTotals.uncommon;
+  $('#countRare').textContent=rarityTotals.rare;
+  $('#countLegendary').textContent=rarityTotals.legendary;
+  const deckList=$('#deckList'), grid=$('#libraryGrid');
+  deckList.innerHTML=''; grid.innerHTML='';
+  Object.entries(counts).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([id,count])=>{
+    const c=CARD_LIBRARY.find(x=>x.id===id); if(!c) return;
+    const row=document.createElement('div'); row.className='deck-row';
+    row.innerHTML=`<div><strong>${gSuit(c.suit).g} ${gSuit(c.suit).desc} ${c.val}</strong><span class="badge ${c.rarity}" style="margin-left:8px">${c.rarity}</span></div><div style="display:flex;align-items:center;gap:8px"><span>x${count}</span><button class="btn small danger" data-remove="${id}">-1</button></div>`;
+    deckList.appendChild(row)
+  });
+  CARD_LIBRARY.forEach(c=>{
+    const copies=counts[c.id]||0, limit=RARITY_RULES[c.rarity].copies, canAdd=copies<limit&&deck.length<DECK_SIZE;
+    const card=document.createElement('div'); card.className='lib-card';
+    card.innerHTML=`<div class="top"><span>${c.val}</span><span class="badge ${c.rarity}">${c.rarity}</span></div><div class="glyph">${gSuit(c.suit).g}</div><div class="name">${gSuit(c.suit).desc}</div><div class="meta">Cost: ${RARITY_RULES[c.rarity].cost}<br>Copies: ${copies}/${limit}<br>Base suit: ${c.suit}</div><div class="controls"><button class="btn small" data-add="${c.id}" ${canAdd?'':'disabled'}>Add</button><button class="btn small danger" data-remove="${c.id}" ${copies?'':'disabled'}>Remove</button></div>`;
+    grid.appendChild(card)
+  })
 }
-function mutateDeck(action,id){const deck=getDeck(), card=CARD_LIBRARY.find(c=>c.id===id); if(!card) return; const count=deck.filter(x=>x===id).length, limit=RARITY_RULES[card.rarity].copies; if(action==='add'){if(deck.length>=DECK_SIZE||count>=limit) return; deck.push(id)} else {const idx=deck.indexOf(id); if(idx>=0) deck.splice(idx,1)} saveDeck(deck); renderBuilder()}
+function mutateDeck(action,id){
+  const deck=getDeck(), card=CARD_LIBRARY.find(c=>c.id===id); if(!card) return;
+  const count=deck.filter(x=>x===id).length, limit=RARITY_RULES[card.rarity].copies;
+  if(action==='add'){if(deck.length>=DECK_SIZE||count>=limit) return; deck.push(id)}
+  else{const idx=deck.indexOf(id); if(idx>=0) deck.splice(idx,1)}
+  saveDeck(deck); renderBuilder()
+}
 
+// ── Game logic ────────────────────────────────────────────────────────────────
 function newFighter(name, deckList, elo=1000, token=''){
-  const deck=makeDeckFromList(deckList), hand=[]; for(let i=0;i<5;i++) if(deck.length) hand.push(deck.shift());
+  const deck=makeDeckFromList(deckList), hand=[];
+  for(let i=0;i<5;i++) if(deck.length) hand.push(deck.shift());
   return {name,hp:STARTING_HP,atk:8,def:5,spd:5,bleed:0,curse:0,energy:MAX_ENERGY,maxEnergy:MAX_ENERGY,hand,deck,discard:[],elo,wins:0,losses:0,combo:0,mirror:false,queenBuff:false,seatToken:token}
 }
+
 function startOfTurn(state, role){
-  const pl=state[role]; if(!pl) return {forced:false, log:[]};
+  const pl=state[role]; if(!pl) return {forced:false,log:[]};
   pl.energy=pl.maxEnergy;
   let log=[];
   if(pl.bleed>0){const dmg=mf(pl.bleed*2+rr()*2); pl.hp=Math.max(0,pl.hp-dmg); pl.bleed=Math.max(0,pl.bleed-1); log.push(`${pl.name} bleeds for ${dmg}`)}
   if(pl.curse>0){const dmg=mf(pl.curse*2+rr()*2); pl.hp=Math.max(0,pl.hp-dmg); pl.curse=Math.max(0,pl.curse-1); log.push(`${pl.name} suffers ${dmg} curse`)}
   if(pl.hand.length===0){
-    if(pl.deck.length>0){pl.hand.push(pl.deck.shift()); pl.energy=0; log.push(`${pl.name} is forced to draw and loses the turn`); return {forced:true, log}}
-    pl.hp=Math.max(0,pl.hp-6); pl.energy=0; log.push(`${pl.name} has no cards left and takes 6 fatigue`); return {forced:true, log}
+    if(pl.deck.length>0){pl.hand.push(pl.deck.shift()); pl.energy=0; log.push(`${pl.name} is forced to draw and loses the turn`); return {forced:true,log}}
+    pl.hp=Math.max(0,pl.hp-6); pl.energy=0; log.push(`${pl.name} has no cards left and takes 6 fatigue`); return {forced:true,log}
   }
-  return {forced:false, log}
+  return {forced:false,log}
 }
 function passTurn(state){
   const next=state.turn==='p1'?'p2':'p1';
@@ -430,11 +501,11 @@ function passTurn(state){
   state.seq=(state.seq||0)+1;
   return startOfTurn(state,next).log
 }
-function drawCardAndEndTurn(state, role, reason='draw'){
+function drawCardAndEndTurn(state, role){
   const pl=state[role];
   if(pl.deck.length>0) pl.hand.push(pl.deck.shift()); else pl.hp=Math.max(0,pl.hp-6);
   pl.energy=0;
-  state.lastAction={by:role,type:reason,_seen:false};
+  state.lastAction={by:role,type:'draw',_seen:false};
   return passTurn(state)
 }
 function discardCardForEnergy(state, role, handIndex){
@@ -443,9 +514,11 @@ function discardCardForEnergy(state, role, handIndex){
   pl.energy=Math.min(pl.maxEnergy,pl.energy+1);
   state.lastAction={by:role,type:'discard',card:card?.id,_seen:false}
 }
+function canPlayCard(player, card){ return !!card && player.energy>=(card.cost||1) }
+
 function resolveCardPlay(state, role, handIndex){
   const me=state[role], oppRole=role==='p1'?'p2':'p1', foe=state[oppRole], card=me.hand[handIndex];
-  if(!card || !canPlayCard(me,card)) return {text:'Cannot play that card.', passed:[]};
+  if(!card||!canPlayCard(me,card)) return {text:'Cannot play that card.',passed:[]};
   me.hand.splice(handIndex,1); me.discard.push(card); me.energy-=(card.cost||1);
   let comboBonus=0;
   if(state.lastSuit===card.suit){me.combo=(me.combo||0)+1; comboBonus=Math.min(me.combo*2,8); showCombo(`COMBO x${me.combo}`)} else me.combo=0;
@@ -466,175 +539,400 @@ function resolveCardPlay(state, role, handIndex){
   }
   state.lastSuit=card.suit;
   state.lastAction={by:role,type:'play',cardId:card.id,suit:card.suit,val:card.val,text:text.join(' | '),_seen:false};
-  return {text:text.join(' | '), passed:passTurn(state)}
+  return {text:text.join(' | '),passed:passTurn(state)}
 }
+
 function checkForWinner(state){
-  if(state.p1.hp<=0 && state.p2.hp<=0){state.status='gameover'; state.winner=state.p1.hp>=state.p2.hp?'p1':'p2'}
+  if(state.p1.hp<=0&&state.p2.hp<=0){state.status='gameover'; state.winner=state.p1.hp>=state.p2.hp?'p1':'p2'}
   else if(state.p1.hp<=0){state.status='gameover'; state.winner='p2'}
   else if(state.p2.hp<=0){state.status='gameover'; state.winner='p1'}
   else state.status='playing'
 }
+
 function initializeMatchState(base){
   const state=deepClone(base);
   state.seq=0;
-  state.maxPlayers=2;
   const startLog=startOfTurn(state,state.turn).log;
   checkForWinner(state);
   if(startLog.length) state.lastAction={by:state.turn,type:'turnstart',text:startLog.join(' | '),_seen:false};
   return state
 }
 
-function renderEnergy(el,current,max){el.innerHTML=''; for(let i=0;i<max;i++){const d=document.createElement('div'); d.className='energy-pip'+(i<current?' on':''); el.appendChild(d)}}
-function currentPlayer(){return gameState ? gameState[myRole] : null}
+// ── Render ────────────────────────────────────────────────────────────────────
+function renderEnergy(el, current, max){
+  el.innerHTML='';
+  for(let i=0;i<max;i++){const d=document.createElement('div'); d.className='energy-pip'+(i<current?' on':''); el.appendChild(d)}
+}
+function currentPlayer(){ return gameState ? gameState[myRole] : null }
+
 function renderGame(){
   if(!gameState) return;
   const me=currentPlayer();
-  $('#p1label').textContent=gameState.p1.name; $('#p2label').textContent=gameState.p2.name||'OPEN';
-  $('#p1h').style.width=`${Math.max(0,gameState.p1.hp)}%`; $('#p2h').style.width=`${Math.max(0,gameState.p2.hp||0)}%`;
-  $('#p1DeckCount').textContent=gameState.p1.deck.length; $('#p2DeckCount').textContent=gameState.p2.deck.length;
-  $('#p1HandCount').textContent=gameState.p1.hand.length; $('#p2HandCount').textContent=gameState.p2.hand.length;
-  $('#p1Rating').textContent=gameState.p1.elo||1000; $('#p2Rating').textContent=gameState.p2.elo||1000;
-  renderEnergy($('#p1Energy'),gameState.p1.energy,gameState.p1.maxEnergy); renderEnergy($('#p2Energy'),gameState.p2.energy,gameState.p2.maxEnergy);
-  $('#fc1 .fcard-name').textContent=gameState.p1.name; $('#fc2 .fcard-name').textContent=gameState.p2.name||'OPEN';
-  if(me){$('#s-atk').textContent=me.atk; $('#s-def').textContent=me.def; $('#s-spd').textContent=me.spd; $('#s-bld').textContent=me.bleed; $('#s-crs').textContent=me.curse; $('#s-eng').textContent=me.energy; $('#s-cmb').textContent=me.combo||0}
+  $('#p1label').textContent=gameState.p1.name;
+  $('#p2label').textContent=gameState.p2?.name||'OPEN';
+  $('#p1h').style.width=`${Math.max(0,gameState.p1.hp)}%`;
+  $('#p2h').style.width=`${Math.max(0,gameState.p2?.hp||0)}%`;
+  $('#p1DeckCount').textContent=gameState.p1.deck.length;
+  $('#p2DeckCount').textContent=gameState.p2?.deck?.length||0;
+  $('#p1HandCount').textContent=gameState.p1.hand.length;
+  $('#p2HandCount').textContent=gameState.p2?.hand?.length||0;
+  $('#p1Rating').textContent=gameState.p1.elo||1000;
+  $('#p2Rating').textContent=gameState.p2?.elo||1000;
+  renderEnergy($('#p1Energy'),gameState.p1.energy,gameState.p1.maxEnergy);
+  renderEnergy($('#p2Energy'),gameState.p2?.energy||0,gameState.p2?.maxEnergy||MAX_ENERGY);
+  $('#fc1 .fcard-name').textContent=gameState.p1.name;
+  $('#fc2 .fcard-name').textContent=gameState.p2?.name||'OPEN';
+  if(me){
+    $('#s-atk').textContent=me.atk;
+    $('#s-def').textContent=me.def;
+    $('#s-spd').textContent=me.spd;
+    $('#s-bld').textContent=me.bleed;
+    $('#s-crs').textContent=me.curse;
+    $('#s-eng').textContent=me.energy;
+    $('#s-cmb').textContent=me.combo||0;
+  }
   $('#s-seq').textContent=gameState.seq||0;
-
-  // Leave button: only enabled for local/bot matches
-  const canLeave = (mode === 'local');
-  $('#leaveMatchBtn').disabled = !canLeave;
-  $('#leaveMatchBtn').title = canLeave ? 'Leave bot match' : 'Cannot leave online matches';
-
+  // Leave only allowed for local bot matches
+  $('#leaveMatchBtn').disabled = (mode !== 'local');
+  $('#leaveMatchBtn').title = mode==='local' ? 'Leave bot match' : 'Cannot leave online matches';
   renderHand(); updateButtons()
 }
+
 function renderHand(){
-  const handEl=$('#hand'); handEl.innerHTML=''; if(!gameState) return;
-  const me=currentPlayer(), isTurn=gameState.turn===myRole && !gameOver && gameState.status==='playing';
-  me.hand.forEach((c,i)=>{const suit=gSuit(c.suit), d=document.createElement('div'); d.className=`hc${selectedIndex===i?' sel':''}${suit.red?' suit-red':''}${isTurn?'':' disabled-card'}`; d.innerHTML=`<div class="hctop">${c.val}</div><div class="hccost">${c.cost}</div><div class="hcs">${suit.g}</div><div class="hcv">${c.val}</div><div class="hct">${suit.desc}</div><div class="hcrare">${c.rarity}</div><div class="hcbot">${c.val}</div>`; if(isTurn){d.onclick=()=>{selectedIndex=selectedIndex===i?null:i; renderHand(); updateButtons()}} handEl.appendChild(d)})
+  const handEl=$('#hand'); handEl.innerHTML='';
+  if(!gameState) return;
+  const me=currentPlayer(), isTurn=gameState.turn===myRole&&!gameOver&&gameState.status==='playing';
+  me.hand.forEach((c,i)=>{
+    const suit=gSuit(c.suit), d=document.createElement('div');
+    d.className=`hc${selectedIndex===i?' sel':''}${suit.red?' suit-red':''}${isTurn?'':' disabled-card'}`;
+    d.innerHTML=`<div class="hctop">${c.val}</div><div class="hccost">${c.cost}</div><div class="hcs">${suit.g}</div><div class="hcv">${c.val}</div><div class="hct">${suit.desc}</div><div class="hcrare">${c.rarity}</div><div class="hcbot">${c.val}</div>`;
+    if(isTurn){ d.onclick=()=>{selectedIndex=selectedIndex===i?null:i; renderHand(); updateButtons()} }
+    handEl.appendChild(d)
+  })
 }
+
 function updateButtons(){
-  const me=currentPlayer(), myTurn=!!gameState && gameState.turn===myRole && !gameOver && gameState.status==='playing', selected=selectedIndex!==null ? me?.hand[selectedIndex] : null;
-  $('#playbtn').disabled=!(myTurn && selected && canPlayCard(me,selected)); $('#drawbtn').disabled=!myTurn; $('#discardBtn').disabled=!(myTurn && selectedIndex!==null);
-  if(myTurn){$('#hint').textContent=selected?`${selected.val} of ${selected.suit.toUpperCase()} - cost ${selected.cost}`:'-- choose a card, draw, or discard --'}
+  const me=currentPlayer(), myTurn=!!gameState&&gameState.turn===myRole&&!gameOver&&gameState.status==='playing';
+  const selected=selectedIndex!==null?me?.hand[selectedIndex]:null;
+  $('#playbtn').disabled=!(myTurn&&selected&&canPlayCard(me,selected));
+  $('#drawbtn').disabled=!myTurn;
+  $('#discardBtn').disabled=!(myTurn&&selectedIndex!==null);
+  if(myTurn){$('#hint').textContent=selected?`${selected.val} of ${selected.suit.toUpperCase()} — cost ${selected.cost}`:'-- choose a card, draw, or discard --'}
 }
-function setNetStatus(cls, txt){const el=$('#net-status'); el.className=cls; el.textContent=txt}
-function startTurnTimer(){clearInterval(timerInt); let t=TURN_TIME; $('#tmr').textContent=t; $('#tmr').classList.remove('urgent'); $('#tmr-bar').style.transition='none'; $('#tmr-bar').style.width='100%'; setTimeout(()=>{$('#tmr-bar').style.transition=`width ${TURN_TIME}s linear`; $('#tmr-bar').style.width='0%'},50); timerInt=setInterval(()=>{if(gameOver || !gameState || gameState.turn!==myRole || gameState.status!=='playing') return; t--; $('#tmr').textContent=t; if(t<=5) $('#tmr').classList.add('urgent'); if(t<=0){clearInterval(timerInt); handleAction('draw')}},1000)}
-function pauseTimer(){clearInterval(timerInt); $('#tmr').classList.remove('urgent')}
+
+function setNetStatus(cls, txt){ const el=$('#net-status'); el.className=cls; el.textContent=txt }
+function logText(t){ $('#log').textContent=t }
+function showBanner(t){ const b=$('#bnr'); b.textContent=t; b.style.display='block'; setTimeout(()=>b.style.display='none',1600) }
+function showCombo(t){ const c=$('#combo-flash'); c.textContent=t; c.style.display='block'; setTimeout(()=>c.style.display='none',1200) }
+
+function startTurnTimer(){
+  clearInterval(timerInt);
+  let t=TURN_TIME;
+  $('#tmr').textContent=t; $('#tmr').classList.remove('urgent');
+  $('#tmr-bar').style.transition='none'; $('#tmr-bar').style.width='100%';
+  setTimeout(()=>{ $('#tmr-bar').style.transition=`width ${TURN_TIME}s linear`; $('#tmr-bar').style.width='0%' },50);
+  timerInt=setInterval(()=>{
+    if(gameOver||!gameState||gameState.turn!==myRole||gameState.status!=='playing') return;
+    t--; $('#tmr').textContent=t;
+    if(t<=5) $('#tmr').classList.add('urgent');
+    if(t<=0){ clearInterval(timerInt); handleAction('draw') }
+  },1000)
+}
+function pauseTimer(){ clearInterval(timerInt); $('#tmr').classList.remove('urgent') }
+
 function beginTurnIfNeeded(){
-  if(!gameState || gameOver) return;
+  if(!gameState||gameOver) return;
   const whose=gameState.turn;
-  if(gameState.status==='waiting'){setNetStatus('waiting',`● ROOM ${roomId} WAITING`); pauseTimer(); $('#opp-indicator').style.display='none'; $('#hint').textContent='-- waiting for player 2 to join --'; updateButtons(); return}
-  if(whose===myRole){setNetStatus('myturn','● YOUR TURN'); $('#opp-indicator').style.display='none'; $('#hint').textContent='-- choose a card, draw, or discard --'; startTurnTimer()}
-  else {setNetStatus('connected',mode==='local'?'● AI THINKING':'● ONLINE'); $('#opp-indicator').style.display='block'; pauseTimer(); $('#hint').textContent=mode==='local'?'-- ember ai is thinking --':'-- opponent is playing --'; if(mode==='local' && whose==='p2'){clearAITimeout(); aiTimeout=setTimeout(aiTakeTurn,900)}}
+  if(gameState.status==='gameover') return;
+  if(whose===myRole){
+    setNetStatus('myturn','● YOUR TURN');
+    $('#opp-indicator').style.display='none';
+    $('#hint').textContent='-- choose a card, draw, or discard --';
+    startTurnTimer()
+  } else {
+    setNetStatus('connected', mode==='local'?'● AI THINKING':'● ONLINE');
+    $('#opp-indicator').style.display='block';
+    pauseTimer();
+    $('#hint').textContent=mode==='local'?'-- ember ai is thinking --':'-- opponent is playing --';
+    if(mode==='local'&&whose==='p2'){ clearAITimeout(); aiTimeout=setTimeout(aiTakeTurn,900) }
+  }
   updateButtons()
 }
 
+// ── Network cleanup ───────────────────────────────────────────────────────────
+function clearOnlineListeners(){
+  if(stateUnsubscribe){ stateUnsubscribe(); stateUnsubscribe=null }
+  if(queuePoll){ clearInterval(queuePoll); queuePoll=null }
+}
+function clearAITimeout(){ if(aiTimeout){ clearTimeout(aiTimeout); aiTimeout=null } }
+
+// ── Online: listen to room ────────────────────────────────────────────────────
+// State machine:
+//   waiting  → P1 on lobby screen, P2 hasn't joined yet
+//   playing  → both players present; game runs
+//   gameover → match concluded
 function listenToRoom(rid){
   clearOnlineListeners();
-  const roomRef = ref(db, `rooms/${rid}`);
-  let prevStatus = null;
-  stateUnsubscribe = onValue(roomRef, snap => {
-    if(!snap.exists()){
-      // Room deleted externally (e.g. P1 cancelled)
-      if(prevStatus === 'waiting' || prevStatus === null){
-        msg('Room was cancelled by the host.');
-      }
-      leaveMatch(false, false); return;
-    }
-    const data = snap.val();
-    const wasWaiting = prevStatus === 'waiting' || prevStatus === null;
-    prevStatus = data.status;
+  const roomRef=ref(db,`rooms/${rid}`);
+  let seenPlaying=false; // prevent double-transition
 
-    // ── Transition: waiting → playing ──────────────────────────────────────
-    // Only fire once. For P1 (host): leave lobby screen, enter game.
-    // For P2: they called enterGame() already in joinRoom, so just start.
-    if(data.status === 'playing' && wasWaiting){
-      gameState = data;
-      // Update lobby P2 seat display briefly before switching (P1 sees this)
-      if($('#screen-lobby') && !$('#screen-lobby').classList.contains('hidden')){
-        $('#lobby-name-p2').textContent = data.p2?.name || '—';
-        $('#lobby-elo-p2').textContent = `ELO ${data.p2?.elo || 1000}`;
-        $('#lobby-seat-p2').classList.replace('empty','filled');
-        $('#lobby-pulse').textContent = 'Opponent found! Entering arena...';
-        // Short delay so P1 sees the seat fill before game starts
-        setTimeout(()=>{ enterGame(); renderGame(); logText(`${data.p2.name} entered the room. Duel begins!`); beginTurnIfNeeded(); }, 900);
+  stateUnsubscribe=onValue(roomRef, snap=>{
+    if(!snap.exists()){
+      // Room deleted (host cancelled or match cleaned up)
+      msg('Room no longer exists.');
+      leaveMatch(false,false);
+      return;
+    }
+    const data=snap.val();
+
+    // ── waiting → playing transition ─────────────────────────────────────────
+    if(data.status==='playing' && !seenPlaying){
+      seenPlaying=true;
+      gameState=data;
+
+      if(!document.getElementById('screen-game') || document.getElementById('screen-game').classList.contains('hidden')){
+        // P1 path: currently on lobby screen → move to game
+        // Update lobby seat display briefly so P1 sees P2 arrive
+        $('#lobby-name-p2').textContent=data.p2?.name||'—';
+        $('#lobby-elo-p2').textContent=`ELO ${data.p2?.elo||1000}`;
+        $('#lobby-seat-p2').className='lobby-seat filled';
+        $('#lobby-pulse').textContent='Opponent found! Entering arena...';
+        setTimeout(()=>{
+          enterGame();
+          renderGame();
+          logText(`${data.p2.name} joined. Duel begins!`);
+          beginTurnIfNeeded();
+        }, 800);
       } else {
-        // P2 path — already on game screen
-        renderGame(); logText(`Duel begins! You are challenging ${data.p1.name}.`); beginTurnIfNeeded();
+        // P2 path: already on game screen from joinRoom()
+        renderGame();
+        logText(`Duel begins! You face ${data.p1.name}.`);
+        beginTurnIfNeeded();
       }
       return;
     }
 
-    // ── Ongoing game updates ────────────────────────────────────────────────
-    if(data.status === 'gameover' && !gameOver){
-      gameState = data; renderGame(); finishGame(data.winner); return;
+    // ── ongoing game updates ──────────────────────────────────────────────────
+    if(data.status==='gameover' && !gameOver){
+      gameState=data; renderGame(); finishGame(data.winner); return;
     }
-    if(data.status === 'playing'){
-      gameState = data; renderGame(); beginTurnIfNeeded();
-      // Trigger FX for opponent's last action
-      if(data.lastAction && !data.lastAction._seen && data.lastAction.by !== myRole && data.lastAction.type==='play'){
-        const a = data.lastAction;
-        const oppRole = myRole==='p1'?'p2':'p1';
-        triggerCardFX(a.suit, a.val, oppRole, myRole, 0, 0);
+    if(data.status==='playing'){
+      gameState=data; renderGame(); beginTurnIfNeeded();
+      // FX for opponent action
+      if(data.lastAction&&!data.lastAction._seen&&data.lastAction.by!==myRole&&data.lastAction.type==='play'){
+        const a=data.lastAction, oppRole=myRole==='p1'?'p2':'p1';
+        triggerCardFX(a.suit,a.val,oppRole,myRole,0,0);
       }
-    }
-    if(data.lastLog && data.lastAction && !data.lastAction._seen){
-      logText(data.lastLog);
+      if(data.lastLog) logText(data.lastLog);
     }
   });
 }
 
-async function applyOnlineAction(actionType){
-  if(!roomId) return;
-  const roomRef=ref(db,`rooms/${roomId}`);
-  let newLog = '';
-  const actionIndex = selectedIndex;
-  const result = await runTransaction(roomRef, cur=>{
-    if(!cur) return cur;
-    if(cur.status!=='playing') return cur;
-    const actor = myRole;
-    const actorSeat = cur[actor];
-    if(!actorSeat) return cur;
-    if(actorSeat.seatToken !== seatToken) return cur;
-    if(cur.turn !== actor) return cur;
-    const state = deepClone(cur);
-    if(actionType==='draw'){
-      newLog = [`${state[actor].name} draws and ends the turn.`, ...drawCardAndEndTurn(state, actor, 'draw')].filter(Boolean).join(' | ');
-    }else if(actionType==='discard'){
-      if(actionIndex===null) return cur;
-      discardCardForEnergy(state, actor, actionIndex);
-      newLog = `${state[actor].name} discards to recover energy.`;
-    }else if(actionType==='play'){
-      if(actionIndex===null) return cur;
-      const res = resolveCardPlay(state, actor, actionIndex);
-      newLog = [res.text, ...res.passed].filter(Boolean).join(' | ');
-    }else{
-      return cur;
+// ── Create room (P1) ──────────────────────────────────────────────────────────
+// P1 goes to the LOBBY screen, not the game screen.
+// No game state is initialised — we wait for P2 to join.
+async function createRoom(){
+  clearInterval(timerInt); clearAITimeout(); clearOnlineListeners();
+  if(!currentProfile.name||currentProfile.name.length<2){ msg('You must be logged in to create a room.'); return }
+
+  mode='online'; onlineType='casual'; myRole='p1'; gameOver=false; selectedIndex=null;
+  roomId=roomCode();
+
+  // Only store P1 data. p2 is explicitly null. status='waiting'.
+  const roomData={
+    mode:'online', ranked:false, maxPlayers:2,
+    status:'waiting', created:Date.now(),
+    turn:'p1', round:1, seq:0,
+    lastSuit:null, lastLog:'', lastAction:null,
+    p1:newFighter(currentProfile.name, getDeck(), currentProfile.elo, seatToken),
+    p2:null,
+    presence:{p1:sessionToken, p2:null}
+  };
+  await set(ref(db,`rooms/${roomId}`), roomData);
+
+  // Show lobby screen with the room code large and prominent
+  $('#lobby-code-display').textContent=roomId;
+  $('#lobby-name-p1').textContent=currentProfile.name;
+  $('#lobby-elo-p1').textContent=`ELO ${currentProfile.elo}`;
+  $('#lobby-name-p2').textContent='Waiting...';
+  $('#lobby-elo-p2').textContent='';
+  $('#lobby-seat-p2').className='lobby-seat empty';
+  $('#lobby-pulse').textContent='Waiting for opponent';
+  setScreen('lobby');
+
+  // Start listening — transition fires when P2 joins and flips status→playing
+  listenToRoom(roomId);
+}
+
+// ── Join room (P2) ────────────────────────────────────────────────────────────
+// Validates: real profile, room exists & waiting, not own room, seat empty.
+// Atomically fills P2 slot and flips status→playing (which triggers P1 transition too).
+async function joinRoom(code){
+  clearInterval(timerInt); clearAITimeout(); clearOnlineListeners();
+
+  // Must be a real logged-in player
+  if(!currentProfile.name||currentProfile.name.length<2){
+    msg('You must be logged in with a valid name to join a room.'); return
+  }
+
+  const cleanCode=code.trim().toUpperCase();
+  if(!cleanCode){ msg('Enter a room code first.'); return }
+
+  mode='online'; onlineType='casual'; myRole='p2'; gameOver=false; selectedIndex=null;
+
+  const roomRef=ref(db,`rooms/${cleanCode}`);
+
+  // Pre-check before transaction
+  const snap=await get(roomRef);
+  if(!snap.exists()){ msg('Room not found.'); mode='menu'; myRole='p1'; return }
+  const cur=snap.val();
+  if(cur.status!=='waiting'){ msg('That room has already started or finished.'); mode='menu'; myRole='p1'; return }
+  if(cur.p2!==null&&cur.p2?.seatToken){ msg('Room is already full.'); mode='menu'; myRole='p1'; return }
+  if(cur.p1?.seatToken===seatToken){ msg('You cannot join your own room.'); mode='menu'; myRole='p1'; return }
+  // Prevent joining with no name (imaginary player guard)
+  if(!currentProfile.name||currentProfile.name.trim().length<2){ msg('Invalid profile — cannot join.'); mode='menu'; myRole='p1'; return }
+
+  // Atomic join: fill P2 and transition to playing
+  const res=await runTransaction(roomRef, state=>{
+    if(!state) return state; // room deleted mid-transaction
+    if(state.status!=='waiting') return; // abort — no longer waiting
+    if(state.p2!==null&&state.p2?.seatToken) return; // abort — already full
+    if(state.p1?.seatToken===seatToken) return; // abort — same person
+
+    // Build full match state now that both players are present
+    const p2Fighter=newFighter(currentProfile.name, getDeck(), currentProfile.elo, seatToken);
+    const fullState={
+      ...state,
+      p2: p2Fighter,
+      status:'playing',
+      turn:'p1', round:1, seq:0,
+      lastSuit:null, lastLog:'', lastAction:null,
+      presence:{...(state.presence||{}), p2:sessionToken}
+    };
+    // Run start-of-turn for p1 inline (can't call external fns in transaction)
+    if(fullState.p1.hand.length===0&&fullState.p1.deck.length>0){
+      fullState.p1.hand.push(fullState.p1.deck.shift());
     }
-    checkForWinner(state);
-    state.lastLog = newLog;
-    return state;
+    return fullState;
   });
-  if(result.committed){
-    selectedIndex=null;
-    if(newLog) logText(newLog);
+
+  if(!res.committed){
+    msg('Could not join room. It may be full or already started.');
+    mode='menu'; myRole='p1'; return
+  }
+  const joined=res.snapshot.val();
+  if(!joined||joined.p2?.seatToken!==seatToken){
+    msg('Join failed — please try again.');
+    mode='menu'; myRole='p1'; return
+  }
+
+  roomId=cleanCode;
+  // P2 goes to game screen immediately; P1 transitions via listenToRoom
+  gameState=joined;
+  enterGame();
+  renderGame();
+  logText(`You joined ${joined.p1.name}'s room. Duel begins!`);
+  listenToRoom(cleanCode);
+  beginTurnIfNeeded();
+}
+
+// ── Ranked queue ──────────────────────────────────────────────────────────────
+async function joinRankedQueue(){
+  msg('Searching ranked queue...');
+  clearOnlineListeners();
+  if(!currentProfile.name||currentProfile.name.length<2){ msg('Log in first.'); return }
+  mode='online'; onlineType='ranked'; myRole='p1';
+  const me={name:currentProfile.name,elo:currentProfile.elo,deck:getDeck(),seatToken,joined:Date.now()};
+  const myTicketRef=push(ref(db,'rankedQueue'));
+  const myTicketId=myTicketRef.key;
+  await set(myTicketRef, me);
+
+  const q=await get(ref(db,'rankedQueue'));
+  const all=q.val()||{};
+  const others=Object.entries(all).filter(([id])=>id!==myTicketId).map(([id,v])=>({id,...v})).sort((a,b)=>Math.abs(a.elo-me.elo)-Math.abs(b.elo-me.elo));
+  if(others.length){
+    const opp=others[0];
+    roomId=roomCode();
+    const base={mode:'online',ranked:true,maxPlayers:2,turn:'p1',round:1,status:'playing',created:Date.now(),lastSuit:null,lastLog:'',lastAction:null,p1:newFighter(currentProfile.name,getDeck(),currentProfile.elo,seatToken),p2:newFighter(opp.name,opp.deck,opp.elo,opp.seatToken),presence:{p1:sessionToken,p2:'ranked'}};
+    const state=initializeMatchState(base);
+    await set(ref(db,`rooms/${roomId}`), state);
+    await remove(ref(db,`rankedQueue/${opp.id}`));
+    await remove(ref(db,`rankedQueue/${myTicketId}`));
+    myRole='p1'; enterGame(); listenToRoom(roomId); return;
+  }
+  queuePoll=setInterval(async()=>{
+    const meSnap=await get(ref(db,`rankedQueue/${myTicketId}`));
+    if(!meSnap.exists()){ clearInterval(queuePoll); return }
+    const roomsSnap=await get(ref(db,'rooms'));
+    const rooms=roomsSnap.val()||{};
+    for(const [rid,room] of Object.entries(rooms)){
+      if(room.ranked&&room.p2?.seatToken===seatToken){
+        roomId=rid; myRole='p2';
+        await remove(ref(db,`rankedQueue/${myTicketId}`));
+        clearInterval(queuePoll);
+        enterGame(); listenToRoom(rid); return;
+      }
+    }
+  },1400)
+}
+
+// ── Enter game screen ─────────────────────────────────────────────────────────
+function enterGame(){ setScreen('game'); initCanvas() }
+
+// ── Leave match ───────────────────────────────────────────────────────────────
+async function leaveMatch(deleteRoomData=false, applyEloLoss=false){
+  clearInterval(timerInt); clearAITimeout(); clearOnlineListeners();
+  if(applyEloLoss&&gameState){
+    const oppRole=myRole==='p1'?'p2':'p1', oppElo=gameState[oppRole]?.elo||1000;
+    await updateProfileAfterRanked(false, oppElo);
+  }
+  if(deleteRoomData&&roomId&&mode==='online'){
+    try{ await remove(ref(db,`rooms/${roomId}`)) }catch(e){ console.warn('Room cleanup failed:',e) }
+  }
+  mode='menu'; onlineType=null; roomId=null; gameState=null; gameOver=false; selectedIndex=null;
+  $('#opp-indicator').style.display='none';
+  logText('Awaiting duel...');
+  $('#hand').innerHTML='';
+  setScreen('menu'); renderHome(); msg('')
+}
+
+// ── Finish game ───────────────────────────────────────────────────────────────
+async function finishGame(winner){
+  if(gameOver) return;
+  gameOver=true;
+  clearInterval(timerInt); clearAITimeout();
+  const won=winner===myRole;
+  showBanner(won?'K.O. — YOU WIN':'K.O. — YOU LOSE');
+  logText(won?'VICTORY! The opponent has fallen.':'DEFEAT. You have been bested.');
+  if(gameState?.ranked){
+    const oppRole=myRole==='p1'?'p2':'p1';
+    await updateProfileAfterRanked(won, gameState[oppRole]?.elo||1000);
+  }
+  if(roomId&&mode==='online'){
+    try{ await remove(ref(db,`rooms/${roomId}`)) }catch(e){ console.warn('Room cleanup:',e) }
   }
 }
 
+// ── Action dispatch ───────────────────────────────────────────────────────────
 function handleAction(type){
   if(mode==='local') return performLocalAction(type);
   if(mode==='online') return applyOnlineAction(type);
 }
 
 function performLocalAction(type){
-  if(!gameState || gameOver || gameState.turn!==myRole || gameState.status!=='playing') return;
+  if(!gameState||gameOver||gameState.turn!==myRole||gameState.status!=='playing') return;
   const state=deepClone(gameState); let logParts=[];
-  if(type==='draw'){logParts.push(`${state[myRole].name} draws and ends the turn.`); logParts.push(...drawCardAndEndTurn(state,myRole,'draw'))}
-  else if(type==='discard'){if(selectedIndex===null) return; discardCardForEnergy(state,myRole,selectedIndex); selectedIndex=null; logParts.push(`${state[myRole].name} discards to recover energy.`)}
-  else if(type==='play'){
+  if(type==='draw'){
+    logParts.push(`${state[myRole].name} draws and ends the turn.`);
+    logParts.push(...drawCardAndEndTurn(state,myRole));
+  } else if(type==='discard'){
+    if(selectedIndex===null) return;
+    discardCardForEnergy(state,myRole,selectedIndex); selectedIndex=null;
+    logParts.push(`${state[myRole].name} discards to recover energy.`);
+  } else if(type==='play'){
     if(selectedIndex===null) return;
     const card=state[myRole].hand[selectedIndex];
-    const res=resolveCardPlay(state,myRole,selectedIndex);
-    selectedIndex=null;
+    const res=resolveCardPlay(state,myRole,selectedIndex); selectedIndex=null;
     logParts.push(res.text); logParts.push(...res.passed);
     if(card){
       const oppRole=myRole==='p1'?'p2':'p1';
@@ -643,9 +941,42 @@ function performLocalAction(type){
       setTimeout(()=>triggerCardFX(card.suit,card.val,myRole,oppRole,dmgM?parseInt(dmgM[1]):0,healM?parseInt(healM[1]):0),80);
     }
   }
-  checkForWinner(state); gameState=state; logText(logParts.filter(Boolean).join(' | ')); renderGame(); if(state.status==='gameover') finishGame(state.winner); else beginTurnIfNeeded()
+  checkForWinner(state); gameState=state;
+  logText(logParts.filter(Boolean).join(' | '));
+  renderGame();
+  if(state.status==='gameover') finishGame(state.winner); else beginTurnIfNeeded()
 }
 
+async function applyOnlineAction(actionType){
+  if(!roomId) return;
+  const roomRef=ref(db,`rooms/${roomId}`);
+  let newLog='';
+  const actionIndex=selectedIndex;
+  const result=await runTransaction(roomRef, cur=>{
+    if(!cur) return cur;
+    if(cur.status!=='playing') return cur;
+    if(cur[myRole]?.seatToken!==seatToken) return cur;
+    if(cur.turn!==myRole) return cur;
+    const state=deepClone(cur);
+    if(actionType==='draw'){
+      newLog=[`${state[myRole].name} draws and ends the turn.`, ...drawCardAndEndTurn(state,myRole)].filter(Boolean).join(' | ');
+    } else if(actionType==='discard'){
+      if(actionIndex===null) return cur;
+      discardCardForEnergy(state,myRole,actionIndex);
+      newLog=`${state[myRole].name} discards to recover energy.`;
+    } else if(actionType==='play'){
+      if(actionIndex===null) return cur;
+      const res=resolveCardPlay(state,myRole,actionIndex);
+      newLog=[res.text,...res.passed].filter(Boolean).join(' | ');
+    } else { return cur }
+    checkForWinner(state);
+    state.lastLog=newLog;
+    return state;
+  });
+  if(result.committed){ selectedIndex=null; if(newLog) logText(newLog) }
+}
+
+// ── AI ────────────────────────────────────────────────────────────────────────
 function scoreAICard(state, card){
   const ai=state.p2, me=state.p1; let score=card.pw*0.8-(card.cost||1)*1.2; const base=gSuit(card.suit).base;
   if(base==='strike') score+=(100-me.hp)*0.06+ai.atk*0.4;
@@ -663,214 +994,40 @@ function scoreAICard(state, card){
   return score+rr()
 }
 function aiTakeTurn(){
-  if(mode!=='local' || !gameState || gameOver || gameState.turn!=='p2' || gameState.status!=='playing') return;
-  const state=deepClone(gameState), ai=state.p2; const playable=ai.hand.map((card,i)=>({card,i})).filter(x=>canPlayCard(ai,x.card)); let logParts=[];
-  if(!playable.length){logParts.push('EMBER AI draws and passes.'); logParts.push(...drawCardAndEndTurn(state,'p2','draw'))}
-  else {
+  if(mode!=='local'||!gameState||gameOver||gameState.turn!=='p2'||gameState.status!=='playing') return;
+  const state=deepClone(gameState), ai=state.p2;
+  const playable=ai.hand.map((card,i)=>({card,i})).filter(x=>canPlayCard(ai,x.card));
+  let logParts=[];
+  if(!playable.length){
+    logParts.push('EMBER AI draws and passes.');
+    logParts.push(...drawCardAndEndTurn(state,'p2'));
+  } else {
     playable.sort((a,b)=>scoreAICard(state,a.card)-scoreAICard(state,b.card));
-    const choice=playable[playable.length-1];
-    const card=choice.card;
+    const choice=playable[playable.length-1], card=choice.card;
     const res=resolveCardPlay(state,'p2',choice.i);
     logParts.push(`EMBER AI: ${res.text}`); logParts.push(...res.passed);
     const dmgM=res.text.match(/(?:deals|strikes?|crashes?)\s+(\d+)/i);
     const healM=res.text.match(/(?:restores?|heals?)\s+(\d+)/i);
     setTimeout(()=>triggerCardFX(card.suit,card.val,'p2','p1',dmgM?parseInt(dmgM[1]):0,healM?parseInt(healM[1]):0),200);
   }
-  checkForWinner(state); gameState=state; logText(logParts.filter(Boolean).join(' | ')); renderGame(); if(state.status==='gameover') finishGame(state.winner); else beginTurnIfNeeded()
-}
-
-async function createRoom(){
-  clearInterval(timerInt); clearOnlineListeners();
-  mode='online'; onlineType='casual'; myRole='p1'; gameOver=false; selectedIndex=null; roomId=roomCode();
-
-  // Store only P1's data. Do NOT run initializeMatchState yet — game hasn't started.
-  // P2 slot is empty. status='waiting' means no game logic runs.
-  const roomData = {
-    mode:'online', ranked:false, maxPlayers:2,
-    status:'waiting', created:Date.now(),
-    lastSuit:null, lastLog:'', lastAction:null,
-    p1: newFighter(currentProfile.name, getDeck(), currentProfile.elo, seatToken),
-    p2: null,  // explicitly null — no imaginary player
-    presence:{ p1:sessionToken, p2:null }
-  };
-  await set(ref(db,`rooms/${roomId}`), roomData);
-
-  // Show the lobby screen with room code prominently
-  $('#lobby-code-display').textContent = roomId;
-  $('#lobby-name-p1').textContent = currentProfile.name;
-  $('#lobby-elo-p1').textContent = `ELO ${currentProfile.elo}`;
-  $('#lobby-name-p2').textContent = 'Waiting...';
-  $('#lobby-elo-p2').textContent = '';
-  $('#lobby-seat-p2').className = 'lobby-seat empty';
-  $('#lobby-pulse').textContent = 'Waiting for opponent...';
-  setScreen('lobby');
-
-  // Listen for P2 joining
-  listenToRoom(roomId);
-}
-
-async function joinRoom(code){
-  clearInterval(timerInt); clearOnlineListeners();
-
-  // Validate: joiner must have a real profile
-  if(!currentProfile.name || currentProfile.name.length < 2){
-    msg('You must be logged in with a valid name to join a room.'); return;
-  }
-
-  mode='online'; onlineType='casual'; myRole='p2'; gameOver=false; selectedIndex=null;
-  const cleanCode = code.trim().toUpperCase();
-  if(!cleanCode){ msg('Enter a room code first.'); return; }
-
-  const roomRef = ref(db, `rooms/${cleanCode}`);
-
-  // First check room exists and is joinable
-  const snap = await get(roomRef);
-  if(!snap.exists()){ msg('Room not found.'); mode='menu'; return; }
-  const roomData = snap.val();
-  if(roomData.status !== 'waiting'){ msg('That room has already started or is full.'); mode='menu'; return; }
-  if(roomData.p2 !== null && roomData.p2?.name){ msg('Room is already full.'); mode='menu'; return; }
-  // Prevent joining your own room
-  if(roomData.p1?.seatToken === seatToken){ msg('You cannot join your own room.'); mode='menu'; return; }
-
-  // Atomic join — only succeeds if room is still waiting and p2 is empty
-  const res = await runTransaction(roomRef, cur=>{
-    if(!cur) return cur;
-    if(cur.status !== 'waiting') return; // abort — already started
-    if(cur.p2 !== null && cur.p2?.name) return; // abort — already full
-    if(cur.p1?.seatToken === seatToken) return; // abort — same person
-
-    // Fill P2 slot with real profile data
-    cur.p2 = newFighter(currentProfile.name, getDeck(), currentProfile.elo, seatToken);
-    cur.presence = cur.presence || {};
-    cur.presence.p2 = sessionToken;
-
-    // NOW initialize the full match state (both players present)
-    // Carry over P1's fighter data from cur
-    const fullState = {
-      ...cur,
-      turn:'p1', round:1, seq:0,
-      status:'playing',
-      lastSuit:null, lastLog:'', lastAction:null
-    };
-    // Run start-of-turn for p1 (the first turn)
-    // We can't call initializeMatchState here (it's outside transaction),
-    // so we inline the minimal setup and let the listener handle full render
-    return fullState;
-  });
-
-  if(!res.committed){
-    msg('Could not join room. It may be full or already started.'); mode='menu'; return;
-  }
-  const joined = res.snapshot.val();
-  if(!joined || joined.p2?.seatToken !== seatToken){
-    msg('Join failed — room may be full.'); mode='menu'; return;
-  }
-
-  roomId = cleanCode;
-  // P2 goes straight to the game screen (their transition is immediate)
-  enterGame();
-  gameState = joined;
+  checkForWinner(state); gameState=state;
+  logText(logParts.filter(Boolean).join(' | '));
   renderGame();
-  logText(`You joined ${joined.p1.name}'s room. Duel begins!`);
-  listenToRoom(cleanCode);
-  beginTurnIfNeeded();
+  if(state.status==='gameover') finishGame(state.winner); else beginTurnIfNeeded()
 }
 
-async function joinRankedQueue(){
-  msg('Searching ranked queue...');
-  clearOnlineListeners();
-  mode='online'; onlineType='ranked'; myRole='p1';
-  const me={name:currentProfile.name, elo:currentProfile.elo, deck:getDeck(), seatToken, joined:Date.now()};
-  const myTicketRef = push(ref(db,'rankedQueue'));
-  const myTicketId = myTicketRef.key;
-  await set(myTicketRef, me);
-
-  const q = await get(ref(db,'rankedQueue'));
-  const all = q.val() || {};
-  const others = Object.entries(all).filter(([id])=>id!==myTicketId).map(([id,v])=>({id,...v})).sort((a,b)=>Math.abs(a.elo-me.elo)-Math.abs(b.elo-me.elo));
-  if(others.length){
-    const opp = others[0];
-    roomId = roomCode();
-    const base={mode:'online',ranked:true,maxPlayers:2,turn:'p1',round:1,status:'playing',created:Date.now(),lastSuit:null,lastLog:'',lastAction:null,p1:newFighter(currentProfile.name,getDeck(),currentProfile.elo,seatToken),p2:newFighter(opp.name,opp.deck,opp.elo,opp.seatToken),presence:{p1:sessionToken,p2:'ranked'}};
-    const state=initializeMatchState(base);
-    await set(ref(db,`rooms/${roomId}`), state);
-    await remove(ref(db,`rankedQueue/${opp.id}`));
-    await remove(ref(db,`rankedQueue/${myTicketId}`));
-    myRole='p1';
-    enterGame(); listenToRoom(roomId); return;
-  }
-  queuePoll=setInterval(async()=>{
-    const meSnap=await get(ref(db,`rankedQueue/${myTicketId}`));
-    if(!meSnap.exists()){clearInterval(queuePoll); return}
-    const roomsSnap=await get(ref(db,'rooms'));
-    const rooms=roomsSnap.val()||{};
-    for(const [rid,room] of Object.entries(rooms)){
-      if(room.ranked && room.p2?.seatToken===seatToken){
-        roomId=rid; myRole='p2'; await remove(ref(db,`rankedQueue/${myTicketId}`)); clearInterval(queuePoll); enterGame(); listenToRoom(rid); return;
-      }
-    }
-  },1400);
-}
-
-function enterGame(){setScreen('game'); initCanvas()}
-
-// ── Leave match — only allowed for local/bot mode ────────────────────────────
-// deleteMatchData: if true, delete the Firebase room (cancel waiting room case)
-// applyEloLoss: if true, this is a ranked forfeit — penalise ELO
-async function leaveMatch(deleteMatchData=true, applyEloLoss=false){
-  clearInterval(timerInt); clearAITimeout(); clearOnlineListeners();
-  hideWaitingOverlay();
-
-  // Apply ELO loss for ranked forfeit before clearing state
-  if(applyEloLoss && gameState){
-    const oppRole = myRole==='p1'?'p2':'p1';
-    const oppElo = gameState[oppRole]?.elo || 1000;
-    await updateProfileAfterRanked(false, oppElo);
-  }
-
-  // Delete Firebase room data if requested (e.g. cancelling a waiting room)
-  if(deleteMatchData && roomId && mode==='online'){
-    try{ await remove(ref(db,`rooms/${roomId}`)); }catch(e){ console.warn('Room cleanup failed:', e); }
-  }
-
-  // Fully wipe all match state
-  mode='menu'; onlineType=null; roomId=null; gameState=null; gameOver=false; selectedIndex=null;
-  $('#opp-indicator').style.display='none';
-  logText('Awaiting duel...');
-  $('#hand').innerHTML='';
-  setScreen('menu'); renderHome(); msg('')
-}
-
-async function finishGame(winner){
-  if(gameOver) return;
-  gameOver=true;
-  clearInterval(timerInt); clearAITimeout();
-  const won = winner===myRole;
-  showBanner(won?'K.O. - YOU WIN':'K.O. - YOU LOSE');
-  logText(won?'K.O. - YOU WIN':'K.O. - YOU LOSE');
-  if(gameState?.ranked){
-    const oppRole=myRole==='p1'?'p2':'p1';
-    await updateProfileAfterRanked(won, gameState[oppRole].elo||1000);
-  }
-  // Delete the room after a completed match so no stale data lingers
-  if(roomId && mode==='online'){
-    try{ await remove(ref(db,`rooms/${roomId}`)); }catch(e){ console.warn('Room cleanup failed:', e); }
-  }
-}
-
-// ── Canvas & particle system ─────────────────────────────────────────────────
+// ── Canvas & particles ────────────────────────────────────────────────────────
 function initCanvas(){
-  canvas=$('#fx-canvas');
-  if(!canvas) return;
+  canvas=$('#fx-canvas'); if(!canvas) return;
   canvas.width=canvas.offsetWidth||900;
   canvas.height=canvas.offsetHeight||300;
   ctx=canvas.getContext('2d');
-  if(!animLoopRunning) startAnimLoop();
+  if(!animLoopRunning) startAnimLoop()
 }
 let animLoopRunning=false;
-function startAnimLoop(){animLoopRunning=true; requestAnimationFrame(animLoop)}
+function startAnimLoop(){ animLoopRunning=true; requestAnimationFrame(animLoop) }
 function animLoop(){
-  if(!ctx||!canvas){requestAnimationFrame(animLoop); return}
+  if(!ctx||!canvas){ requestAnimationFrame(animLoop); return }
   ctx.clearRect(0,0,canvas.width,canvas.height);
   particles=particles.filter(p=>p.life>0);
   for(const p of particles){
@@ -895,81 +1052,72 @@ function animLoop(){
     if(p.rot!==undefined) p.rot+=p.rotSpeed||0;
     if(p.shape==='ring') p.size+=p.expand||2;
   }
-  requestAnimationFrame(animLoop);
+  requestAnimationFrame(animLoop)
 }
 
 function fzCenter(role){
   const el=$(`#${role==='p1'?'p1z':'p2z'}`), cv=canvas;
-  if(!el||!cv) return {x:cv?.width/2||200,y:cv?.height/2||150};
+  if(!el||!cv) return {x:cv?.width/2||200, y:cv?.height/2||150};
   const er=el.getBoundingClientRect(), cr=cv.getBoundingClientRect();
-  return {x:er.left-cr.left+er.width/2, y:er.top-cr.top+er.height/2};
+  return {x:er.left-cr.left+er.width/2, y:er.top-cr.top+er.height/2}
 }
 
 function floatNumber(text, role, color='#fff'){
   const arena=$('#arena'); if(!arena) return;
   const el=document.createElement('div'); el.className='floatxt';
   el.textContent=text; el.style.color=color; el.style.fontFamily="'Special Elite',serif";
-  el.style.fontSize='18px'; el.style.fontWeight='bold'; el.style.zIndex='60';
-  el.style.pointerEvents='none'; el.style.textShadow='1px 1px 0 #000,0 0 8px currentColor';
+  el.style.fontSize='18px'; el.style.fontWeight='bold'; el.style.pointerEvents='none';
+  el.style.textShadow='1px 1px 0 #000,0 0 8px currentColor';
   const fz=$(`#${role==='p1'?'p1z':'p2z'}`);
   const ar=arena.getBoundingClientRect(), fr=fz?.getBoundingClientRect();
   const x=fr?(fr.left-ar.left+fr.width/2-16):200, y=fr?(fr.top-ar.top-10):60;
-  el.style.left=x+'px'; el.style.top=y+'px';
+  el.style.left=x+'px'; el.style.top=y+'px'; el.style.zIndex='60';
   arena.appendChild(el);
-  let t=0; const tick=()=>{t+=1; el.style.top=(y-t*1.5)+'px'; el.style.opacity=String(1-t/32); if(t<32) requestAnimationFrame(tick); else el.remove()};
-  requestAnimationFrame(tick);
+  let t=0;
+  const tick=()=>{ t+=1; el.style.top=(y-t*1.5)+'px'; el.style.opacity=String(1-t/32); if(t<32) requestAnimationFrame(tick); else el.remove() };
+  requestAnimationFrame(tick)
 }
 
 function spawnParticles(suit, attackerRole, defenderRole, value){
   if(!canvas||!ctx) return;
   const ac=fzCenter(attackerRole), dc=fzCenter(defenderRole);
-  const n=Math.min(value*2+10, 60);
+  const n=Math.min(value*2+10,60);
   if(suit==='spade'||suit==='void'){
     const clrs=['#d0d0d0','#888','#c8c8c8','#505050'];
-    for(let i=0;i<n;i++){const ang=-Math.PI/2+(-0.5+Math.random())*1.2, spd=2+Math.random()*5; particles.push({x:dc.x,y:dc.y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,size:2+Math.random()*4,color:clrs[mf(Math.random()*clrs.length)],life:1,decay:.04+Math.random()*.03,drag:.91,gravity:.12,shrink:.96,shape:'circle'})}
+    for(let i=0;i<n;i++){const ang=-Math.PI/2+(-0.5+rr())*1.2, spd=2+rr()*5; particles.push({x:dc.x,y:dc.y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,size:2+rr()*4,color:clrs[mf(rr()*clrs.length)],life:1,decay:.04+rr()*.03,drag:.91,gravity:.12,shrink:.96,shape:'circle'})}
     particles.push({x:dc.x,y:dc.y,vx:0,vy:0,size:4,color:'rgba(200,200,210,.7)',life:.8,decay:.04,shape:'ring',lw:3,expand:6});
-    particles.push({x:dc.x,y:dc.y,vx:0,vy:0,size:2,color:'rgba(255,255,255,.5)',life:.6,decay:.05,shape:'ring',lw:1.5,expand:9});
-    for(let i=0;i<5;i++){const a=Math.random()*Math.PI*2, l=20+Math.random()*30; particles.push({x:dc.x,y:dc.y,vx:0,vy:0,size:l,color:'rgba(220,220,230,.6)',life:.7,decay:.07,shape:'line',dx:Math.cos(a),dy:Math.sin(a),lw:1.5})}
-  }
-  else if(suit==='heart'){
-    const clrs=['#7be87b','#a8f5a8','#c8f5c8','#e5ffe5','#d4e870'];
-    for(let i=0;i<n;i++){const ang=Math.random()*Math.PI*2, spd=.5+Math.random()*2.5; particles.push({x:ac.x+(-30+Math.random()*60),y:ac.y+20,vx:Math.cos(ang)*spd,vy:-1.5-Math.random()*2,size:3+Math.random()*5,color:clrs[mf(Math.random()*clrs.length)],life:1,decay:.022+Math.random()*.015,drag:.96,gravity:-.02,shrink:.98,shape:Math.random()>.5?'circle':'star',rot:Math.random()*Math.PI*2,rotSpeed:(.05+Math.random()*.05)*(Math.random()>.5?1:-1)})}
+    for(let i=0;i<5;i++){const a=rr()*Math.PI*2, l=20+rr()*30; particles.push({x:dc.x,y:dc.y,vx:0,vy:0,size:l,color:'rgba(220,220,230,.6)',life:.7,decay:.07,shape:'line',dx:Math.cos(a),dy:Math.sin(a),lw:1.5})}
+  } else if(suit==='heart'){
+    const clrs=['#7be87b','#a8f5a8','#c8f5c8','#e5ffe5'];
+    for(let i=0;i<n;i++){const ang=rr()*Math.PI*2, spd=.5+rr()*2.5; particles.push({x:ac.x+(-30+rr()*60),y:ac.y+20,vx:Math.cos(ang)*spd,vy:-1.5-rr()*2,size:3+rr()*5,color:clrs[mf(rr()*clrs.length)],life:1,decay:.022+rr()*.015,drag:.96,gravity:-.02,shrink:.98,shape:rr()>.5?'circle':'star',rot:rr()*Math.PI*2,rotSpeed:(.05+rr()*.05)*(rr()>.5?1:-1)})}
     particles.push({x:ac.x,y:ac.y,vx:0,vy:0,size:5,color:'rgba(100,240,130,.5)',life:.9,decay:.05,shape:'ring',lw:4,expand:5});
-  }
-  else if(suit==='club'){
-    const clrs=['#8ab4f8','#c0d8ff','#6090e0','#d0e8ff'];
-    for(let i=0;i<n;i++){const ang=Math.random()*Math.PI*2, spd=1.5+Math.random()*3; particles.push({x:ac.x+(-20+Math.random()*40),y:ac.y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,size:2+Math.random()*4,color:clrs[mf(Math.random()*clrs.length)],life:1,decay:.035,drag:.93,gravity:.05,shrink:.97,shape:'circle'})}
+  } else if(suit==='club'){
+    const clrs=['#8ab4f8','#c0d8ff','#6090e0'];
+    for(let i=0;i<n;i++){const ang=rr()*Math.PI*2, spd=1.5+rr()*3; particles.push({x:ac.x+(-20+rr()*40),y:ac.y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,size:2+rr()*4,color:clrs[mf(rr()*clrs.length)],life:1,decay:.035,drag:.93,gravity:.05,shrink:.97,shape:'circle'})}
     particles.push({x:ac.x,y:ac.y,vx:0,vy:0,size:10,color:'rgba(130,180,255,.6)',life:.9,decay:.04,shape:'ring',lw:5,expand:4});
-    particles.push({x:ac.x,y:ac.y,vx:0,vy:0,size:20,color:'rgba(160,200,255,.35)',life:.7,decay:.04,shape:'ring',lw:2,expand:3});
-  }
-  else if(suit==='diamond'||suit==='curse'){
-    const clrs=['#c080ff','#9050e0','#e0a0ff','#7020c0'];
-    for(let i=0;i<n;i++){const ang=Math.random()*Math.PI*2, spd=.8+Math.random()*2; particles.push({x:dc.x+(-25+Math.random()*50),y:dc.y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd-.8,size:3+Math.random()*5,color:clrs[mf(Math.random()*clrs.length)],life:1,decay:.025,drag:.95,gravity:-.05,shrink:.97,shape:Math.random()>.4?'circle':'star',rot:Math.random()*Math.PI*2,rotSpeed:.04})}
+  } else if(suit==='diamond'||suit==='curse'){
+    const clrs=['#c080ff','#9050e0','#e0a0ff'];
+    for(let i=0;i<n;i++){const ang=rr()*Math.PI*2, spd=.8+rr()*2; particles.push({x:dc.x+(-25+rr()*50),y:dc.y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd-.8,size:3+rr()*5,color:clrs[mf(rr()*clrs.length)],life:1,decay:.025,drag:.95,gravity:-.05,shrink:.97,shape:rr()>.4?'circle':'star',rot:rr()*Math.PI*2,rotSpeed:.04})}
     particles.push({x:dc.x,y:dc.y,vx:0,vy:0,size:5,color:'rgba(160,60,255,.5)',life:.85,decay:.05,shape:'ring',lw:4,expand:5});
-  }
-  else if(suit==='drain'){
-    const clrs=['#ff6020','#ff9040','#ffb060','#cc3010'];
-    for(let i=0;i<n;i++){const t=Math.random(), x=dc.x+(ac.x-dc.x)*t, y=dc.y+(ac.y-dc.y)*t; const perp=(-0.3+Math.random()*.6); particles.push({x:x+perp*30,y:y+perp*30,vx:(ac.x-dc.x)*.012+(-1+Math.random()*2)*.5,vy:(ac.y-dc.y)*.012+(-1+Math.random()*2)*.5,size:3+Math.random()*4,color:clrs[mf(Math.random()*clrs.length)],life:1,decay:.03,drag:.94,shrink:.97,shape:'circle'})}
-    particles.push({x:dc.x,y:dc.y,vx:0,vy:0,size:3,color:'rgba(255,80,20,.5)',life:.7,decay:.05,shape:'ring',lw:3,expand:5});
-  }
-  else if(suit==='wound'){
-    const clrs=['#c01010','#8b0000','#ff2020','#801010'];
-    for(let i=0;i<n;i++){const ang=-Math.PI/2+(-1+Math.random()*2)*1.5, spd=2+Math.random()*5; particles.push({x:dc.x,y:dc.y,vx:Math.cos(ang)*spd*(Math.random()>.5?1:-1),vy:Math.sin(ang)*spd,size:3+Math.random()*5,color:clrs[mf(Math.random()*clrs.length)],life:1,decay:.03,drag:.90,gravity:.2,shrink:.97,shape:'circle'})}
+  } else if(suit==='drain'){
+    const clrs=['#ff6020','#ff9040','#ffb060'];
+    for(let i=0;i<n;i++){const t=rr(), x=dc.x+(ac.x-dc.x)*t, y=dc.y+(ac.y-dc.y)*t; const perp=(-0.3+rr()*.6); particles.push({x:x+perp*30,y:y+perp*30,vx:(ac.x-dc.x)*.012+(-1+rr()*2)*.5,vy:(ac.y-dc.y)*.012+(-1+rr()*2)*.5,size:3+rr()*4,color:clrs[mf(rr()*clrs.length)],life:1,decay:.03,drag:.94,shrink:.97,shape:'circle'})}
+  } else if(suit==='wound'){
+    const clrs=['#c01010','#8b0000','#ff2020'];
+    for(let i=0;i<n;i++){const ang=-Math.PI/2+(-1+rr()*2)*1.5, spd=2+rr()*5; particles.push({x:dc.x,y:dc.y,vx:Math.cos(ang)*spd*(rr()>.5?1:-1),vy:Math.sin(ang)*spd,size:3+rr()*5,color:clrs[mf(rr()*clrs.length)],life:1,decay:.03,drag:.90,gravity:.2,shrink:.97,shape:'circle'})}
     particles.push({x:dc.x,y:dc.y,vx:0,vy:0,size:4,color:'rgba(200,10,10,.6)',life:.7,decay:.05,shape:'ring',lw:5,expand:5});
-  }
-  else if(suit==='mirror'){
-    const clrs=['#aae8ff','#ffeebb','#c8aaff','#aaffcc','#ffffaa'];
-    for(let i=0;i<n;i++){const ang=(i/n)*Math.PI*2, spd=1.5+Math.random()*3; particles.push({x:ac.x,y:ac.y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,size:3+Math.random()*5,color:clrs[i%clrs.length],life:1,decay:.025,drag:.95,shrink:.96,gravity:0,shape:'star',rot:Math.random()*Math.PI*2,rotSpeed:.08})}
+  } else if(suit==='mirror'){
+    const clrs=['#aae8ff','#ffeebb','#c8aaff','#aaffcc'];
+    for(let i=0;i<n;i++){const ang=(i/n)*Math.PI*2, spd=1.5+rr()*3; particles.push({x:ac.x,y:ac.y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,size:3+rr()*5,color:clrs[i%clrs.length],life:1,decay:.025,drag:.95,shrink:.96,gravity:0,shape:'star',rot:rr()*Math.PI*2,rotSpeed:.08})}
     particles.push({x:ac.x,y:ac.y,vx:0,vy:0,size:8,color:'rgba(180,230,255,.5)',life:.9,decay:.04,shape:'ring',lw:4,expand:5});
-    particles.push({x:ac.x,y:ac.y,vx:0,vy:0,size:16,color:'rgba(200,200,255,.3)',life:.7,decay:.04,shape:'ring',lw:2,expand:6});
   }
   if(['J','Q','K','A'].includes(String(value))){
-    for(let i=0;i<14;i++){const ang=(i/14)*Math.PI*2, spd=3+Math.random()*4; particles.push({x:ac.x,y:ac.y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,size:4+Math.random()*4,color:i%2===0?'#e5c45f':'#fff5c0',life:1,decay:.03,drag:.93,gravity:.06,shrink:.97,shape:'star',rot:Math.random()*Math.PI*2,rotSpeed:.1})}
+    for(let i=0;i<14;i++){const ang=(i/14)*Math.PI*2, spd=3+rr()*4; particles.push({x:ac.x,y:ac.y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,size:4+rr()*4,color:i%2===0?'#e5c45f':'#fff5c0',life:1,decay:.03,drag:.93,gravity:.06,shrink:.97,shape:'star',rot:rr()*Math.PI*2,rotSpeed:.1})}
   }
 }
 
 function triggerCardFX(suit, val, attackerRole, defenderRole, dmg, heal){
-  const numVal = VAL_POWER[val]||5;
+  const numVal=VAL_POWER[val]||5;
   spawnParticles(suit, attackerRole, defenderRole, numVal);
   if(dmg>0) floatNumber(`-${dmg}`, defenderRole, suit==='wound'?'#ff4040':suit==='curse'?'#c080ff':suit==='drain'?'#ff8040':'#fff');
   if(heal>0) floatNumber(`+${heal}`, attackerRole, '#7be87b');
@@ -980,79 +1128,64 @@ function triggerCardFX(suit, val, attackerRole, defenderRole, dmg, heal){
   if(suit==='wound'){const fc=$('#'+(defenderRole==='p1'?'fc1':'fc2')); if(fc){fc.classList.add('bleeding'); setTimeout(()=>fc.classList.remove('bleeding'),4000)}}
 }
 
-function showWaitingOverlay(code){
-  const ov=$('#waiting-overlay'); if(!ov) return;
-  $('#waiting-room-code').textContent=code;
-  ov.classList.remove('hidden');
-}
-function hideWaitingOverlay(){
-  const ov=$('#waiting-overlay'); if(ov) ov.classList.add('hidden');
-}
-
-// ── Sign-out ─────────────────────────────────────────────────────────────────
-function signOut(){
-  // Reset in-memory profile; do NOT persist name to localStorage
-  currentProfile = {name:'', wins:0, losses:0, elo:1000};
-  setScreen('login');
-  $('#loginName').value='';
-  loginMsg('');
-}
-
-// ── Boot: always go to login — no auto sign-in ───────────────────────────────
+// ── Boot ──────────────────────────────────────────────────────────────────────
 setScreen('login');
 
-// ── Event wiring ─────────────────────────────────────────────────────────────
+// ── Event wiring ──────────────────────────────────────────────────────────────
 $('#loginBtn').onclick=async()=>{
   const name=($('#loginName').value||'').trim().toUpperCase();
-  if(name.length<2){loginMsg('Use at least 2 characters.'); return}
+  if(name.length<2){ loginMsg('Use at least 2 characters.'); return }
   loginMsg('Loading profile...');
-  try{
-    await ensureProfile(name);
-    loginMsg('');
-    setScreen('menu');
-  }catch(e){
-    loginMsg(`Error: ${e.message}`);
-  }
+  try{ await ensureProfile(name); loginMsg(''); setScreen('menu') }
+  catch(e){ loginMsg(`Error: ${e.message}`) }
 };
-
-$('#loginName').addEventListener('keydown', e=>{
-  if(e.key==='Enter') $('#loginBtn').click();
-});
-
+$('#loginName').addEventListener('keydown',e=>{ if(e.key==='Enter') $('#loginBtn').click() });
 $('#logoutBtn').onclick=()=>signOut();
 
+// Click to copy lobby code
+$('#lobby-code-display').onclick=()=>{
+  const code=$('#lobby-code-display').textContent;
+  if(code&&code!=='------') navigator.clipboard?.writeText(code).then(()=>{ $('#lobby-share').textContent='Copied to clipboard!' }).catch(()=>{})
+};
+
+// Cancel waiting room — deletes from Firebase, returns to menu
+$('#cancelLobbyBtn').onclick=()=>{
+  const isRanked=onlineType==='ranked';
+  leaveMatch(true, isRanked);
+};
+
+// Offline vs AI
 $('#offlineBtn').onclick=()=>{
   mode='local'; onlineType=null; myRole='p1'; gameOver=false; selectedIndex=null;
   const aiDeck=['spade_7','spade_7','spade_9','spade_K','heart_4','heart_7','heart_Q','club_5','club_8','club_8','diamond_5','diamond_8','diamond_8','drain_6','drain_6','drain_J','wound_6','wound_6','wound_A','void_8','mirror_9','mirror_A','heart_4','spade_5'];
   const base={mode:'local',ranked:false,maxPlayers:2,turn:'p1',round:1,status:'playing',created:Date.now(),lastSuit:null,lastLog:'',lastAction:null,p1:newFighter(currentProfile.name,getDeck(),currentProfile.elo,seatToken),p2:newFighter('EMBER AI',aiDeck,1200,'AI')};
-  gameState=initializeMatchState(base); enterGame(); renderGame(); logText('The AI studies your opening hand.'); beginTurnIfNeeded()
+  gameState=initializeMatchState(base);
+  enterGame(); renderGame(); logText('The AI studies your opening hand.'); beginTurnIfNeeded()
 };
 
 $('#createRoomBtn').onclick=()=>createRoom().catch(e=>msg(`Create failed: ${e.message}`));
-$('#joinRoomMenuBtn').onclick=()=>{const code=($('#joinCodeHome').value||'').trim().toUpperCase(); if(!code){msg('Enter a room code first.'); return} joinRoom(code).catch(e=>msg(`Join failed: ${e.message}`))};
-$('#rankedBtn').onclick=()=>joinRankedQueue().catch(e=>msg(`Ranked failed: ${e.message}`));
-$('#openBuilderBtn').onclick=()=>{setScreen('builder'); renderBuilder()};
-$('#backHomeBtn').onclick=()=>{setScreen('menu'); renderHome()};
-$('#saveDeckBtn').onclick=()=>{const deck=getDeck(); if(deck.length!==DECK_SIZE){msg('Deck must be exactly 24 cards.'); return} setScreen('menu'); renderHome(); msg('Deck saved.')};
-$('#resetDeckBtn').onclick=()=>{saveDeck(getDefaultDeck()); renderBuilder()};
-$('#libraryGrid').onclick=e=>{const add=e.target.getAttribute('data-add'), rem=e.target.getAttribute('data-remove'); if(add) mutateDeck('add',add); if(rem) mutateDeck('remove',rem)};
-$('#deckList').onclick=e=>{const rem=e.target.getAttribute('data-remove'); if(rem) mutateDeck('remove',rem)};
-
-// Leave match — only enabled for local bot games
-$('#leaveMatchBtn').onclick=()=>{
-  if(mode!=='local'){
-    msg('Online matches cannot be left. Fight to the end!');
-    return;
-  }
-  leaveMatch(false, false);
+$('#joinRoomMenuBtn').onclick=()=>{
+  const code=($('#joinCodeHome').value||'').trim().toUpperCase();
+  if(!code){ msg('Enter a room code first.'); return }
+  joinRoom(code).catch(e=>msg(`Join failed: ${e.message}`))
 };
+$('#rankedBtn').onclick=()=>joinRankedQueue().catch(e=>msg(`Ranked failed: ${e.message}`));
 
-// Cancel waiting room — deletes the room from Firebase
-$('#cancelWaitBtn').onclick=()=>{
-  // Cancelling a waiting room is treated as a loss only if it was ranked
-  // (waiting rooms can only be casual, but guard anyway)
-  const isRanked = gameState?.ranked || onlineType==='ranked';
-  leaveMatch(true, isRanked);
+$('#openBuilderBtn').onclick=()=>{ setScreen('builder'); renderBuilder() };
+$('#backHomeBtn').onclick=()=>{ setScreen('menu'); renderHome() };
+$('#saveDeckBtn').onclick=()=>{
+  const deck=getDeck();
+  if(deck.length!==DECK_SIZE){ msg('Deck must be exactly 24 cards.'); return }
+  setScreen('menu'); renderHome(); msg('Deck saved.')
+};
+$('#resetDeckBtn').onclick=()=>{ saveDeck(getDefaultDeck()); renderBuilder() };
+$('#libraryGrid').onclick=e=>{ const a=e.target.getAttribute('data-add'), r=e.target.getAttribute('data-remove'); if(a) mutateDeck('add',a); if(r) mutateDeck('remove',r) };
+$('#deckList').onclick=e=>{ const r=e.target.getAttribute('data-remove'); if(r) mutateDeck('remove',r) };
+
+// Leave match — only for local bot games
+$('#leaveMatchBtn').onclick=()=>{
+  if(mode!=='local'){ msg('Online matches cannot be left. Fight to the end!'); return }
+  leaveMatch(false, false)
 };
 
 $('#playbtn').onclick=()=>handleAction('play');
