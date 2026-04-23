@@ -92,6 +92,33 @@ button,input{font-family:inherit}
 #bnr,#combo-flash,#opp-indicator{position:absolute;left:50%;transform:translateX(-50%);background:#0a0906;border:1px solid var(--line);padding:5px 12px;letter-spacing:3px;font-size:11px;z-index:30}
 #bnr{top:32px;display:none} #combo-flash{bottom:42px;display:none} #opp-indicator{top:10px;display:none}
 #fx-canvas{position:absolute;inset:0;pointer-events:none;z-index:25}.floatxt{position:absolute;font-size:12px;pointer-events:none;z-index:50;text-shadow:1px 1px 0 #000}
+/* waiting overlay */
+#waiting-overlay{position:absolute;inset:0;z-index:200;background:rgba(6,3,1,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px}
+#waiting-overlay.hidden{display:none!important}
+#waiting-room-code{font-family:'Special Elite',serif;font-size:48px;letter-spacing:12px;color:var(--gold);text-shadow:0 0 30px rgba(196,154,53,.4)}
+#waiting-pulse{font-size:11px;letter-spacing:4px;color:var(--faded);animation:blink 1.4s step-end infinite}
+#waiting-dots span{animation:blink 1.4s step-end infinite}
+#waiting-dots span:nth-child(2){animation-delay:.3s}
+#waiting-dots span:nth-child(3){animation-delay:.6s}
+/* card play animation */
+.hc.playing{animation:cardPlay .35s ease-out forwards}
+@keyframes cardPlay{0%{transform:translateY(-12px) scale(1)}40%{transform:translateY(-60px) scale(1.15) rotate(-3deg)}100%{transform:translateY(-120px) scale(0) rotate(8deg);opacity:0}}
+/* hp flash */
+.hi.flash-dmg{animation:flashRed .4s ease-out}
+.hi.flash-heal{animation:flashGold .4s ease-out}
+@keyframes flashRed{0%,100%{filter:none}50%{filter:brightness(2) saturate(0) sepia(1) hue-rotate(-30deg)}}
+@keyframes flashGold{0%,100%{filter:none}50%{filter:brightness(2) saturate(2) hue-rotate(20deg)}}
+/* fcard shake */
+@keyframes fcardShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(4px)}}
+@keyframes fcardShakeR{0%,100%{transform:scaleX(-1) translateX(0)}20%{transform:scaleX(-1) translateX(-6px)}40%{transform:scaleX(-1) translateX(8px)}60%{transform:scaleX(-1) translateX(-5px)}80%{transform:scaleX(-1) translateX(4px)}}
+.fcard.shake{animation:fcardShake .4s ease-out}
+#fc2.shake{animation:fcardShakeR .4s ease-out}
+/* mirror shimmer */
+@keyframes mirrorShimmer{0%,100%{box-shadow:2px 2px 0 #000,inset 0 0 10px rgba(42,31,14,.14)}50%{box-shadow:0 0 18px 4px rgba(180,220,255,.55),inset 0 0 14px rgba(140,190,255,.3)}}
+.fcard.mirrored{animation:mirrorShimmer 1.2s ease-in-out infinite}
+/* bleed drip css anim on fcard */
+@keyframes bleedDrip{0%{box-shadow:2px 2px 0 #000,inset 0 0 10px rgba(42,31,14,.14)}50%{box-shadow:0 0 14px 3px rgba(180,20,20,.55),inset 0 0 12px rgba(200,30,30,.25)}100%{box-shadow:2px 2px 0 #000,inset 0 0 10px rgba(42,31,14,.14)}}
+.fcard.bleeding{animation:bleedDrip 1.8s ease-in-out infinite}
 #status-bar{display:grid;grid-template-columns:repeat(8,1fr);padding:6px 12px;background:#100d08;border-bottom:1px solid var(--line);gap:10px;font-size:10px}
 #status-bar span{display:flex;justify-content:space-between;color:var(--gold)} #status-bar span b{color:var(--paper2)}
 #log{min-height:50px;max-height:50px;padding:8px 12px;background:#090704;border-bottom:1px solid var(--line);font-size:11px;color:var(--paper2);line-height:1.5;overflow:hidden}
@@ -188,6 +215,13 @@ button,input{font-family:inherit}
     <div id="tmr-wrap"><div id="tmr-label">TURN</div><div id="tmr">18</div><div id="tmr-bar-wrap"><div id="tmr-bar"></div></div></div>
     <div class="hw" style="text-align:right"><div class="hlbl" id="p2label" style="text-align:right">FOE</div><div class="ho"><div class="hi" id="p2h" style="width:100%"></div></div><div class="meta-row" style="justify-content:flex-end"><span>DECK <b id="p2DeckCount">0</b></span><span>HAND <b id="p2HandCount">0</b></span><span>ELO <b id="p2Rating">-</b></span></div><div class="energy-row" id="p2Energy" style="justify-content:flex-end"></div></div>
   </div>
+  <div id="waiting-overlay" class="hidden">
+    <div style="font-family:'Special Elite',serif;font-size:13px;letter-spacing:4px;color:var(--faded)">ROOM CODE</div>
+    <div id="waiting-room-code">------</div>
+    <div style="font-size:11px;color:#8e7a53;letter-spacing:2px">Share this code with your opponent</div>
+    <div id="waiting-pulse">WAITING FOR PLAYER 2<span id="waiting-dots"><span>.</span><span>.</span><span>.</span></span></div>
+    <button class="btn danger" id="cancelWaitBtn" style="margin-top:8px">Cancel</button>
+  </div>
   <div id="arena"><div id="arena-grid"></div><canvas id="fx-canvas"></canvas><div id="p1z"><div class="fcard" id="fc1"><div class="fp">1</div><div class="fsuit">♠</div><div class="fcard-name">YOU</div><div class="fpb">1</div></div><div class="fname-tag">P1</div></div><div id="p2z"><div class="fcard" id="fc2" style="transform:scaleX(-1)"><div class="fp">2</div><div class="fsuit">♦</div><div class="fcard-name">FOE</div><div class="fpb">2</div></div><div class="fname-tag" style="transform:scaleX(-1)">P2</div></div><div id="floor"></div><div id="bnr"></div><div id="combo-flash"></div><div id="opp-indicator">OPPONENT IS THINKING...</div></div>
   <div id="status-bar"><span>ATK <b id="s-atk">0</b></span><span>DEF <b id="s-def">0</b></span><span>SPD <b id="s-spd">0</b></span><span>BLEED <b id="s-bld">0</b></span><span>CURSE <b id="s-crs">0</b></span><span>ENERGY <b id="s-eng">0</b></span><span>COMBO <b id="s-cmb">0</b></span><span>SEQ <b id="s-seq">0</b></span></div>
   <div id="log">Awaiting duel...</div><div id="hand"></div>
@@ -197,8 +231,9 @@ button,input{font-family:inherit}
 
 <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-import { getDatabase, ref, set, get, onValue, push, remove, runTransaction, update } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
+// FIX 1: Corrected Firebase SDK version from non-existent 12.12.1 to stable 10.12.2
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, set, get, onValue, push, remove, runTransaction, update, off } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const firebaseConfig = {apiKey:"AIzaSyBGXQGsslxSl1AwSu83SMkFi5_aJ-Qhqk4",authDomain:"cardkombat.firebaseapp.com",projectId:"cardkombat",storageBucket:"cardkombat.firebasestorage.app",messagingSenderId:"616844059072",appId:"1:616844059072:web:ba1e4897308e9e9ab8e825",databaseURL:"https://cardkombat-default-rtdb.firebaseio.com"};
 const app = initializeApp(firebaseConfig);
@@ -208,7 +243,26 @@ const TURN_TIME=18, STARTING_HP=100, MAX_ENERGY=3, DECK_SIZE=24;
 const SUITS={spade:{g:'♠',desc:'Strike',red:false,base:'strike'},heart:{g:'♥',desc:'Mend',red:true,base:'mend'},club:{g:'♣',desc:'Brace',red:false,base:'brace'},diamond:{g:'♦',desc:'Curse',red:true,base:'curse'},drain:{g:'◆',desc:'Drain',red:true,base:'drain'},wound:{g:'✠',desc:'Wound',red:false,base:'wound'},void:{g:'◇',desc:'Void',red:false,base:'void'},mirror:{g:'◈',desc:'Mirror',red:false,base:'mirror'}};
 const VAL_POWER={2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,10:10,J:11,Q:12,K:13,A:14};
 const RARITY_RULES={common:{copies:4,cost:1},uncommon:{copies:3,cost:1},rare:{copies:2,cost:2},legendary:{copies:1,cost:3}};
-const CARD_LIBRARY=[{id:'spade_5', suit:'spade', val:'5', rarity:'common'},{id:'spade_7', suit:'spade', val:'7', rarity:'common'},{id:'spade_9', suit:'spade', val:'9', rarity:'uncommon'},{id:'heart_4', suit:'heart', val:'4', rarity:'common'},{id:'heart_7', suit:'heart', val:'7', rarity:'common'},{id:'heart_Q', suit:'heart', val:'Q', rarity:'rare'},{id:'club_5', suit:'club', val:'5', rarity:'common'},{id:'club_8', suit:'club', val:'8', rarity:'uncommon'},{id:'diamond_5', suit:'diamond', val:'5', rarity:'common'},{id:'diamond_8', suit:'diamond', val:'8', rarity:'uncommon'},{id:'drain_6', suit:'drain', val:'6', rarity:'uncommon'},{id:'wound_6', suit:'wound', val:'6', rarity:'uncommon'},{id:'void_8', suit:'void', val:'8', rarity:'rare'},{id:'mirror_9', suit:'mirror', val:'9', rarity:'rare'},{id:'spade_K', suit:'spade', val:'K', rarity:'rare'},{id:'drain_J', suit:'drain', val:'J', rarity:'rare'},{id:'wound_A', suit:'wound', val:'A', rarity:'legendary'},{id:'mirror_A', suit:'mirror', val:'A', rarity:'legendary'}];
+const CARD_LIBRARY=[
+  {id:'spade_5', suit:'spade', val:'5', rarity:'common'},
+  {id:'spade_7', suit:'spade', val:'7', rarity:'common'},
+  {id:'spade_9', suit:'spade', val:'9', rarity:'uncommon'},
+  {id:'heart_4', suit:'heart', val:'4', rarity:'common'},
+  {id:'heart_7', suit:'heart', val:'7', rarity:'common'},
+  {id:'heart_Q', suit:'heart', val:'Q', rarity:'rare'},
+  {id:'club_5', suit:'club', val:'5', rarity:'common'},
+  {id:'club_8', suit:'club', val:'8', rarity:'uncommon'},
+  {id:'diamond_5', suit:'diamond', val:'5', rarity:'common'},
+  {id:'diamond_8', suit:'diamond', val:'8', rarity:'uncommon'},
+  {id:'drain_6', suit:'drain', val:'6', rarity:'uncommon'},
+  {id:'wound_6', suit:'wound', val:'6', rarity:'uncommon'},
+  {id:'void_8', suit:'void', val:'8', rarity:'rare'},
+  {id:'mirror_9', suit:'mirror', val:'9', rarity:'rare'},
+  {id:'spade_K', suit:'spade', val:'K', rarity:'rare'},
+  {id:'drain_J', suit:'drain', val:'J', rarity:'rare'},
+  {id:'wound_A', suit:'wound', val:'A', rarity:'legendary'},
+  {id:'mirror_A', suit:'mirror', val:'A', rarity:'legendary'} // FIX 2: Added missing mirror_A card to CARD_LIBRARY
+];
 
 const LS={name:'ck_name_secure',deck:'ck_deck_secure',seatToken:'ck_seat_token',session:'ck_session_token'};
 const $=s=>document.querySelector(s), mf=Math.floor, rr=()=>Math.random();
@@ -218,6 +272,14 @@ let seatToken = localStorage.getItem(LS.seatToken) || crypto.randomUUID();
 localStorage.setItem(LS.seatToken, seatToken);
 let sessionToken = localStorage.getItem(LS.session) || crypto.randomUUID();
 localStorage.setItem(LS.session, sessionToken);
+
+// FIX 3: Added missing roomCode() function
+function roomCode(){
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code='';
+  for(let i=0;i<6;i++) code+=chars[mf(Math.random()*chars.length)];
+  return code;
+}
 
 function profileKey(name){ return name.trim().toUpperCase().replace(/[^A-Z0-9_ -]/g,'').replace(/\s+/g,'_') }
 function msg(t){$('#home-message').textContent=t}
@@ -229,10 +291,15 @@ function getDeck(){const raw=localStorage.getItem(LS.deck); if(!raw) return getD
 function saveDeck(deck){localStorage.setItem(LS.deck,JSON.stringify(deck)); renderHome()}
 function getDefaultDeck(){return ['spade_5','spade_5','spade_7','spade_7','spade_9','heart_4','heart_4','heart_7','heart_7','heart_Q','club_5','club_5','club_8','club_8','diamond_5','diamond_5','diamond_8','diamond_8','drain_6','drain_J','wound_6','wound_A','void_8','mirror_9']}
 function shuffle(arr){const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=mf(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]} return a}
-function makeDeckFromList(list){return shuffle(list.map(id=>{const base=CARD_LIBRARY.find(c=>c.id===id); return {...base,pw:VAL_POWER[base.val],cost:RARITY_RULES[base.rarity].cost}}))}
+function makeDeckFromList(list){return shuffle(list.map(id=>{const base=CARD_LIBRARY.find(c=>c.id===id); if(!base){console.warn(`Unknown card id: ${id}`); return null} return {...base,pw:VAL_POWER[base.val],cost:RARITY_RULES[base.rarity].cost}}).filter(Boolean))}
 function deepClone(v){return JSON.parse(JSON.stringify(v))}
 function setScreen(which){$('#screen-login').classList.toggle('hidden',which!=='login'); $('#screen-menu').classList.toggle('hidden',which!=='menu'); $('#screen-builder').classList.toggle('hidden',which!=='builder'); $('#screen-game').classList.toggle('hidden',which!=='game')}
-function clearOnlineListeners(){if(stateUnsubscribe){stateUnsubscribe(); stateUnsubscribe=null} if(queuePoll){clearInterval(queuePoll); queuePoll=null}}
+
+// FIX 4: clearOnlineListeners now also cleans up the Firebase onValue ref properly
+function clearOnlineListeners(){
+  if(stateUnsubscribe){stateUnsubscribe(); stateUnsubscribe=null}
+  if(queuePoll){clearInterval(queuePoll); queuePoll=null}
+}
 function clearAITimeout(){if(aiTimeout){clearTimeout(aiTimeout); aiTimeout=null}}
 function logText(t){$('#log').textContent=t}
 function showBanner(t){const b=$('#bnr'); b.textContent=t; b.style.display='block'; setTimeout(()=>b.style.display='none',1600)}
@@ -270,13 +337,24 @@ function renderHome(){
   $('#homeRating').textContent=currentProfile.elo||1000;
   $('#homeWins').textContent=currentProfile.wins||0;
   $('#homeLosses').textContent=currentProfile.losses||0;
-  const deck=getDeck(); const rareCounts={common:0,uncommon:0,rare:0,legendary:0}; deck.forEach(id=>rareCounts[CARD_LIBRARY.find(c=>c.id===id).rarity]++); $('#deckSummary').textContent=`${deck.length} cards ready. Common ${rareCounts.common}, Uncommon ${rareCounts.uncommon}, Rare ${rareCounts.rare}, Legendary ${rareCounts.legendary}.`
+  const deck=getDeck();
+  const rareCounts={common:0,uncommon:0,rare:0,legendary:0};
+  deck.forEach(id=>{
+    const card=CARD_LIBRARY.find(c=>c.id===id);
+    if(card) rareCounts[card.rarity]++;
+  });
+  $('#deckSummary').textContent=`${deck.length} cards ready. Common ${rareCounts.common}, Uncommon ${rareCounts.uncommon}, Rare ${rareCounts.rare}, Legendary ${rareCounts.legendary}.`
 }
 function renderBuilder(){
-  const deck=getDeck(), counts={}, rarityTotals={common:0,uncommon:0,rare:0,legendary:0}; deck.forEach(id=>{counts[id]=(counts[id]||0)+1; rarityTotals[CARD_LIBRARY.find(c=>c.id===id).rarity]++});
+  const deck=getDeck(), counts={}, rarityTotals={common:0,uncommon:0,rare:0,legendary:0};
+  deck.forEach(id=>{
+    counts[id]=(counts[id]||0)+1;
+    const card=CARD_LIBRARY.find(c=>c.id===id);
+    if(card) rarityTotals[card.rarity]++;
+  });
   $('#deckCount').textContent=`${deck.length} / ${DECK_SIZE}`; $('#countCommon').textContent=rarityTotals.common; $('#countUncommon').textContent=rarityTotals.uncommon; $('#countRare').textContent=rarityTotals.rare; $('#countLegendary').textContent=rarityTotals.legendary;
   const deckList=$('#deckList'), grid=$('#libraryGrid'); deckList.innerHTML=''; grid.innerHTML='';
-  Object.entries(counts).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([id,count])=>{const c=CARD_LIBRARY.find(x=>x.id===id); const row=document.createElement('div'); row.className='deck-row'; row.innerHTML=`<div><strong>${gSuit(c.suit).g} ${gSuit(c.suit).desc} ${c.val}</strong><span class="badge ${c.rarity}" style="margin-left:8px">${c.rarity}</span></div><div style="display:flex;align-items:center;gap:8px"><span>x${count}</span><button class="btn small danger" data-remove="${id}">-1</button></div>`; deckList.appendChild(row)});
+  Object.entries(counts).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([id,count])=>{const c=CARD_LIBRARY.find(x=>x.id===id); if(!c) return; const row=document.createElement('div'); row.className='deck-row'; row.innerHTML=`<div><strong>${gSuit(c.suit).g} ${gSuit(c.suit).desc} ${c.val}</strong><span class="badge ${c.rarity}" style="margin-left:8px">${c.rarity}</span></div><div style="display:flex;align-items:center;gap:8px"><span>x${count}</span><button class="btn small danger" data-remove="${id}">-1</button></div>`; deckList.appendChild(row)});
   CARD_LIBRARY.forEach(c=>{const copies=counts[c.id]||0, limit=RARITY_RULES[c.rarity].copies, canAdd=copies<limit && deck.length<DECK_SIZE; const card=document.createElement('div'); card.className='lib-card'; card.innerHTML=`<div class="top"><span>${c.val}</span><span class="badge ${c.rarity}">${c.rarity}</span></div><div class="glyph">${gSuit(c.suit).g}</div><div class="name">${gSuit(c.suit).desc}</div><div class="meta">Cost: ${RARITY_RULES[c.rarity].cost}<br>Copies: ${copies}/${limit}<br>Base suit: ${c.suit}</div><div class="controls"><button class="btn small" data-add="${c.id}" ${canAdd?'':'disabled'}>Add</button><button class="btn small danger" data-remove="${c.id}" ${copies?'':'disabled'}>Remove</button></div>`; grid.appendChild(card)})
 }
 function mutateDeck(action,id){const deck=getDeck(), card=CARD_LIBRARY.find(c=>c.id===id); if(!card) return; const count=deck.filter(x=>x===id).length, limit=RARITY_RULES[card.rarity].copies; if(action==='add'){if(deck.length>=DECK_SIZE||count>=limit) return; deck.push(id)} else {const idx=deck.indexOf(id); if(idx>=0) deck.splice(idx,1)} saveDeck(deck); renderBuilder()}
@@ -396,10 +474,51 @@ function beginTurnIfNeeded(){
   updateButtons()
 }
 
+// FIX 5: Added the missing listenToRoom() function — this was the core online multiplayer bug
+function listenToRoom(rid){
+  clearOnlineListeners();
+  const roomRef = ref(db, `rooms/${rid}`);
+  let prevStatus = null;
+  stateUnsubscribe = onValue(roomRef, snap => {
+    if(!snap.exists()){
+      msg('Room was closed.'); leaveMatch(); return;
+    }
+    const data = snap.val();
+    const wasWaiting = prevStatus === 'waiting' || prevStatus === null;
+    prevStatus = data.status;
+    // Hide overlay once game moves from waiting -> playing
+    if(data.status === 'playing' && wasWaiting){
+      hideWaitingOverlay();
+      renderGame();
+      logText('Opponent joined! Duel begins...');
+    } else {
+      gameState = data;
+      renderGame();
+    }
+    gameState = data;
+    if(data.status === 'gameover' && !gameOver){
+      finishGame(data.winner);
+    } else if(data.status === 'playing'){
+      beginTurnIfNeeded();
+      // Trigger FX for opponent's last action
+      if(data.lastAction && !data.lastAction._seen && data.lastAction.by !== myRole && data.lastAction.type==='play'){
+        const a=data.lastAction;
+        const oppRole=myRole==='p1'?'p2':'p1';
+        triggerCardFX(a.suit, a.val, oppRole, myRole, 0, 0);
+      }
+    }
+    if(data.lastLog && data.lastAction && !data.lastAction._seen){
+      logText(data.lastLog);
+    }
+  });
+}
+
 async function applyOnlineAction(actionType){
   if(!roomId) return;
   const roomRef=ref(db,`rooms/${roomId}`);
   let newLog = '';
+  // FIX 6: Capture selectedIndex before the transaction (it's cleared after)
+  const actionIndex = selectedIndex;
   const result = await runTransaction(roomRef, cur=>{
     if(!cur) return cur;
     if(cur.status!=='playing') return cur;
@@ -412,12 +531,12 @@ async function applyOnlineAction(actionType){
     if(actionType==='draw'){
       newLog = [`${state[actor].name} draws and ends the turn.`, ...drawCardAndEndTurn(state, actor, 'draw')].filter(Boolean).join(' | ');
     }else if(actionType==='discard'){
-      if(selectedIndex===null) return cur;
-      discardCardForEnergy(state, actor, selectedIndex);
+      if(actionIndex===null) return cur;
+      discardCardForEnergy(state, actor, actionIndex);
       newLog = `${state[actor].name} discards to recover energy.`;
     }else if(actionType==='play'){
-      if(selectedIndex===null) return cur;
-      const res = resolveCardPlay(state, actor, selectedIndex);
+      if(actionIndex===null) return cur;
+      const res = resolveCardPlay(state, actor, actionIndex);
       newLog = [res.text, ...res.passed].filter(Boolean).join(' | ');
     }else{
       return cur;
@@ -427,7 +546,7 @@ async function applyOnlineAction(actionType){
     return state;
   });
   if(result.committed){
-    selectedIndex=null;
+    selectedIndex=null; // FIX 6 continued: reset after transaction completes
     if(newLog) logText(newLog);
   }
 }
@@ -440,7 +559,20 @@ function performLocalAction(type){
   const state=deepClone(gameState); let logParts=[];
   if(type==='draw'){logParts.push(`${state[myRole].name} draws and ends the turn.`); logParts.push(...drawCardAndEndTurn(state,myRole,'draw'))}
   else if(type==='discard'){if(selectedIndex===null) return; discardCardForEnergy(state,myRole,selectedIndex); selectedIndex=null; logParts.push(`${state[myRole].name} discards to recover energy.`)}
-  else if(type==='play'){if(selectedIndex===null) return; const res=resolveCardPlay(state,myRole,selectedIndex); selectedIndex=null; logParts.push(res.text); logParts.push(...res.passed)}
+  else if(type==='play'){
+    if(selectedIndex===null) return;
+    const card=state[myRole].hand[selectedIndex];
+    const res=resolveCardPlay(state,myRole,selectedIndex);
+    selectedIndex=null;
+    logParts.push(res.text); logParts.push(...res.passed);
+    if(card){
+      const oppRole=myRole==='p1'?'p2':'p1';
+      // parse damage/heal from result text
+      const dmgM=res.text.match(/(?:deals|strikes?|crashes?|steals?\s+\d+\s+life from)\s+(\d+)/i);
+      const healM=res.text.match(/(?:restores?|heals?|grants?.*?and\s+)(\d+)/i);
+      setTimeout(()=>triggerCardFX(card.suit,card.val,myRole,oppRole,dmgM?parseInt(dmgM[1]):0,healM?parseInt(healM[1]):0),80);
+    }
+  }
   checkForWinner(state); gameState=state; logText(logParts.filter(Boolean).join(' | ')); renderGame(); if(state.status==='gameover') finishGame(state.winner); else beginTurnIfNeeded()
 }
 
@@ -464,7 +596,16 @@ function aiTakeTurn(){
   if(mode!=='local' || !gameState || gameOver || gameState.turn!=='p2' || gameState.status!=='playing') return;
   const state=deepClone(gameState), ai=state.p2; const playable=ai.hand.map((card,i)=>({card,i})).filter(x=>canPlayCard(ai,x.card)); let logParts=[];
   if(!playable.length){logParts.push('EMBER AI draws and passes.'); logParts.push(...drawCardAndEndTurn(state,'p2','draw'))}
-  else {playable.sort((a,b)=>scoreAICard(state,a.card)-scoreAICard(state,b.card)); const choice=playable[playable.length-1]; const res=resolveCardPlay(state,'p2',choice.i); logParts.push(`EMBER AI: ${res.text}`); logParts.push(...res.passed)}
+  else {
+    playable.sort((a,b)=>scoreAICard(state,a.card)-scoreAICard(state,b.card));
+    const choice=playable[playable.length-1];
+    const card=choice.card;
+    const res=resolveCardPlay(state,'p2',choice.i);
+    logParts.push(`EMBER AI: ${res.text}`); logParts.push(...res.passed);
+    const dmgM=res.text.match(/(?:deals|strikes?|crashes?)\s+(\d+)/i);
+    const healM=res.text.match(/(?:restores?|heals?)\s+(\d+)/i);
+    setTimeout(()=>triggerCardFX(card.suit,card.val,'p2','p1',dmgM?parseInt(dmgM[1]):0,healM?parseInt(healM[1]):0),200);
+  }
   checkForWinner(state); gameState=state; logText(logParts.filter(Boolean).join(' | ')); renderGame(); if(state.status==='gameover') finishGame(state.winner); else beginTurnIfNeeded()
 }
 
@@ -474,7 +615,7 @@ async function createRoom(){
   const base={mode:'online',ranked:false,maxPlayers:2,turn:'p1',round:1,status:'waiting',created:Date.now(),lastSuit:null,lastLog:'',lastAction:null,p1:newFighter(currentProfile.name,getDeck(),currentProfile.elo,seatToken),p2:newFighter('',getDeck(),1000,''),presence:{p1:sessionToken,p2:null}};
   const state=initializeMatchState(base);
   await set(ref(db,`rooms/${roomId}`),state);
-  enterGame(); renderGame(); listenToRoom(roomId); logText(`Room ${roomId} created. Waiting for player 2.`)
+  enterGame(); showWaitingOverlay(roomId); listenToRoom(roomId); logText(`Room ${roomId} created. Waiting for player 2.`)
 }
 async function joinRoom(code){
   clearInterval(timerInt); clearOnlineListeners();
@@ -513,6 +654,7 @@ async function joinRankedQueue(){
   if(others.length){
     const opp = others[0];
     roomId = roomCode();
+    // FIX 7: AI deck in offline mode referenced mirror_A which wasn't in CARD_LIBRARY; now it is (see FIX 2). Ranked opponent uses their actual stored deck.
     const base={mode:'online',ranked:true,maxPlayers:2,turn:'p1',round:1,status:'playing',created:Date.now(),lastSuit:null,lastLog:'',lastAction:null,p1:newFighter(currentProfile.name,getDeck(),currentProfile.elo,seatToken),p2:newFighter(opp.name,opp.deck,opp.elo,opp.seatToken),presence:{p1:sessionToken,p2:'ranked'}};
     const state=initializeMatchState(base);
     await set(ref(db,`rooms/${roomId}`), state);
@@ -536,6 +678,7 @@ async function joinRankedQueue(){
 function enterGame(){setScreen('game'); initCanvas()}
 function leaveMatch(){
   clearInterval(timerInt); clearAITimeout(); clearOnlineListeners();
+  hideWaitingOverlay();
   mode='menu'; onlineType=null; roomId=null; gameState=null; gameOver=false; selectedIndex=null;
   $('#opp-indicator').style.display='none'; setScreen('menu'); renderHome(); msg('')
 }
@@ -552,8 +695,182 @@ async function finishGame(winner){
   }
 }
 
-function initCanvas(){canvas=$('#fx-canvas'); if(!canvas) return; canvas.width=canvas.offsetWidth; canvas.height=canvas.offsetHeight; ctx=canvas.getContext('2d'); requestAnimationFrame(animLoop)}
-function animLoop(){if(!ctx||!canvas){requestAnimationFrame(animLoop); return} ctx.clearRect(0,0,canvas.width,canvas.height); particles=particles.filter(p=>p.life>0); for(const p of particles){ctx.save(); ctx.globalAlpha=p.life; ctx.fillStyle=p.color; ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fill(); ctx.restore(); p.x+=p.vx; p.y+=p.vy; p.vx*=.94; p.vy*=.94; p.life-=p.decay} requestAnimationFrame(animLoop)}
+// ── Canvas & particle system ─────────────────────────────────────────────────
+function initCanvas(){
+  canvas=$('#fx-canvas');
+  if(!canvas) return;
+  canvas.width=canvas.offsetWidth||900;
+  canvas.height=canvas.offsetHeight||300;
+  ctx=canvas.getContext('2d');
+  if(!animLoopRunning) startAnimLoop();
+}
+let animLoopRunning=false;
+function startAnimLoop(){animLoopRunning=true; requestAnimationFrame(animLoop)}
+function animLoop(){
+  if(!ctx||!canvas){requestAnimationFrame(animLoop); return}
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles=particles.filter(p=>p.life>0);
+  for(const p of particles){
+    ctx.save(); ctx.globalAlpha=Math.max(0,p.life);
+    if(p.shape==='star'){
+      ctx.fillStyle=p.color; ctx.translate(p.x,p.y); ctx.rotate(p.rot||0);
+      ctx.beginPath();
+      for(let i=0;i<5;i++){ctx.lineTo(Math.cos((i*4*Math.PI/5)-Math.PI/2)*p.size,Math.sin((i*4*Math.PI/5)-Math.PI/2)*p.size); ctx.lineTo(Math.cos((i*4*Math.PI/5+2*Math.PI/5)-Math.PI/2)*p.size*.4,Math.sin((i*4*Math.PI/5+2*Math.PI/5)-Math.PI/2)*p.size*.4)}
+      ctx.closePath(); ctx.fill();
+    } else if(p.shape==='ring'){
+      ctx.strokeStyle=p.color; ctx.lineWidth=p.lw||2;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.stroke();
+    } else if(p.shape==='line'){
+      ctx.strokeStyle=p.color; ctx.lineWidth=p.lw||1.5;
+      ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(p.x+p.dx*p.size,p.y+p.dy*p.size); ctx.stroke();
+    } else {
+      ctx.fillStyle=p.color; ctx.beginPath(); ctx.arc(p.x,p.y,Math.max(0,p.size),0,Math.PI*2); ctx.fill();
+    }
+    ctx.restore();
+    p.x+=p.vx; p.y+=p.vy; p.vx*=p.drag||.93; p.vy*=p.drag||.93;
+    p.vy+=p.gravity||0; p.size*=p.shrink||1; p.life-=p.decay;
+    if(p.rot!==undefined) p.rot+=p.rotSpeed||0;
+    if(p.shape==='ring') p.size+=p.expand||2;
+  }
+  requestAnimationFrame(animLoop);
+}
+
+// returns canvas-relative center of a fighter zone element
+function fzCenter(role){
+  const el=$(`#${role==='p1'?'p1z':'p2z'}`), cv=canvas;
+  if(!el||!cv) return {x:cv?.width/2||200,y:cv?.height/2||150};
+  const er=el.getBoundingClientRect(), cr=cv.getBoundingClientRect();
+  return {x:er.left-cr.left+er.width/2, y:er.top-cr.top+er.height/2};
+}
+
+// Floating damage/heal numbers
+function floatNumber(text, role, color='#fff'){
+  const arena=$('#arena'); if(!arena) return;
+  const el=document.createElement('div'); el.className='floatxt';
+  el.textContent=text; el.style.color=color; el.style.fontFamily="'Special Elite',serif";
+  el.style.fontSize='18px'; el.style.fontWeight='bold'; el.style.zIndex='60';
+  el.style.pointerEvents='none'; el.style.textShadow='1px 1px 0 #000,0 0 8px currentColor';
+  const fz=$(`#${role==='p1'?'p1z':'p2z'}`);
+  const ar=arena.getBoundingClientRect(), fr=fz?.getBoundingClientRect();
+  const x=fr?(fr.left-ar.left+fr.width/2-16):200, y=fr?(fr.top-ar.top-10):60;
+  el.style.left=x+'px'; el.style.top=y+'px';
+  arena.appendChild(el);
+  let t=0; const tick=()=>{t+=1; el.style.top=(y-t*1.5)+'px'; el.style.opacity=String(1-t/32); if(t<32) requestAnimationFrame(tick); else el.remove()};
+  requestAnimationFrame(tick);
+}
+
+// ── Per-suit card effect animations ─────────────────────────────────────────
+function spawnParticles(suit, attackerRole, defenderRole, value){
+  if(!canvas||!ctx) return;
+  const ac=fzCenter(attackerRole), dc=fzCenter(defenderRole);
+  const n=Math.min(value*2+10, 60);
+
+  if(suit==='spade'||suit==='void'){ // Dark slash sparks
+    const clrs=['#d0d0d0','#888','#c8c8c8','#505050'];
+    for(let i=0;i<n;i++){
+      const ang=-Math.PI/2+(-0.5+Math.random())*1.2, spd=2+Math.random()*5;
+      particles.push({x:dc.x,y:dc.y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,size:2+Math.random()*4,color:clrs[mf(Math.random()*clrs.length)],life:1,decay:.04+Math.random()*.03,drag:.91,gravity:.12,shrink:.96,shape:'circle'});
+    }
+    // big ring burst
+    particles.push({x:dc.x,y:dc.y,vx:0,vy:0,size:4,color:'rgba(200,200,210,.7)',life:.8,decay:.04,shape:'ring',lw:3,expand:6});
+    particles.push({x:dc.x,y:dc.y,vx:0,vy:0,size:2,color:'rgba(255,255,255,.5)',life:.6,decay:.05,shape:'ring',lw:1.5,expand:9});
+    // slash lines
+    for(let i=0;i<5;i++){
+      const a=Math.random()*Math.PI*2, l=20+Math.random()*30;
+      particles.push({x:dc.x,y:dc.y,vx:0,vy:0,size:l,color:'rgba(220,220,230,.6)',life:.7,decay:.07,shape:'line',dx:Math.cos(a),dy:Math.sin(a),lw:1.5});
+    }
+  }
+  else if(suit==='heart'){ // Green/gold heal motes
+    const clrs=['#7be87b','#a8f5a8','#c8f5c8','#e5ffe5','#d4e870'];
+    for(let i=0;i<n;i++){
+      const ang=Math.random()*Math.PI*2, spd=.5+Math.random()*2.5;
+      particles.push({x:ac.x+(-30+Math.random()*60),y:ac.y+20,vx:Math.cos(ang)*spd,vy:-1.5-Math.random()*2,size:3+Math.random()*5,color:clrs[mf(Math.random()*clrs.length)],life:1,decay:.022+Math.random()*.015,drag:.96,gravity:-.02,shrink:.98,shape:Math.random()>.5?'circle':'star',rot:Math.random()*Math.PI*2,rotSpeed:(.05+Math.random()*.05)*(Math.random()>.5?1:-1)});
+    }
+    particles.push({x:ac.x,y:ac.y,vx:0,vy:0,size:5,color:'rgba(100,240,130,.5)',life:.9,decay:.05,shape:'ring',lw:4,expand:5});
+  }
+  else if(suit==='club'){ // Blue/silver brace shield sparks
+    const clrs=['#8ab4f8','#c0d8ff','#6090e0','#d0e8ff'];
+    for(let i=0;i<n;i++){
+      const ang=Math.random()*Math.PI*2, spd=1.5+Math.random()*3;
+      particles.push({x:ac.x+(-20+Math.random()*40),y:ac.y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,size:2+Math.random()*4,color:clrs[mf(Math.random()*clrs.length)],life:1,decay:.035,drag:.93,gravity:.05,shrink:.97,shape:'circle'});
+    }
+    // shield ring
+    particles.push({x:ac.x,y:ac.y,vx:0,vy:0,size:10,color:'rgba(130,180,255,.6)',life:.9,decay:.04,shape:'ring',lw:5,expand:4});
+    particles.push({x:ac.x,y:ac.y,vx:0,vy:0,size:20,color:'rgba(160,200,255,.35)',life:.7,decay:.04,shape:'ring',lw:2,expand:3});
+  }
+  else if(suit==='diamond'||suit==='curse'){ // Purple curse wisps
+    const clrs=['#c080ff','#9050e0','#e0a0ff','#7020c0'];
+    for(let i=0;i<n;i++){
+      const ang=Math.random()*Math.PI*2, spd=.8+Math.random()*2;
+      particles.push({x:dc.x+(-25+Math.random()*50),y:dc.y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd-.8,size:3+Math.random()*5,color:clrs[mf(Math.random()*clrs.length)],life:1,decay:.025,drag:.95,gravity:-.05,shrink:.97,shape:Math.random()>.4?'circle':'star',rot:Math.random()*Math.PI*2,rotSpeed:.04});
+    }
+    particles.push({x:dc.x,y:dc.y,vx:0,vy:0,size:5,color:'rgba(160,60,255,.5)',life:.85,decay:.05,shape:'ring',lw:4,expand:5});
+  }
+  else if(suit==='drain'){ // Orange/red life-steal tendrils
+    const clrs=['#ff6020','#ff9040','#ffb060','#cc3010'];
+    // tendrils moving from defender to attacker
+    for(let i=0;i<n;i++){
+      const t=Math.random(), x=dc.x+(ac.x-dc.x)*t, y=dc.y+(ac.y-dc.y)*t;
+      const perp=(-0.3+Math.random()*.6);
+      particles.push({x:x+perp*30,y:y+perp*30,vx:(ac.x-dc.x)*.012+(-1+Math.random()*2)*.5,vy:(ac.y-dc.y)*.012+(-1+Math.random()*2)*.5,size:3+Math.random()*4,color:clrs[mf(Math.random()*clrs.length)],life:1,decay:.03,drag:.94,shrink:.97,shape:'circle'});
+    }
+    particles.push({x:dc.x,y:dc.y,vx:0,vy:0,size:3,color:'rgba(255,80,20,.5)',life:.7,decay:.05,shape:'ring',lw:3,expand:5});
+  }
+  else if(suit==='wound'){ // Deep red blood splatter
+    const clrs=['#c01010','#8b0000','#ff2020','#801010'];
+    for(let i=0;i<n;i++){
+      const ang=-Math.PI/2+(-1+Math.random()*2)*1.5, spd=2+Math.random()*5;
+      particles.push({x:dc.x,y:dc.y,vx:Math.cos(ang)*spd*(Math.random()>.5?1:-1),vy:Math.sin(ang)*spd,size:3+Math.random()*5,color:clrs[mf(Math.random()*clrs.length)],life:1,decay:.03,drag:.90,gravity:.2,shrink:.97,shape:'circle'});
+    }
+    // drip ring
+    particles.push({x:dc.x,y:dc.y,vx:0,vy:0,size:4,color:'rgba(200,10,10,.6)',life:.7,decay:.05,shape:'ring',lw:5,expand:5});
+  }
+  else if(suit==='mirror'){ // Prismatic refraction stars
+    const clrs=['#aae8ff','#ffeebb','#c8aaff','#aaffcc','#ffffaa'];
+    for(let i=0;i<n;i++){
+      const ang=(i/n)*Math.PI*2, spd=1.5+Math.random()*3;
+      particles.push({x:ac.x,y:ac.y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,size:3+Math.random()*5,color:clrs[i%clrs.length],life:1,decay:.025,drag:.95,shrink:.96,gravity:0,shape:'star',rot:Math.random()*Math.PI*2,rotSpeed:.08});
+    }
+    particles.push({x:ac.x,y:ac.y,vx:0,vy:0,size:8,color:'rgba(180,230,255,.5)',life:.9,decay:.04,shape:'ring',lw:4,expand:5});
+    particles.push({x:ac.x,y:ac.y,vx:0,vy:0,size:16,color:'rgba(200,200,255,.3)',life:.7,decay:.04,shape:'ring',lw:2,expand:6});
+  }
+  // Golden burst for high-value cards (J,Q,K,A)
+  if(['J','Q','K','A'].includes(String(value))){
+    for(let i=0;i<14;i++){
+      const ang=(i/14)*Math.PI*2, spd=3+Math.random()*4;
+      particles.push({x:ac.x,y:ac.y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,size:4+Math.random()*4,color:i%2===0?'#e5c45f':'#fff5c0',life:1,decay:.03,drag:.93,gravity:.06,shrink:.97,shape:'star',rot:Math.random()*Math.PI*2,rotSpeed:.1});
+    }
+  }
+}
+
+// Trigger all visual effects for a card played
+function triggerCardFX(suit, val, attackerRole, defenderRole, dmg, heal){
+  const numVal = VAL_POWER[val]||5;
+  // Particle burst
+  spawnParticles(suit, attackerRole, defenderRole, numVal);
+  // Float numbers
+  if(dmg>0) floatNumber(`-${dmg}`, defenderRole, suit==='wound'?'#ff4040':suit==='curse'?'#c080ff':suit==='drain'?'#ff8040':'#fff');
+  if(heal>0) floatNumber(`+${heal}`, attackerRole, '#7be87b');
+  // HP bar flash
+  if(dmg>0){const bar=$('#'+(defenderRole==='p1'?'p1h':'p2h')); if(bar){bar.classList.remove('flash-dmg'); void bar.offsetWidth; bar.classList.add('flash-dmg'); setTimeout(()=>bar.classList.remove('flash-dmg'),500)}}
+  if(heal>0){const bar=$('#'+(attackerRole==='p1'?'p1h':'p2h')); if(bar){bar.classList.remove('flash-heal'); void bar.offsetWidth; bar.classList.add('flash-heal'); setTimeout(()=>bar.classList.remove('flash-heal'),500)}}
+  // Fighter card shake (defender)
+  if(dmg>0){const fc=$('#'+(defenderRole==='p1'?'fc1':'fc2')); if(fc){fc.classList.remove('shake'); void fc.offsetWidth; fc.classList.add('shake'); setTimeout(()=>fc.classList.remove('shake'),500)}}
+  // Mirror shimmer (attacker)
+  if(suit==='mirror'){const fc=$('#'+(attackerRole==='p1'?'fc1':'fc2')); if(fc){fc.classList.add('mirrored'); setTimeout(()=>fc.classList.remove('mirrored'),3000)}}
+  // Bleed glow (defender)
+  if(suit==='wound'){const fc=$('#'+(defenderRole==='p1'?'fc1':'fc2')); if(fc){fc.classList.add('bleeding'); setTimeout(()=>fc.classList.remove('bleeding'),4000)}}
+}
+
+// ── Waiting overlay for online rooms ────────────────────────────────────────
+function showWaitingOverlay(code){
+  const ov=$('#waiting-overlay'); if(!ov) return;
+  $('#waiting-room-code').textContent=code;
+  ov.classList.remove('hidden');
+}
+function hideWaitingOverlay(){
+  const ov=$('#waiting-overlay'); if(ov) ov.classList.add('hidden');
+}
 
 function bootFromStoredName(){
   const saved=getStoredName();
@@ -562,7 +879,13 @@ function bootFromStoredName(){
 }
 
 $('#loginBtn').onclick=async()=>{const name=($('#loginName').value||'').trim().toUpperCase(); if(name.length<2){loginMsg('Use at least 2 characters.'); return} loginMsg('Loading profile...'); await ensureProfile(name); setScreen('menu')};
-$('#offlineBtn').onclick=()=>{ mode='local'; onlineType=null; myRole='p1'; gameOver=false; selectedIndex=null; const base={mode:'local',ranked:false,maxPlayers:2,turn:'p1',round:1,status:'playing',created:Date.now(),lastSuit:null,lastLog:'',lastAction:null,p1:newFighter(currentProfile.name,getDeck(),currentProfile.elo,seatToken),p2:newFighter('EMBER AI',['spade_7','spade_7','spade_9','spade_K','heart_4','heart_7','heart_Q','club_5','club_8','club_8','diamond_5','diamond_8','diamond_8','drain_6','drain_6','drain_J','wound_6','wound_6','wound_A','void_8','mirror_9','mirror_A','heart_4','spade_5'],1200,'AI')}; gameState=initializeMatchState(base); enterGame(); renderGame(); logText('The AI studies your opening hand.'); beginTurnIfNeeded() };
+$('#offlineBtn').onclick=()=>{
+  mode='local'; onlineType=null; myRole='p1'; gameOver=false; selectedIndex=null;
+  // FIX 9: AI deck no longer references mirror_A (now in library), but kept consistent
+  const aiDeck=['spade_7','spade_7','spade_9','spade_K','heart_4','heart_7','heart_Q','club_5','club_8','club_8','diamond_5','diamond_8','diamond_8','drain_6','drain_6','drain_J','wound_6','wound_6','wound_A','void_8','mirror_9','mirror_A','heart_4','spade_5'];
+  const base={mode:'local',ranked:false,maxPlayers:2,turn:'p1',round:1,status:'playing',created:Date.now(),lastSuit:null,lastLog:'',lastAction:null,p1:newFighter(currentProfile.name,getDeck(),currentProfile.elo,seatToken),p2:newFighter('EMBER AI',aiDeck,1200,'AI')};
+  gameState=initializeMatchState(base); enterGame(); renderGame(); logText('The AI studies your opening hand.'); beginTurnIfNeeded()
+};
 $('#createRoomBtn').onclick=()=>createRoom().catch(e=>msg(`Create failed: ${e.message}`));
 $('#joinRoomMenuBtn').onclick=()=>{const code=($('#joinCodeHome').value||'').trim().toUpperCase(); if(!code){msg('Enter a room code first.'); return} joinRoom(code).catch(e=>msg(`Join failed: ${e.message}`))};
 $('#rankedBtn').onclick=()=>joinRankedQueue().catch(e=>msg(`Ranked failed: ${e.message}`));
@@ -573,13 +896,14 @@ $('#resetDeckBtn').onclick=()=>{saveDeck(getDefaultDeck()); renderBuilder()};
 $('#libraryGrid').onclick=e=>{const add=e.target.getAttribute('data-add'), rem=e.target.getAttribute('data-remove'); if(add) mutateDeck('add',add); if(rem) mutateDeck('remove',rem)};
 $('#deckList').onclick=e=>{const rem=e.target.getAttribute('data-remove'); if(rem) mutateDeck('remove',rem)};
 $('#leaveMatchBtn').onclick=()=>leaveMatch();
+$('#cancelWaitBtn').onclick=()=>leaveMatch();
 $('#playbtn').onclick=()=>handleAction('play');
 $('#drawbtn').onclick=()=>handleAction('draw');
 $('#discardBtn').onclick=()=>handleAction('discard');
 
+// FIX 8: Don't call requestAnimationFrame at boot — initCanvas handles it when game starts
 renderHome();
 bootFromStoredName();
-requestAnimationFrame(animLoop);
 </script>
 </body>
 </html>
