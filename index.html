@@ -148,6 +148,11 @@ button,input{font-family:inherit}
 #hand.energy-empty{animation:energyWarn 1s ease-in-out infinite}
 .hc.unaffordable{opacity:.32;pointer-events:none;filter:grayscale(0.6)}
 .energy-critical .energy-pip.on{animation:blink .5s step-end infinite}
+@keyframes comboGlow{0%,100%{box-shadow:inset 0 0 8px rgba(255,210,40,.15),0 0 0 1px rgba(255,200,0,.25)}50%{box-shadow:inset 0 0 18px rgba(255,210,40,.35),0 0 0 2px rgba(255,200,0,.6)}}
+#hand.combo-active{animation:comboGlow .7s ease-in-out infinite;border-top:2px solid rgba(255,200,40,.5)}
+.hc.combo-suit{border-color:#c8a020!important;box-shadow:0 0 10px rgba(255,200,40,.45),1px 1px 0 #000!important}
+.hc.combo-suit:hover{transform:translateY(-10px);box-shadow:0 0 18px rgba(255,200,40,.7),1px 1px 0 #000!important}
+#combo-flash{color:#e8c840;border-color:#9a7a10;font-family:'Special Elite',serif;letter-spacing:4px}
 .hc.playing{animation:cardPlay .35s ease-out forwards}
 @keyframes cardPlay{0%{transform:translateY(-12px) scale(1)}40%{transform:translateY(-60px) scale(1.15) rotate(-3deg)}100%{transform:translateY(-120px) scale(0) rotate(8deg);opacity:0}}
 /* hp flash */
@@ -532,7 +537,7 @@ function newFighter(name, deckList, elo=1000, token=''){
   const deck=makeDeckFromList(deckList), hand=[];
   for(let i=0;i<5;i++) if(deck.length) hand.push(deck.shift());
   return {
-    name,hp:STARTING_HP,atk:8,def:5,spd:5,bleed:0,curse:0,energy:MAX_ENERGY,maxEnergy:MAX_ENERGY,
+    name,hp:STARTING_HP,atk:8,def:5,spd:5,bleed:0,curse:0,energy:2,maxEnergy:MAX_ENERGY,
     hand,deck,discard:[],elo,wins:0,losses:0,combo:0,mirror:false,queenBuff:false,seatToken:token,
     archetype:inferArchetype(deckList),
     guard:0, expose:0, focus:0, hex:0, siphon:0, pressure:0, mirrorCharges:0, stance:0,
@@ -578,56 +583,79 @@ function addSiphon(player, amount){ player.siphon=Math.min(COMPETITIVE_SYSTEM.MA
 
 function startOfTurn(state, role){
   const pl=state[role]; if(!pl) return {forced:false,log:[]};
-  // Energy restores to max each turn - this is the core resource
-  pl.energy=pl.maxEnergy;
+  // ── Energy: regen +1 per turn, NOT full restore. Energy carries over. ──
+  const prevEnergy = pl.energy || 0;
+  pl.energy = Math.min(pl.maxEnergy, prevEnergy + 1);
+  // Siphon converts to bonus energy on top of regen
+  if(pl.siphon>=3){ pl.energy=Math.min(pl.maxEnergy, pl.energy+1); pl.siphon=0; }
   let log=[];
+  const regenMsg = `${pl.name} regens 1 energy (${pl.energy}/${pl.maxEnergy})`;
+  if(pl.siphon===0 && prevEnergy < pl.maxEnergy) log.push(regenMsg);
   if(pl.bleed>0){const dmg=mf(pl.bleed*2+rr()*2); pl.hp=Math.max(0,pl.hp-dmg); pl.bleed=Math.max(0,pl.bleed-1); log.push(`${pl.name} bleeds for ${dmg}`)}
   if(pl.curse>0){const dmg=mf(pl.curse*2+rr()*2); pl.hp=Math.max(0,pl.hp-dmg); pl.curse=Math.max(0,pl.curse-1); log.push(`${pl.name} suffers ${dmg} curse`)}
   pl.expose=Math.max(0,(pl.expose||0)-1);
   pl.pressure=Math.max(0,(pl.pressure||0)-1);
   pl.focus=Math.max(0,(pl.focus||0)-1);
-  // Siphon converts to bonus energy
-  if(pl.siphon>=3){ pl.energy=Math.min(pl.maxEnergy+1, pl.energy+1); pl.siphon=0; log.push(`${pl.name} converts siphon into +1 energy`) }
+  // Reset combo-turn flag at start of each new turn
+  state[role+'_comboTurn'] = false;
   if(pl.hand.length===0){
-    if(pl.deck.length>0){pl.hand.push(pl.deck.shift()); pl.energy=0; log.push(`${pl.name} is forced to draw — turn spent!`); return {forced:true,log}}
-    // No cards at all — fatigue damage scales up
-    pl.hp=Math.max(0,pl.hp-10); pl.energy=0; log.push(`${pl.name} has no cards — suffers 10 fatigue!`); return {forced:true,log}
+    if(pl.deck.length>0){pl.hand.push(pl.deck.shift()); log.push(`${pl.name} forced to draw — turn spent!`); return {forced:true,log}}
+    pl.hp=Math.max(0,pl.hp-10); log.push(`${pl.name} has no cards — suffers 10 fatigue!`); return {forced:true,log}
   }
   return {forced:false,log}
 }
+
 function passTurn(state){
   const next=state.turn==='p1'?'p2':'p1';
+  // Clear combo-turn flag for the player who just ended their turn
+  state[state.turn+'_comboTurn']=false;
   state.turn=next;
   state.round+=1;
   state.seq=(state.seq||0)+1;
   return startOfTurn(state,next).log
 }
+
 function drawCardAndEndTurn(state, role){
   const pl=state[role];
   if(pl.deck.length>0) pl.hand.push(pl.deck.shift()); else { pl.hp=Math.max(0,pl.hp-10); }
-  // Burning your turn to draw wastes all energy — deliberate high-stakes tradeoff
-  pl.energy=0;
+  // Drawing ends turn — energy is NOT spent, carries over as-is
   state.lastAction={by:role,type:'draw',_seen:false};
   return passTurn(state)
 }
+
 function discardCardForEnergy(state, role, handIndex){
   const pl=state[role], card=pl.hand.splice(handIndex,1)[0];
   if(card) pl.discard.push(card);
-  // Discarding gives 2 energy — a real meaningful choice vs playing
-  pl.energy=Math.min(pl.maxEnergy,pl.energy+2);
+  // Discarding gives +2 energy and does NOT end the turn
+  pl.energy=Math.min(pl.maxEnergy, pl.energy+2);
+  state.seq=(state.seq||0)+1;
   state.lastAction={by:role,type:'discard',card:card?.id,_seen:false}
+  // Note: turn does NOT change — player keeps their turn after discarding
 }
 function canPlayCard(player, card){ return !!card && player.energy>=(card.cost||1) }
 
 function resolveCardPlay(state, role, handIndex, localRitualHistory){
   const me=state[role], oppRole=role==='p1'?'p2':'p1', foe=state[oppRole], card=me.hand[handIndex];
-  if(!card||!canPlayCard(me,card)) return {text:'Cannot play that card.',passed:[]};
+  if(!card||!canPlayCard(me,card)) return {text:'Cannot play that card.',passed:[],comboTurn:false};
   me.hand.splice(handIndex,1); me.discard.push(card); me.energy-=(card.cost||1);
   applySuitMastery(me, card.suit);
   const ritual=detectRitual(card, localRitualHistory);
-  let comboBonus=0;
-  if(state.lastSuit===card.suit){ me.combo=(me.combo||0)+1; comboBonus=Math.min(me.combo*2,8); showCombo(`COMBO x${me.combo}`); addPressure(me,1); }
-  else me.combo=0;
+
+  // ── Combo system: same suit as last played = COMBO TURN (no turn end) ──
+  let comboBonus=0, isCombo=false;
+  if(state.lastSuit===card.suit){
+    me.combo=(me.combo||0)+1;
+    isCombo=true;
+    comboBonus=Math.min(me.combo*2,8);
+    showCombo(`COMBO x${me.combo} — PLAY AGAIN!`);
+    addPressure(me,1);
+    // Mark combo turn — turn will NOT pass after this play
+    state[role+'_comboTurn']=true;
+  } else {
+    // Different suit breaks the combo and ends the turn
+    me.combo=0;
+    state[role+'_comboTurn']=false;
+  }
   if(ritual?.bonus?.damage) comboBonus += ritual.bonus.damage/2;
   const suit=gSuit(card.suit), basePow=card.pw+comboBonus+(me.focus||0); let text=[];
   applyArchetypePassive(me, foe, text);
@@ -683,7 +711,7 @@ function resolveCardPlay(state, role, handIndex, localRitualHistory){
     if(suit.base==='void'){
       const purged=(foe.bleed||0)+(foe.curse||0)+(foe.hex||0); foe.bleed=0; foe.curse=0; foe.hex=0;
       const dmg=applyIncomingDamage(foe, me, mf(basePow*0.30+rr()*4+purged*1.5), ['spell','void'], text);
-      if(purged>0) me.energy=Math.min(me.maxEnergy, me.energy+2); // Void rewards energy on big purges
+      if(purged>0) me.energy=Math.min(me.maxEnergy, me.energy+2);
       text.push(`VOID purges ${purged} stacks and hits for ${dmg}${purged>0?' (+2 energy)':''}`);
     }
     if(suit.base==='mirror'){
@@ -709,8 +737,16 @@ function resolveCardPlay(state, role, handIndex, localRitualHistory){
 
   if((me.suitMastery[card.suit]||0)>=4) text.push(`${card.suit.toUpperCase()} MASTERY ONLINE`);
   state.lastSuit=card.suit;
-  state.lastAction={by:role,type:'play',cardId:card.id,suit:card.suit,val:card.val,text:text.join(' | '),ritual:ritual?.name||'',combo:me.combo||0,_seen:false};
-  return {text:text.join(' | '),passed:passTurn(state)}
+  state.lastAction={by:role,type:'play',cardId:card.id,suit:card.suit,val:card.val,text:text.join(' | '),ritual:ritual?.name||'',combo:me.combo||0,comboTurn:isCombo,_seen:false};
+  state.seq=(state.seq||0)+1;
+
+  // ── Combo turn: DON'T pass the turn — player gets another action ──
+  if(isCombo){
+    if(isCombo) text.push(`⚡ COMBO — play ${card.suit.toUpperCase()} again to extend!`);
+    return {text:text.join(' | '), passed:[], comboTurn:true}
+  }
+  // Normal play: pass the turn
+  return {text:text.join(' | '), passed:passTurn(state), comboTurn:false}
 }
 
 function checkForWinner(state){
@@ -797,13 +833,17 @@ function renderHand(){
   if(!gameState) return;
   const me=currentPlayer(), isTurn=gameState.turn===myRole&&!gameOver&&gameState.status==='playing';
   const ritualHint=ritualHistory.length?ritualHistory.map(x=>x.split(':')[0][0].toUpperCase()).join(' · '):'';
+  const isComboTurn = isTurn && gameState?.[myRole+'_comboTurn']===true;
+  const lastSuit = gameState?.lastSuit;
   // Energy-empty warning on the hand container
   const allUnaffordable = isTurn && me.hand.every(c=>!canPlayCard(me,c));
-  handEl.classList.toggle('energy-empty', isTurn && allUnaffordable);
+  handEl.classList.toggle('energy-empty', isTurn && allUnaffordable && !isComboTurn);
+  handEl.classList.toggle('combo-active', isComboTurn);
   me.hand.forEach((c,i)=>{
     const suit=gSuit(c.suit), d=document.createElement('div');
     const affordable = !isTurn || canPlayCard(me, c);
-    d.className=`hc${selectedIndex===i?' sel':''}${suit.red?' suit-red':''}${isTurn&&affordable?'':' disabled-card'}${c.rarity==='legendary'?' legendary-card':''}${isTurn&&!affordable?' unaffordable':''}`;
+    const isComboSuit = isComboTurn && c.suit === lastSuit && affordable;
+    d.className=`hc${selectedIndex===i?' sel':''}${suit.red?' suit-red':''}${isTurn&&affordable?'':' disabled-card'}${c.rarity==='legendary'?' legendary-card':''}${isTurn&&!affordable?' unaffordable':''}${isComboSuit?' combo-suit':''}`;
     d.innerHTML=`${i===selectedIndex&&ritualHint?`<div class="ritual-chip">${ritualHint}</div>`:''}<div class="hctop">${c.val}</div><div class="hccost">${c.cost}</div><div class="hcs">${suit.g}</div><div class="hcv">${c.val}</div><div class="hct">${suit.desc}</div><div class="flavor">${c.flavor||''}</div><div class="hcrare">${c.rarity}</div><div class="hcbot">${c.val}</div>`;
     if(isTurn && affordable){ d.onclick=()=>{selectedIndex=selectedIndex===i?null:i; renderHand(); updateButtons()} }
     handEl.appendChild(d)
@@ -814,17 +854,24 @@ function updateButtons(){
   const me=currentPlayer(), myTurn=!!gameState&&gameState.turn===myRole&&!gameOver&&gameState.status==='playing';
   const selected=selectedIndex!==null?me?.hand[selectedIndex]:null;
   const canAfford = selected && canPlayCard(me, selected);
-  const cantAffordReason = selected && !canAfford ? ` — need ${selected.cost} energy, have ${me?.energy}` : '';
+  const cantAffordReason = selected && !canAfford ? ` — need ${selected.cost}, have ${me?.energy}` : '';
+  const isComboTurn = myTurn && gameState?.[myRole+'_comboTurn']===true;
+  const lastSuit = gameState?.lastSuit;
   $('#playbtn').disabled=!(myTurn&&canAfford);
   $('#drawbtn').disabled=!myTurn;
   $('#discardBtn').disabled=!(myTurn&&selectedIndex!==null);
   if(myTurn){
     if(selected){
-      const energyLeft = me.energy - (selected.cost||1);
-      $('#hint').textContent=`${selected.val} of ${selected.suit.toUpperCase()} — costs ${selected.cost} energy${cantAffordReason} — ${energyLeft>=0?energyLeft+' remaining after play':'CANNOT AFFORD'}${ritualHistory.length?` — chain ${ritualHistory.map(x=>x.split(':')[0][0].toUpperCase()).join('/')}`:''}`
+      const energyLeft = (me?.energy||0) - (selected.cost||1);
+      const isComboCard = selected.suit === lastSuit;
+      const comboTag = isComboTurn && isComboCard ? ' ⚡ COMBO CONTINUE' : isComboTurn && !isComboCard ? ' ✗ breaks combo' : '';
+      $('#hint').textContent=`${selected.val} of ${selected.suit.toUpperCase()} — ${selected.cost} energy${cantAffordReason} — ${energyLeft>=0?energyLeft+' left':'CANNOT AFFORD'}${comboTag}${ritualHistory.length?` — chain ${ritualHistory.map(x=>x.split(':')[0][0].toUpperCase()).join('/')}`:''}`
     } else {
       const e=me?.energy||0;
-      $('#hint').textContent=e===0?'⚠ NO ENERGY — discard a card to gain 2, or draw to end turn':e===1?'⚡ 1 energy left — spend wisely':'-- choose a card, draw (+draw, end turn), or discard (+2 energy) --'
+      if(isComboTurn) $('#hint').textContent=`⚡ COMBO x${me?.combo||1} — play ${lastSuit?.toUpperCase()} again to extend, or end with draw/discard`;
+      else if(e===0) $('#hint').textContent='⚠ NO ENERGY — discard a card (+2 energy) or draw to end turn';
+      else if(e===1) $('#hint').textContent=`⚡ 1 energy left — ${me?.maxEnergy} max — regen +1/turn`;
+      else $('#hint').textContent=`-- ${e}/${me?.maxEnergy} energy — play, draw (end turn), or discard (+2 energy) --`;
     }
   }
 }
@@ -899,11 +946,17 @@ function beginTurnIfNeeded(){
   if(!gameState||gameOver) return;
   const whose=gameState.turn;
   if(gameState.status==='gameover') return;
+  const isComboTurn = gameState[whose+'_comboTurn']===true;
   if(whose===myRole){
-    setNetStatus('myturn','● YOUR TURN');
+    setNetStatus('myturn', isComboTurn ? '⚡ COMBO — PLAY AGAIN' : '● YOUR TURN');
     $('#opp-indicator').style.display='none';
-    $('#hint').textContent='-- choose a card, draw, or discard --';
-    startTurnTimer()
+    if(!isComboTurn){
+      $('#hint').textContent='-- choose a card, draw, or discard --';
+      startTurnTimer();
+    } else {
+      $('#hint').textContent=`⚡ COMBO ACTIVE — play the same suit (${gameState.lastSuit?.toUpperCase()}) to extend chain!`;
+      startTurnTimer(); // still time-limited on combo turns
+    }
   } else {
     setNetStatus('connected', mode==='local'?'● AI THINKING':'● ONLINE');
     $('#opp-indicator').style.display='block';
@@ -1061,8 +1114,8 @@ async function joinRoom(code){
       lastSuit:null, lastLog:'Duel begins!', lastAction:null,
       presence:{...(state.presence||{}), p2:sessionToken}
     };
-    // Ensure p1 starts with full energy
-    fullState.p1.energy = fullState.p1.maxEnergy;
+    // Ensure p1 starts with at least 2 energy (not forced to max)
+    if(typeof fullState.p1.energy === 'undefined' || fullState.p1.energy === null) fullState.p1.energy = 2;
     // Handle forced draw if p1 somehow has no hand
     if(fullState.p1.hand.length===0&&fullState.p1.deck.length>0){
       fullState.p1.hand.push(fullState.p1.deck.shift());
@@ -1182,7 +1235,7 @@ function performLocalAction(type){
   } else if(type==='discard'){
     if(selectedIndex===null) return;
     discardCardForEnergy(state,myRole,selectedIndex); selectedIndex=null;
-    logParts.push(`${state[myRole].name} discards to recover energy.`);
+    logParts.push(`${state[myRole].name} discards — gains 2 energy. Turn continues.`);
   } else if(type==='play'){
     if(selectedIndex===null) return;
     const card=state[myRole].hand[selectedIndex];
@@ -1196,7 +1249,8 @@ function performLocalAction(type){
       if(card.val==='A') duelMoment('ACE STRIKE',1.8);
       if(card.val==='K') duelMoment('ROYAL EXECUTION',1.45);
       if(state.lastAction?.ritual) duelMoment(state.lastAction.ritual,2);
-      if((state[myRole].combo||0)>=3) duelMoment('COMBO BREAKER',1.35);
+      if(res.comboTurn) duelMoment(`COMBO x${state[myRole].combo} — PLAY AGAIN`,1.35);
+      else if((state[myRole]?.combo||0)>=3) duelMoment('COMBO CHAIN COMPLETE',1.35);
     }
   }
   checkForWinner(state); gameState=state;
@@ -1265,8 +1319,7 @@ async function applyOnlineAction(actionType){
     } else if(actionType==='discard'){
       if(actionIndex===null) return cur;
       discardCardForEnergy(state,myRole,actionIndex);
-      state.seq=(state.seq||0)+1;
-      newLog=`${state[myRole].name} discards — gains 2 energy.`;
+      newLog=`${state[myRole].name} discards — gains 2 energy. Turn continues.`;
     } else if(actionType==='play'){
       if(actionIndex===null) return cur;
       const chosen=state[myRole].hand[actionIndex];
@@ -1283,15 +1336,17 @@ async function applyOnlineAction(actionType){
   });
 
   if(result.committed && result.snapshot.exists()){
-    // Sync the local ritual history if a card was played
-    if(actionType==='play') ritualHistory=[...localRitualSnap]; // localHist was mutated by detectRitual inside resolveCardPlay
+    // Sync ritual history after a committed play
+    if(actionType==='play') ritualHistory=[...localRitualSnap];
     selectedIndex=null;
     gameState=result.snapshot.val();
     if(newLog) logText(newLog);
-    if(gameState?.lastAction?.val==='A') duelMoment('ACE STRIKE',1.8);
-    if(gameState?.lastAction?.val==='K') duelMoment('ROYAL EXECUTION',1.45);
-    if(gameState?.lastAction?.ritual) duelMoment(gameState.lastAction.ritual,2);
-    if((gameState?.[myRole]?.combo||0)>=3) duelMoment('COMBO BREAKER',1.35);
+    const la=gameState?.lastAction;
+    if(la?.val==='A') duelMoment('ACE STRIKE',1.8);
+    if(la?.val==='K') duelMoment('ROYAL EXECUTION',1.45);
+    if(la?.ritual) duelMoment(la.ritual,2);
+    if(la?.comboTurn) duelMoment(`COMBO x${gameState[myRole]?.combo||1} — PLAY AGAIN`,1.35);
+    else if((gameState?.[myRole]?.combo||0)>=3) duelMoment('COMBO CHAIN COMPLETE',1.35);
     renderGame();
     if(gameState.status==='gameover') finishGame(gameState.winner);
     else beginTurnIfNeeded();
@@ -1326,32 +1381,66 @@ function aiTakeTurn(){
   if(mode!=='local'||!gameState||gameOver||gameState.turn!=='p2'||gameState.status!=='playing') return;
   const state=deepClone(gameState), ai=state.p2;
   aiStyle = ai.archetype==='warlock' ? 'trickster' : ai.archetype==='bastion' ? 'defensive' : 'aggressive';
-  const playable=ai.hand.map((card,i)=>({card,i})).filter(x=>canPlayCard(ai,x.card));
+
+  const isComboTurn = state['p2_comboTurn']===true;
+  const lastSuit = state.lastSuit;
   let logParts=[];
 
-  // AI energy management: if energy is critically low and has playable card, consider discarding cheap card for more energy
-  const totalHandCost = ai.hand.reduce((s,c)=>s+(c.cost||1),0);
-  const shouldHoard = ai.energy <= 1 && ai.hand.some(c=>(c.cost||1)>ai.energy) && ai.hand.length > 1;
+  // On a combo turn, only play same-suit or end the combo
+  const samesuit = isComboTurn
+    ? ai.hand.map((card,i)=>({card,i})).filter(x=>x.card.suit===lastSuit && canPlayCard(ai,x.card))
+    : null;
 
-  if(!playable.length || (shouldHoard && ai.hand.length > 1 && aiStyle === 'trickster')){
-    // Try to discard cheapest card to bank energy if no good plays
-    if(!playable.length && ai.hand.length > 0){
-      // Discard the lowest-value card for energy
-      const worstIdx = ai.hand.map((c,i)=>({c,i})).sort((a,b)=>(a.c.cost||1)-(b.c.cost||1))[0].i;
+  const playable = ai.hand.map((card,i)=>({card,i})).filter(x=>canPlayCard(ai,x.card));
+
+  // If combo turn and we have same-suit cards with energy — play them
+  if(isComboTurn && samesuit && samesuit.length > 0){
+    samesuit.sort((a,b)=>scoreAICardByStyle(state,a.card)-scoreAICardByStyle(state,b.card));
+    const choice=samesuit[samesuit.length-1], card=choice.card;
+    const res=resolveCardPlay(state,'p2',choice.i);
+    logParts.push(`EMBER CHAINS: ${res.text}`); logParts.push(...res.passed);
+    const dmgM=res.text.match(/(?:deals|strikes?|crashes?)\s+(\d+)/i);
+    setTimeout(()=>triggerCardFX(card.suit,card.val,'p2','p1',dmgM?parseInt(dmgM[1]):0,0),200);
+    if(res.comboTurn) duelMoment(`EMBER COMBO x${state.p2.combo}`,1.2);
+    checkForWinner(state); gameState=state;
+    logText(logParts.filter(Boolean).join(' | '));
+    renderGame();
+    if(state.status==='gameover') finishGame(state.winner);
+    else { clearAITimeout(); aiTimeout=setTimeout(aiTakeTurn,800) }
+    return;
+  }
+
+  // If combo turn but no same-suit or can't afford — draw to end it
+  if(isComboTurn){
+    logParts.push('EMBER AI ends combo chain — draws.');
+    logParts.push(...drawCardAndEndTurn(state,'p2'));
+    checkForWinner(state); gameState=state;
+    logText(logParts.join(' | ')); renderGame();
+    if(state.status==='gameover') finishGame(state.winner); else beginTurnIfNeeded();
+    return;
+  }
+
+  // Normal turn logic
+  if(!playable.length){
+    // Discard cheapest card for energy if possible, else draw
+    if(ai.hand.length > 1 && ai.energy < 2){
+      const worstIdx=ai.hand.map((c,i)=>({c,i})).sort((a,b)=>(a.c.cost||1)-(b.c.cost||1))[0].i;
       discardCardForEnergy(state,'p2',worstIdx);
       logParts.push('EMBER AI discards to charge energy.');
-      state.lastLog=logParts.join(' | ');
       checkForWinner(state); gameState=state;
-      logText(logParts.join(' | '));
-      renderGame();
-      if(state.status==='gameover') finishGame(state.winner); else beginTurnIfNeeded();
+      logText(logParts.join(' | ')); renderGame();
+      if(state.status==='gameover') finishGame(state.winner);
+      else { clearAITimeout(); aiTimeout=setTimeout(aiTakeTurn,700) }
       return;
     }
     logParts.push('EMBER AI draws and passes.');
     logParts.push(...drawCardAndEndTurn(state,'p2'));
   } else {
-    playable.sort((a,b)=>scoreAICardByStyle(state,a.card)-scoreAICardByStyle(state,b.card));
-    const choice=playable[playable.length-1], card=choice.card;
+    // Prefer same-suit as last played to start a combo
+    const sameSuitPlayable = lastSuit ? playable.filter(x=>x.card.suit===lastSuit) : [];
+    const pool = sameSuitPlayable.length ? sameSuitPlayable : playable;
+    pool.sort((a,b)=>scoreAICardByStyle(state,a.card)-scoreAICardByStyle(state,b.card));
+    const choice=pool[pool.length-1], card=choice.card;
     const res=resolveCardPlay(state,'p2',choice.i);
     logParts.push(`EMBER AI: ${res.text}`); logParts.push(...res.passed);
     const dmgM=res.text.match(/(?:deals|strikes?|crashes?)\s+(\d+)/i);
@@ -1359,16 +1448,13 @@ function aiTakeTurn(){
     setTimeout(()=>triggerCardFX(card.suit,card.val,'p2','p1',dmgM?parseInt(dmgM[1]):0,healM?parseInt(healM[1]):0),200);
     if(card.val==='A') duelMoment('EMBER UNLEASHES AN ACE',1.8);
     if(state.lastAction?.ritual) duelMoment(state.lastAction.ritual,2);
-    // AI tries to play a second card if it still has energy
-    const state2=state, ai2=state2.p2;
-    const playable2=ai2.hand.map((c,i)=>({card:c,i})).filter(x=>canPlayCard(ai2,x.card));
-    if(playable2.length && ai2.energy >= 2){
-      playable2.sort((a,b)=>scoreAICardByStyle(state2,a.card)-scoreAICardByStyle(state2,b.card));
-      const c2=playable2[playable2.length-1];
-      const res2=resolveCardPlay(state2,'p2',c2.i);
-      logParts.push(`EMBER CHAINS: ${res2.text}`);
-      const d2=res2.text.match(/(?:deals|strikes?)\s+(\d+)/i);
-      setTimeout(()=>triggerCardFX(c2.card.suit,c2.card.val,'p2','p1',d2?parseInt(d2[1]):0,0),500);
+    if(res.comboTurn){
+      // AI got a combo — schedule next action
+      checkForWinner(state); gameState=state;
+      logText(logParts.filter(Boolean).join(' | ')); renderGame();
+      if(state.status==='gameover'){ finishGame(state.winner); return; }
+      clearAITimeout(); aiTimeout=setTimeout(aiTakeTurn,800);
+      return;
     }
   }
   checkForWinner(state); gameState=state;
