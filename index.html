@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CARD KOMBAT</title>
+<title>CARD KOMBAT — ONLINE</title>
 <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Cutive+Mono&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -17,29 +17,28 @@ body{background:#0e0b06;display:flex;align-items:center;justify-content:center;m
 #cabinet{width:100%;max-width:660px;background:#0e0c08;border:4px solid #3a2d10;position:relative;overflow:hidden;box-shadow:0 0 80px rgba(0,0,0,0.9),inset 0 0 40px rgba(0,0,0,0.6)}
 #cabinet::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.1) 2px,rgba(0,0,0,0.1) 4px);pointer-events:none;z-index:200}
 
-/* HEADER */
 #header{background:#080705;border-bottom:3px double #3a2d10;padding:5px 12px;display:flex;align-items:center;justify-content:space-between}
 #title-text{font-family:'Special Elite',serif;font-size:17px;color:var(--sepia-light);letter-spacing:4px;text-shadow:1px 1px 0 #000}
-#coin-slot{font-size:7px;color:var(--faded);letter-spacing:2px;border:1px solid #2a2010;padding:2px 6px;animation:blink 1.8s step-end infinite}
+#net-status{font-size:7px;letter-spacing:2px;border:1px solid #2a2010;padding:2px 6px;color:var(--faded)}
+#net-status.connected{color:#2a6a2a}
+#net-status.waiting{color:var(--sepia-light);animation:blink 1.8s step-end infinite}
+#net-status.myturn{color:#c49a35;animation:blink 0.9s step-end infinite}
 @keyframes blink{50%{opacity:0.2}}
 
-/* HP BARS */
 #hbar{display:flex;align-items:center;padding:5px 10px;background:#100e09;border-bottom:2px solid #2a2010;gap:8px}
 .hw{flex:1}.hlbl{font-size:7px;color:var(--sepia);letter-spacing:3px;margin-bottom:2px}
 .ho{height:10px;background:#0a0906;border:1px solid #2a2010;position:relative;overflow:hidden}
 .hi{height:100%;background:var(--sepia);transition:width .4s;position:relative}
 .hi::after{content:'';position:absolute;top:0;right:0;width:2px;height:100%;background:rgba(255,255,255,0.12)}
 
-/* TURN TIMER */
 #tmr-wrap{display:flex;flex-direction:column;align-items:center;gap:2px;padding:0 8px}
 #tmr{font-family:'Special Elite',serif;font-size:16px;color:var(--paper-aged);min-width:32px;text-align:center;border:1px solid #2a2010;background:#0a0906;padding:0 6px;transition:color .3s}
 #tmr.urgent{color:#7a1a0a;animation:pulse-red .5s ease-in-out infinite}
 @keyframes pulse-red{50%{opacity:0.5}}
 #tmr-bar-wrap{width:60px;height:4px;background:#0a0906;border:1px solid #1a1508}
-#tmr-bar{height:100%;background:var(--sepia);transition:width .9s linear;width:100%}
+#tmr-bar{height:100%;background:var(--sepia);transition:width 1s linear;width:100%}
 #tmr-label{font-size:6px;color:var(--faded);letter-spacing:2px}
 
-/* ARENA */
 #arena{width:100%;height:200px;background:#0e0c08;position:relative;border-bottom:2px solid #2a2010;overflow:hidden}
 #arena-grid{position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0,transparent 59px,rgba(58,45,16,0.05) 59px,rgba(58,45,16,0.05) 60px),repeating-linear-gradient(0deg,transparent 0,transparent 39px,rgba(58,45,16,0.05) 39px,rgba(58,45,16,0.05) 40px)}
 #floor{position:absolute;bottom:0;width:100%;height:26px;background:#0a0806;border-top:2px solid #2a2010}
@@ -49,7 +48,6 @@ body{background:#0e0b06;display:flex;align-items:center;justify-content:center;m
 #p1z{left:44px}#p2z{right:44px}
 .fname-tag{font-size:6px;color:var(--sepia);letter-spacing:2px}
 
-/* FIGHTER CARDS */
 .fcard{width:54px;height:76px;border:2px solid #3a2d10;background:var(--paper);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;box-shadow:2px 2px 0 #000,inset 0 0 10px rgba(42,31,14,0.15);transition:transform .15s}
 .fcard::before,.fcard::after{content:'';position:absolute;width:7px;height:7px;background:#0e0c08;clip-path:polygon(0 0,100% 0,0 100%)}
 .fcard::before{top:-1px;left:-1px}.fcard::after{bottom:-1px;right:-1px;transform:rotate(180deg)}
@@ -58,24 +56,18 @@ body{background:#0e0b06;display:flex;align-items:center;justify-content:center;m
 .fpb{position:absolute;bottom:3px;right:4px;font-size:8px;color:var(--ink);font-family:'Special Elite',serif;transform:rotate(180deg)}
 .fcard-name{font-size:5px;color:var(--sepia-dark);letter-spacing:1px;margin-top:2px}
 
-/* STAT BAR */
 #statbar{display:flex;justify-content:space-between;padding:3px 12px;background:#100e09;border-bottom:1px solid #1e1a0c;font-size:7px;color:var(--sepia);letter-spacing:2px}
 #statbar span span{color:var(--paper-aged);transition:color .3s}
-.stat-up{animation:statup .6s;color:#2a6a2a !important}
-.stat-dn{animation:statdn .6s;color:#6a2a2a !important}
-@keyframes statup{0%,100%{}50%{text-shadow:0 0 6px #2a6a2a}}
-@keyframes statdn{0%,100%{}50%{text-shadow:0 0 6px #6a2a2a}}
 
-/* LOG */
-#log{min-height:44px;max-height:44px;padding:4px 12px;background:#0a0906;border-bottom:1px solid #1e1a0c;font-size:8px;color:var(--sepia-light);letter-spacing:1px;line-height:1.8;overflow:hidden;transition:opacity .2s}
+#log{min-height:44px;max-height:44px;padding:4px 12px;background:#0a0906;border-bottom:1px solid #1e1a0c;font-size:8px;color:var(--sepia-light);letter-spacing:1px;line-height:1.8;overflow:hidden}
 #log::before{content:'>';margin-right:4px;color:var(--sepia)}
 
-/* HAND */
 #hand{display:flex;justify-content:center;gap:6px;padding:9px 5px;background:#0e0c08;flex-wrap:wrap;min-height:108px;border-bottom:2px solid #2a2010}
 .hc{width:50px;height:70px;border:1px solid #3a2d10;background:var(--paper);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;position:relative;transition:transform .14s,border-color .14s,box-shadow .14s;box-shadow:1px 1px 0 #000}
 .hc::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.05) 0%,transparent 50%,rgba(0,0,0,0.07) 100%);pointer-events:none}
 .hc:hover{transform:translateY(-7px);border-color:var(--sepia)}
 .hc.sel{transform:translateY(-12px);border:2px solid var(--sepia-dark);box-shadow:0 6px 12px rgba(0,0,0,0.6),0 -1px 0 var(--sepia-light)}
+.hc.disabled-card{opacity:0.4;pointer-events:none}
 .hcs{font-size:16px;line-height:1;color:var(--ink)}
 .hcv{font-size:8px;color:var(--ink);font-family:'Special Elite',serif}
 .hct{font-size:5px;color:var(--sepia-dark);text-align:center;line-height:1.3;padding:0 2px}
@@ -84,7 +76,6 @@ body{background:#0e0b06;display:flex;align-items:center;justify-content:center;m
 .hcbot{position:absolute;bottom:2px;right:3px;font-size:7px;color:var(--ink);font-family:'Special Elite',serif;transform:rotate(180deg)}
 .suit-red .hcs,.suit-red .hcv,.suit-red .hctop,.suit-red .hcbot{color:var(--red)}
 
-/* CONTROLS */
 #controls{background:#0a0906;border-top:2px double #2a2010;padding:7px 10px}
 #hint{font-size:7px;color:var(--faded);text-align:center;letter-spacing:2px;margin-bottom:5px;text-transform:uppercase;min-height:12px}
 #btns{display:flex;justify-content:center;gap:7px;flex-wrap:wrap}
@@ -96,51 +87,46 @@ body{background:#0e0b06;display:flex;align-items:center;justify-content:center;m
 #playbtn:hover{background:#1e1708;border-color:var(--sepia-light);color:var(--paper)}
 #playbtn.disabled{opacity:.3;pointer-events:none}
 
-/* OVERLAY */
-#ov{position:absolute;inset:0;background:rgba(8,7,4,0.95);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;z-index:150;padding:18px}
+/* LOBBY OVERLAY */
+#ov{position:absolute;inset:0;background:rgba(8,7,4,0.97);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;z-index:150;padding:18px}
 #ov-title{font-family:'Special Elite',serif;font-size:20px;color:var(--sepia-light);letter-spacing:6px;text-align:center;border-bottom:1px solid #2a2010;padding-bottom:8px;width:100%}
 #ov-sub{font-size:7px;color:var(--faded);text-align:center;line-height:2.2;letter-spacing:2px;max-width:380px;text-transform:uppercase;white-space:pre-line}
 #ov-deco{font-family:'Special Elite',serif;font-size:11px;color:#2a2010;letter-spacing:4px;text-align:center}
-#ov-rules{display:grid;grid-template-columns:1fr 1fr;gap:3px 18px;font-size:7px;color:var(--faded);letter-spacing:1px;text-transform:uppercase;max-width:360px;width:100%}
-.rule-key{color:var(--sepia-light)}
-#startbtn{font-family:'Special Elite',serif;font-size:10px;padding:9px 26px;border:1px solid var(--sepia);color:var(--paper-aged);background:#0e0c08;cursor:pointer;letter-spacing:3px;margin-top:4px;text-transform:uppercase;transition:all .15s}
-#startbtn:hover{border-color:var(--sepia-light);color:var(--paper);background:#1a1508}
 
-/* ── BANNER */
+/* LOBBY PANELS */
+#lobby-panel{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:340px}
+.lobby-section{width:100%;border:1px solid #2a2010;padding:10px 14px;background:#0a0906}
+.lobby-section-title{font-size:7px;color:var(--sepia);letter-spacing:3px;margin-bottom:8px;text-transform:uppercase}
+.lobby-input{font-family:'Cutive Mono',monospace;font-size:10px;padding:6px 10px;border:1px solid #3a2d10;color:var(--paper-aged);background:#0e0c08;width:100%;letter-spacing:2px;outline:none;text-transform:uppercase}
+.lobby-input:focus{border-color:var(--sepia)}
+.lobby-input::placeholder{color:#3a2d10;text-transform:none}
+.lobby-btn{font-family:'Cutive Mono',monospace;font-size:8px;padding:6px 14px;border:1px solid var(--sepia);color:var(--paper-aged);background:#0e0c08;cursor:pointer;letter-spacing:2px;text-transform:uppercase;transition:all .1s;width:100%;margin-top:5px}
+.lobby-btn:hover{background:#1a1508;border-color:var(--sepia-light)}
+.lobby-btn:active{transform:translate(1px,1px)}
+.room-code-display{font-family:'Special Elite',serif;font-size:22px;color:var(--sepia-light);letter-spacing:8px;text-align:center;padding:8px;border:1px solid #3a2d10;background:#080705;width:100%}
+.lobby-note{font-size:7px;color:var(--faded);letter-spacing:1px;text-align:center;margin-top:4px}
+.lobby-divider{color:#2a2010;font-size:8px;letter-spacing:4px}
+#lobby-error{font-size:7px;color:var(--red);letter-spacing:2px;text-align:center;min-height:12px}
+
 #bnr{position:absolute;top:38%;left:50%;transform:translate(-50%,-50%);font-family:'Special Elite',serif;font-size:12px;color:var(--paper-aged);background:#0a0906;padding:6px 16px;border:1px solid #3a2d10;border-top:2px solid var(--sepia);border-bottom:2px solid var(--sepia);z-index:30;display:none;text-align:center;letter-spacing:4px;white-space:nowrap}
 #combo-flash{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);font-size:8px;color:var(--sepia-light);background:#0a0906;border:1px solid #2a2010;border-top:1px solid var(--sepia);padding:2px 10px;display:none;z-index:25;letter-spacing:3px;white-space:nowrap}
-
-/* ── FLOATING DAMAGE TEXT */
 .floatxt{position:absolute;font-size:9px;font-family:'Cutive Mono',monospace;pointer-events:none;z-index:50;color:var(--paper-aged);letter-spacing:1px;text-shadow:1px 1px 0 #000}
-
-/* ── PARTICLE CANVAS */
 #fx-canvas{position:absolute;inset:0;pointer-events:none;z-index:40}
-
-/* ── PROJECTILE */
 .projectile{position:absolute;pointer-events:none;z-index:45;font-size:14px;line-height:1}
+#opp-indicator{position:absolute;top:6px;left:50%;transform:translateX(-50%);font-size:7px;color:var(--sepia);letter-spacing:3px;background:#0a0906;border:1px solid #2a2010;padding:2px 10px;display:none;z-index:30;font-family:'Cutive Mono',monospace}
 
-/* ENEMY TURN INDICATOR */
-#enemy-indicator{position:absolute;top:6px;left:50%;transform:translateX(-50%);font-size:7px;color:var(--sepia);letter-spacing:3px;background:#0a0906;border:1px solid #2a2010;padding:2px 10px;display:none;z-index:30;font-family:'Cutive Mono',monospace}
-
-/* hit flash */
 .hit{animation:hitflash .22s}
 @keyframes hitflash{0%,100%{filter:none}50%{filter:brightness(3) sepia(1)}}
-/* shield pulse */
 .shielded{animation:shieldpulse .4s}
 @keyframes shieldpulse{0%,100%{filter:none}50%{filter:brightness(1.8) saturate(0.3) sepia(0.8)}}
-/* heal glow */
 .healed{animation:healglow .5s}
 @keyframes healglow{0%,100%{filter:none}50%{filter:brightness(1.5) sepia(0.5)}}
-/* curse writhe */
 .cursed-anim{animation:cursewrithe .4s}
 @keyframes cursewrithe{0%,100%{transform:none}25%{transform:translateX(-3px) rotate(-1deg)}75%{transform:translateX(3px) rotate(1deg)}}
-/* stat boost */
 .statboost{animation:statboostpulse .6s}
 @keyframes statboostpulse{0%,100%{filter:none}50%{filter:brightness(2) sepia(0.5)}}
-/* steal */
 .stolen{animation:stealslide .3s}
 @keyframes stealslide{0%{transform:translateX(0)}50%{transform:translateX(8px)}100%{transform:translateX(0)}}
-/* drain */
 .drained{animation:drainpulse .4s}
 @keyframes drainpulse{0%,100%{filter:none}50%{filter:brightness(0.4) sepia(1)}}
 </style>
@@ -148,16 +134,14 @@ body{background:#0e0b06;display:flex;align-items:center;justify-content:center;m
 <body>
 <div id="cabinet">
 
-<!-- HEADER -->
 <div id="header">
   <div id="title-text">CARD KOMBAT</div>
-  <div id="coin-slot">&#9654; INSERT COIN</div>
+  <div id="net-status">● OFFLINE</div>
 </div>
 
-<!-- HP BARS -->
 <div id="hbar">
   <div class="hw">
-    <div class="hlbl">VAGRANT</div>
+    <div class="hlbl" id="p1label">YOU</div>
     <div class="ho"><div class="hi" id="p1h" style="width:100%"></div></div>
   </div>
   <div id="tmr-wrap">
@@ -166,40 +150,38 @@ body{background:#0e0b06;display:flex;align-items:center;justify-content:center;m
     <div id="tmr-bar-wrap"><div id="tmr-bar"></div></div>
   </div>
   <div class="hw" style="text-align:right">
-    <div class="hlbl" style="text-align:right">SHADE</div>
+    <div class="hlbl" id="p2label" style="text-align:right">FOE</div>
     <div class="ho"><div class="hi" id="p2h" style="width:100%;float:right"></div></div>
   </div>
 </div>
 
-<!-- ARENA -->
 <div id="arena">
   <div id="arena-grid"></div>
   <canvas id="fx-canvas"></canvas>
   <div id="p1z">
     <div class="fcard" id="fc1">
-      <div class="fp">V</div>
+      <div class="fp">1</div>
       <div class="fsuit">&#9828;</div>
-      <div class="fcard-name">VAGRANT</div>
-      <div class="fpb">V</div>
+      <div class="fcard-name">YOU</div>
+      <div class="fpb">1</div>
     </div>
     <div class="fname-tag">P1</div>
   </div>
   <div id="p2z">
     <div class="fcard" id="fc2" style="transform:scaleX(-1)">
-      <div class="fp">S</div>
+      <div class="fp">2</div>
       <div class="fsuit">&#9830;</div>
-      <div class="fcard-name">SHADE</div>
-      <div class="fpb">S</div>
+      <div class="fcard-name">FOE</div>
+      <div class="fpb">2</div>
     </div>
     <div class="fname-tag" style="transform:scaleX(-1)">P2</div>
   </div>
   <div id="floor"></div>
   <div id="bnr"></div>
   <div id="combo-flash"></div>
-  <div id="enemy-indicator">SHADE IS THINKING...</div>
+  <div id="opp-indicator">OPPONENT IS THINKING...</div>
 </div>
 
-<!-- STAT BAR -->
 <div id="statbar">
   <span>ATK:<span id="s-atk">10</span></span>
   <span>DEF:<span id="s-def">5</span></span>
@@ -209,82 +191,102 @@ body{background:#0e0b06;display:flex;align-items:center;justify-content:center;m
   <span>COMBO:<span id="s-cmb">0</span></span>
 </div>
 
-<!-- LOG -->
-<div id="log">AWAITING YOUR MOVE...</div>
+<div id="log">AWAITING CONNECTION...</div>
 
-<!-- HAND -->
 <div id="hand"></div>
 
-<!-- CONTROLS -->
 <div id="controls">
-  <div id="hint">-- CLICK A CARD TO SELECT IT --</div>
+  <div id="hint">-- CONNECTING TO SERVER --</div>
   <div id="btns">
     <button class="btn disabled" id="playbtn" onclick="playSelected()">[ PLAY CARD ]</button>
-    <button class="btn" onclick="drawOne()">[ DRAW ]</button>
-    <button class="btn" onclick="showRulesScreen()">[ ? ]</button>
+    <button class="btn disabled" id="drawbtn" onclick="drawOne()">[ DRAW ]</button>
   </div>
 </div>
 
-<!-- OVERLAY -->
+<!-- LOBBY OVERLAY -->
 <div id="ov">
   <div id="ov-title">CARD KOMBAT</div>
   <div id="ov-deco">&#9830; &#9828; &#9829; &#9827;</div>
-  <div id="ov-sub">SELECT A CARD — PRESS PLAY CARD
-15 SECONDS PER TURN OR LOSE HP
-SAME SUIT COMBOS MULTIPLY POWER
-SPECIAL CARDS ALTER STATS & FATE</div>
-  <div id="ov-rules">
-    <span class="rule-key">&#9828; SPADE</span><span>STRIKE</span>
-    <span class="rule-key">&#9829; HEART</span><span>MEND</span>
-    <span class="rule-key">&#9827; CLUB</span><span>BRACE</span>
-    <span class="rule-key">&#9830; DIAMOND</span><span>CURSE</span>
-    <span class="rule-key">&#9670; DARK DIAMOND</span><span>DRAIN LIFE</span>
-    <span class="rule-key">&#10016; SKULL</span><span>BLEED WOUND</span>
-    <span class="rule-key">&#9670; VOID</span><span>NULLIFY BUFFS</span>
-    <span class="rule-key">J/Q/K/A</span><span>SPECIAL POWERS</span>
+  <div id="ov-sub">ONLINE MULTIPLAYER</div>
+  <div id="lobby-panel">
+    <div class="lobby-section">
+      <div class="lobby-section-title">&#9658; CREATE A ROOM</div>
+      <button class="lobby-btn" id="createBtn" onclick="createRoom()">[ CREATE NEW GAME ]</button>
+    </div>
+    <div class="lobby-divider">— OR —</div>
+    <div class="lobby-section">
+      <div class="lobby-section-title">&#9658; JOIN A ROOM</div>
+      <input class="lobby-input" id="joinCode" placeholder="Enter room code..." maxlength="6" oninput="this.value=this.value.toUpperCase()">
+      <button class="lobby-btn" onclick="joinRoom()">[ JOIN GAME ]</button>
+    </div>
+    <div id="lobby-error"></div>
   </div>
-  <button id="startbtn" onclick="startGame()">&#9654; INSERT COIN</button>
 </div>
 
-</div><!-- /cabinet -->
+</div>
 
-<script>
-const Mf=Math.floor,R=Math.random;
-const TURN_TIME=15;
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getDatabase, ref, set, get, update, onValue, off, remove, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
 
-/* ── CARD TYPES ── */
-const SUITS=[
+const firebaseConfig = {
+  apiKey: "AIzaSyBGXQGsslxSl1AwSu83SMkFi5_aJ-Qhqk4",
+  authDomain: "cardkombat.firebaseapp.com",
+  projectId: "cardkombat",
+  storageBucket: "cardkombat.firebasestorage.app",
+  messagingSenderId: "616844059072",
+  appId: "1:616844059072:web:ba1e4897308e9e9ab8e825",
+  databaseURL: "https://cardkombat-default-rtdb.firebaseio.com"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+/* ── CONSTANTS ── */
+const TURN_TIME = 15;
+const Mf = Math.floor, R = Math.random;
+
+const SUITS = [
   {s:'spade',   g:'&#9828;', base:'strike',  desc:'STRIKE',  red:false},
   {s:'heart',   g:'&#9829;', base:'mend',    desc:'MEND',    red:true},
   {s:'club',    g:'&#9827;', base:'brace',   desc:'BRACE',   red:false},
   {s:'diamond', g:'&#9830;', base:'curse',   desc:'CURSE',   red:true},
-  {s:'drain',   g:'&#9670;', base:'drain',   desc:'DRAIN',   red:true},   // dark diamond
-  {s:'wound',   g:'&#10016;',base:'wound',   desc:'WOUND',   red:false},  // skull / bleed
-  {s:'void',    g:'&#9671;', base:'void',    desc:'VOID',    red:false},  // nullify
-  {s:'mirror',  g:'&#9670;', base:'mirror',  desc:'MIRROR',  red:false},  // reflect
+  {s:'drain',   g:'&#9670;', base:'drain',   desc:'DRAIN',   red:true},
+  {s:'wound',   g:'&#10016;',base:'wound',   desc:'WOUND',   red:false},
+  {s:'void',    g:'&#9671;', base:'void',    desc:'VOID',    red:false},
+  {s:'mirror',  g:'&#9670;', base:'mirror',  desc:'MIRROR',  red:false},
 ];
-const VALS=['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
-const PWR={2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,10:10,J:11,Q:12,K:13,A:14};
-const SPECIALS={J:'knave',Q:'queen',K:'king',A:'ace'};
+const VALS = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+const PWR  = {2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,10:10,J:11,Q:12,K:13,A:14};
+const SPECIALS = {J:'knave',Q:'queen',K:'king',A:'ace'};
+const SUIT_WEIGHTS = {spade:13,heart:13,club:13,diamond:13,drain:5,wound:5,void:4,mirror:3};
 
-/* deck weights: common suits get more cards */
-const SUIT_WEIGHTS={spade:13,heart:13,club:13,diamond:13,drain:5,wound:5,void:4,mirror:3};
+/* ── STATE ── */
+let roomId = null;
+let myRole = null; // 'p1' or 'p2'
+let gameState = null;
+let myHand = [];
+let sel = null;
+let busy = false;
+let gameOver = false;
+let timerInt = null;
+let timerV = TURN_TIME;
+let particles = [];
+let canvas, ctx;
+let roomRef = null;
+let stateUnsubscribe = null;
+let queenBuff = false;
+let mirrorActive = false;
+let lastSuit = null;
+let comboCount = 0;
 
-let deck=[],hand=[],sel=null,busy=false,over=false;
-let p1={hp:100,atk:10,def:5,spd:5};
-let p2={hp:100,atk:11,def:4,spd:5};
-let lastSuit=null,comboCount=0,round=1;
-let p1curse=0,p2curse=0,p1bleed=0,p2bleed=0;
-let queenBuff=false,mirrorActive=false;
-let timerV=TURN_TIME,timerInt=null;
-let particles=[];
-let canvas,ctx;
-
-function getSuit(s){return SUITS.find(x=>x.s===s)||SUITS[0]}
+function getSuit(s){ return SUITS.find(x=>x.s===s)||SUITS[0]; }
 
 function mkDeck(){
   let d=[];
-  for(let[sn,cnt] of Object.entries(SUIT_WEIGHTS)){
+  for(let [sn,cnt] of Object.entries(SUIT_WEIGHTS)){
     const su=SUITS.find(x=>x.s===sn);
     for(let i=0;i<cnt;i++){
       const v=VALS[Mf(R()*VALS.length)];
@@ -295,49 +297,297 @@ function mkDeck(){
   return d;
 }
 
-/* ── INIT ── */
-function startGame(){
-  document.getElementById('ov').style.display='none';
-  canvas=document.getElementById('fx-canvas');
-  canvas.width=canvas.offsetWidth; canvas.height=canvas.offsetHeight;
-  ctx=canvas.getContext('2d');
-  deck=mkDeck(); hand=[]; sel=null; busy=false; over=false;
-  p1={hp:100,atk:10,def:5,spd:5}; p2={hp:100,atk:11,def:4,spd:5};
-  lastSuit=null; comboCount=0; round=1;
-  p1curse=0;p2curse=0;p1bleed=0;p2bleed=0;
-  queenBuff=false;mirrorActive=false;particles=[];
-  for(let i=0;i<5;i++)dealCard();
-  renderHand();updateBars();updateStats();
-  log('THE DUEL BEGINS...');
-  showBnr('ROUND  1');
-  startTurnTimer();
+function randCode(){
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let c='';for(let i=0;i<5;i++)c+=chars[Mf(R()*chars.length)];return c;
+}
+
+/* ── LOBBY ── */
+window.createRoom = async function(){
+  setLobbyError('');
+  document.getElementById('createBtn').textContent = '[ CREATING... ]';
+  roomId = randCode();
+  const deck = mkDeck();
+  // Deal 5 cards to each player from the shared deck
+  const p1hand = deck.splice(0,5);
+  const p2hand = deck.splice(0,5);
+  const state = {
+    deck: deck,
+    p1: {hp:100,atk:10,def:5,spd:5,bleed:0,curse:0,hand:p1hand},
+    p2: {hp:100,atk:11,def:4,spd:5,bleed:0,curse:0,hand:p2hand},
+    turn: 'p1',
+    round: 1,
+    lastSuit: null,
+    comboCount: 0,
+    queenBuff: false,
+    mirrorActive: false,
+    status: 'waiting', // waiting | playing | gameover
+    lastAction: null,
+    created: Date.now()
+  };
+  try {
+    await set(ref(db, 'rooms/'+roomId), state);
+    myRole = 'p1';
+    showWaitingRoom();
+    listenToRoom();
+  } catch(e){
+    setLobbyError('CONNECTION FAILED: '+e.message);
+    document.getElementById('createBtn').textContent = '[ CREATE NEW GAME ]';
+  }
+};
+
+window.joinRoom = async function(){
+  const code = document.getElementById('joinCode').value.trim().toUpperCase();
+  if(!code||code.length<4){setLobbyError('ENTER A VALID ROOM CODE');return;}
+  setLobbyError('JOINING...');
+  try {
+    const snap = await get(ref(db,'rooms/'+code));
+    if(!snap.exists()){setLobbyError('ROOM NOT FOUND: '+code);return;}
+    const state = snap.val();
+    if(state.status==='playing'){setLobbyError('GAME ALREADY IN PROGRESS');return;}
+    if(state.status==='gameover'){setLobbyError('GAME IS OVER');return;}
+    roomId = code;
+    myRole = 'p2';
+    // Update status to playing
+    await update(ref(db,'rooms/'+roomId),{status:'playing'});
+    setNetStatus('connected','● CONNECTED');
+    hideLobby();
+    listenToRoom();
+  } catch(e){
+    setLobbyError('ERROR: '+e.message);
+  }
+};
+
+function showWaitingRoom(){
+  const panel = document.getElementById('lobby-panel');
+  panel.innerHTML = `
+    <div class="lobby-section">
+      <div class="lobby-section-title">&#9658; YOUR ROOM CODE</div>
+      <div class="room-code-display">${roomId}</div>
+      <div class="lobby-note">SHARE THIS CODE WITH YOUR OPPONENT</div>
+    </div>
+    <div class="lobby-section" style="text-align:center">
+      <div class="lobby-note" style="animation:blink 1.4s step-end infinite">WAITING FOR OPPONENT TO JOIN...</div>
+    </div>
+    <div id="lobby-error"></div>
+  `;
+  setNetStatus('waiting','● WAITING');
+}
+
+function setLobbyError(msg){
+  const el = document.getElementById('lobby-error');
+  if(el) el.textContent = msg;
+}
+
+function hideLobby(){
+  document.getElementById('ov').style.display = 'none';
+}
+
+function setNetStatus(cls, txt){
+  const el = document.getElementById('net-status');
+  el.className = cls;
+  el.textContent = txt;
+}
+
+/* ── LISTEN TO ROOM ── */
+function listenToRoom(){
+  roomRef = ref(db,'rooms/'+roomId);
+  stateUnsubscribe = onValue(roomRef, snap => {
+    if(!snap.exists()) return;
+    const newState = snap.val();
+
+    // Room just became active
+    if(newState.status==='playing' && (!gameState || gameState.status==='waiting')){
+      hideLobby();
+      initCanvas();
+      startLocalGame(newState);
+    }
+
+    if(newState.status==='playing'){
+      handleStateUpdate(newState);
+    }
+    if(newState.status==='gameover' && !gameOver){
+      gameState = newState;
+      handleGameOver(newState.winner);
+    }
+
+    gameState = newState;
+  });
+}
+
+function initCanvas(){
+  canvas = document.getElementById('fx-canvas');
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+  ctx = canvas.getContext('2d');
   requestAnimationFrame(animLoop);
+}
+
+function startLocalGame(state){
+  setNetStatus('connected','● ONLINE');
+  // Init local copies from Firebase state
+  syncFromState(state);
+  renderHand();
+  updateBars();
+  updateStats();
+  log('DUEL BEGINS — ROUND 1');
+  showBnr('ROUND  1');
+  // Set up labels
+  document.getElementById('p1label').textContent = myRole==='p1'?'YOU':'FOE';
+  document.getElementById('p2label').textContent = myRole==='p2'?'YOU':'FOE';
+  // Enable draw button
+  document.getElementById('drawbtn').classList.remove('disabled');
+  checkTurn(state.turn);
+}
+
+function syncFromState(state){
+  // Mirror local effect vars from server state
+  queenBuff   = state.queenBuff   || false;
+  mirrorActive= state.mirrorActive|| false;
+  lastSuit    = state.lastSuit    || null;
+  comboCount  = state.comboCount  || 0;
+  myHand      = state[myRole].hand || [];
+}
+
+/* ── HANDLE INCOMING STATE UPDATE ── */
+function handleStateUpdate(state){
+  updateBars();
+  updateStats();
+
+  // If there's a new action from opponent, play its visual
+  if(state.lastAction && state.lastAction.by !== myRole){
+    const act = state.lastAction;
+    if(!act._seen){
+      // Mark as seen so we don't replay
+      update(ref(db,'rooms/'+roomId+'/lastAction'),{_seen:true});
+      playOpponentAction(act, state);
+    }
+  }
+
+  myHand = state[myRole].hand || [];
+  renderHand();
+
+  // Check whose turn it is
+  checkTurn(state.turn);
+}
+
+function checkTurn(turn){
+  busy = (turn !== myRole);
+  if(!gameOver){
+    if(turn === myRole){
+      setNetStatus('myturn','● YOUR TURN');
+      document.getElementById('opp-indicator').style.display='none';
+      document.getElementById('hint').textContent='-- CLICK A CARD TO SELECT --';
+      startTurnTimer();
+    } else {
+      setNetStatus('connected','● ONLINE');
+      document.getElementById('opp-indicator').style.display='block';
+      document.getElementById('hint').textContent='-- OPPONENT IS PLAYING --';
+      pauseTimer();
+      document.getElementById('tmr').textContent='--';
+    }
+    updatePlayBtn();
+  }
+}
+
+/* ── PLAY OPPONENT ACTION VISUALLY ── */
+function playOpponentAction(act, state){
+  const myFc   = myRole==='p1'?'fc1':'fc2';
+  const oppFc  = myRole==='p1'?'fc2':'fc1';
+  const myEl   = document.getElementById(myFc);
+  const oppEl  = document.getElementById(oppFc);
+  const su     = getSuit(act.suit);
+  const msgs   = [];
+
+  // Bleed/curse ticks already reflected in state HP — just show visuals
+  if(act.oppBleedDmg){
+    floatAt(oppEl,'-'+act.oppBleedDmg+' BLEED','#7a1a0a');
+    spawnParticles(oppEl,'bleed',8);
+    msgs.push('FOE BLEEDS -'+act.oppBleedDmg);
+  }
+  if(act.oppCurseDmg){
+    floatAt(oppEl,'-'+act.oppCurseDmg+' CRS');
+    spawnSpiralCurse(oppEl);
+  }
+
+  // Show the card effect visually (opponent attacked me, etc.)
+  const base = su.base;
+  if(base==='strike'||act.isSpecial){
+    const d = act.dmgToMe||0;
+    if(d>0){
+      animCardFly(oppEl,myEl,su.g,()=>{
+        spawnSlash(myEl,'right');spawnImpactRing(myEl);
+        spawnParticles(myEl,'strike',14);shake(myFc);
+        floatAt(myEl,'-'+d);
+      });
+      msgs.push('FOE STRIKES -'+d);
+    }
+  } else if(base==='mend'){
+    spawnRipple(oppEl,'#8b6914');spawnParticles(oppEl,'heal',12);anim(oppFc,'healed');
+    if(act.healOpp) floatAt(oppEl,'+'+act.healOpp+' HP');
+    msgs.push('FOE MENDS +'+act.healOpp);
+  } else if(base==='brace'){
+    spawnImpactRing(oppEl);spawnParticles(oppEl,'mirror',10);anim(oppFc,'shielded');
+    msgs.push('FOE BRACES');
+  } else if(base==='curse'){
+    const d = act.dmgToMe||0;
+    animCardFly(oppEl,myEl,'&#9830;',()=>{
+      spawnSpiralCurse(myEl);spawnParticles(myEl,'curse',12);anim(myFc,'cursed-anim');
+      if(d)floatAt(myEl,'CURSED -'+d);
+    });
+    msgs.push('FOE CURSES -'+d);
+  } else if(base==='drain'){
+    const d = act.dmgToMe||0;
+    animCardFly(oppEl,myEl,'&#9670;',()=>{
+      spawnParticles(myEl,'drain',12);anim(myFc,'drained');
+      floatAt(myEl,'-'+d+' DRAINED');
+    });
+    msgs.push('FOE DRAINS -'+d);
+  } else if(base==='wound'){
+    const d = act.dmgToMe||0;
+    animCardFly(oppEl,myEl,'&#10016;',()=>{
+      spawnParticles(myEl,'bleed',14);spawnSlash(myEl,'right');
+      shake(myFc);floatAt(myEl,'-'+d+' BLEED');
+    });
+    msgs.push('FOE WOUNDS -'+d);
+  } else if(base==='void'){
+    const d = act.dmgToMe||0;
+    animCardFly(oppEl,myEl,'&#9671;',()=>{
+      spawnParticles(myEl,'void',16);spawnRipple(myEl,'#2a2020');
+      anim(myFc,'drained');floatAt(myEl,'NULLIFIED -'+d);
+    });
+    msgs.push('FOE VOIDS -'+d);
+  } else if(base==='mirror'){
+    spawnRipple(oppEl,'#a09070');spawnParticles(oppEl,'mirror',14);anim(oppFc,'statboost');
+    floatAt(oppEl,'MIRROR ACTIVE');msgs.push('FOE MIRROR SHIELD');
+  }
+
+  if(act.comboBonus>0) msgs.push('COMBO x'+act.combo);
+  if(msgs.length) log(msgs.join('  |  '));
+  updateBars();
 }
 
 /* ── TURN TIMER ── */
 function startTurnTimer(){
   clearInterval(timerInt);
-  timerV=TURN_TIME;
-  document.getElementById('tmr').textContent=timerV;
+  timerV = TURN_TIME;
+  document.getElementById('tmr').textContent = timerV;
   document.getElementById('tmr').classList.remove('urgent');
+  document.getElementById('tmr-bar').style.transition='none';
   document.getElementById('tmr-bar').style.width='100%';
-  document.getElementById('tmr-bar').style.transition='width '+TURN_TIME+'s linear';
-  setTimeout(()=>document.getElementById('tmr-bar').style.width='0%',50);
-  timerInt=setInterval(()=>{
-    if(busy||over)return;
+  setTimeout(()=>{
+    document.getElementById('tmr-bar').style.transition='width '+TURN_TIME+'s linear';
+    document.getElementById('tmr-bar').style.width='0%';
+  },60);
+  timerInt = setInterval(()=>{
+    if(busy||gameOver) return;
     timerV--;
-    document.getElementById('tmr').textContent=timerV;
-    if(timerV<=5)document.getElementById('tmr').classList.add('urgent');
+    document.getElementById('tmr').textContent = timerV;
+    if(timerV<=5) document.getElementById('tmr').classList.add('urgent');
     if(timerV<=0){
       clearInterval(timerInt);
-      // Timeout penalty
-      const pen=Mf(8+R()*8);
-      p1.hp=Math.max(0,p1.hp-pen);
-      updateBars();
-      log('TIME OUT! -'+pen+' HP PENALTY');
-      floatAt(document.getElementById('fc1'),'-'+pen+' TIMEOUT');
-      shake('fc1');
-      if(!checkKO())setTimeout(()=>{busy=true;enemyTurn();},400);
+      // Timeout penalty — push to Firebase
+      timeoutPenalty();
     }
   },1000);
 }
@@ -345,27 +595,347 @@ function startTurnTimer(){
 function pauseTimer(){
   clearInterval(timerInt);
   document.getElementById('tmr-bar').style.transition='none';
+  document.getElementById('tmr').classList.remove('urgent');
 }
 
-function resumeTimer(){
-  // fresh turn timer for player
-  document.getElementById('tmr-label').textContent='TURN';
-  document.getElementById('enemy-indicator').style.display='none';
-  startTurnTimer();
+async function timeoutPenalty(){
+  if(gameOver||busy) return;
+  busy=true;
+  const pen = Mf(8+R()*8);
+  const mySnap = await get(ref(db,'rooms/'+roomId+'/'+myRole));
+  const me = mySnap.val();
+  const newHp = Math.max(0, me.hp - pen);
+  log('TIME OUT! -'+pen+' HP PENALTY');
+  floatAt(document.getElementById(myRole==='p1'?'fc1':'fc2'),'-'+pen+' TIMEOUT');
+  shake(myRole==='p1'?'fc1':'fc2');
+  const updates = {};
+  updates[myRole+'/hp'] = newHp;
+  updates['turn'] = myRole==='p1'?'p2':'p1';
+  updates['round'] = (gameState.round||1)+1;
+  updates['lastAction'] = {by:myRole,suit:'spade',isTimeout:true,dmgToMe:0};
+  if(newHp<=0){
+    updates['status']='gameover';
+    updates['winner']= myRole==='p1'?'p2':'p1';
+  }
+  await update(ref(db,'rooms/'+roomId), updates);
 }
 
-/* ── DEAL ── */
-function dealCard(){if(!deck.length)deck=mkDeck();hand.push(deck.pop())}
+/* ── LOCAL HAND / DRAW ── */
+function dealCard(){
+  if(!gameState) return;
+  // Draw from Firebase deck — we do this optimistically locally
+  if(myHand.length>=7) return;
+  if(!gameState.deck||!gameState.deck.length) return;
+  const card = gameState.deck[0];
+  myHand.push(card);
+}
 
-/* ── RENDER HAND ── */
+window.drawOne = async function(){
+  if(busy||gameOver) return;
+  if(myHand.length>=7){log('HAND FULL. PLAY A CARD FIRST.');return;}
+  const snap = await get(ref(db,'rooms/'+roomId));
+  const state = snap.val();
+  if(!state.deck||!state.deck.length){log('DECK IS EMPTY.');return;}
+  const card = state.deck[0];
+  const newDeck = state.deck.slice(1);
+  const newHand = [...(state[myRole].hand||[]), card];
+  const updates={};
+  updates['deck'] = newDeck;
+  updates[myRole+'/hand'] = newHand;
+  await update(ref(db,'rooms/'+roomId), updates);
+  log('CARD DRAWN.');
+};
+
+/* ── PLAY CARD ── */
+window.playSelected = async function(){
+  if(busy||gameOver) return;
+  if(sel===null){log('SELECT A CARD FIRST.');return;}
+  const card = myHand[sel];
+  myHand.splice(sel,1);
+  sel=null;
+  busy=true;
+  pauseTimer();
+  renderHand();
+  updatePlayBtn();
+  await resolveAndPush(card);
+};
+
+async function resolveAndPush(card){
+  // Fetch fresh state
+  const snap = await get(ref(db,'rooms/'+roomId));
+  const state = snap.val();
+  const su = getSuit(card.suit);
+  const pw = card.pw;
+  const roll = R();
+  const msgs = [];
+
+  // Local combo tracking
+  let comboBonus=0;
+  if(state.lastSuit && state.lastSuit===card.suit){
+    comboCount = (state.comboCount||0)+1;
+    comboBonus = comboCount*4;
+    showCombo('COMBO x'+comboCount+'  +'+comboBonus+' POWER');
+    spawnParticles(document.getElementById(myRole==='p1'?'fc1':'fc2'),'combo',14);
+    msgs.push('COMBO x'+comboCount);
+  } else {
+    comboCount=0;
+  }
+
+  const myKey   = myRole;
+  const oppKey  = myRole==='p1'?'p2':'p1';
+  const myFc    = myRole==='p1'?'fc1':'fc2';
+  const oppFc   = myRole==='p1'?'fc2':'fc1';
+  const myEl    = document.getElementById(myFc);
+  const oppEl   = document.getElementById(oppFc);
+
+  // Mutable copies
+  let myData  = {...state[myKey],  hand:[...state[myKey].hand||[]]};
+  let oppData = {...state[oppKey], hand:[...state[oppKey].hand||[]]};
+  let deck    = [...(state.deck||[])];
+
+  // Bleed tick for ME
+  let myBleedDmg=0, myCurseDmg=0;
+  if(myData.bleed>0){
+    myBleedDmg = Mf(myData.bleed*3+R()*3);
+    myData.hp = Math.max(0, myData.hp - myBleedDmg);
+    myData.bleed = Math.max(0, myData.bleed-1);
+    floatAt(myEl,'-'+myBleedDmg+' BLEED','#7a1a0a');
+    spawnParticles(myEl,'bleed',8);
+    msgs.push('BLEED -'+myBleedDmg);
+  }
+  if(myData.curse>0){
+    myCurseDmg = Mf(myData.curse*2+R()*3);
+    myData.hp = Math.max(0, myData.hp - myCurseDmg);
+    myData.curse--;
+    floatAt(myEl,'-'+myCurseDmg+' CRS');
+    spawnSpiralCurse(myEl);
+    msgs.push('CURSE -'+myCurseDmg);
+  }
+
+  // Action result object (for opponent to animate)
+  const action = {by:myRole, suit:card.suit, val:card.val, pw:card.pw, roll, isSpecial:!!SPECIALS[card.val],
+    comboBonus, combo:comboCount, dmgToMe:0, healOpp:0, oppBleedDmg:0, oppCurseDmg:0, _seen:false};
+
+  // Resolve card
+  if(SPECIALS[card.val]){
+    resolveSpecial(card, pw+comboBonus, roll, myData, oppData, myEl, oppEl, myFc, oppFc, action, msgs, state);
+  } else {
+    resolveNormal(su, pw+comboBonus, roll, myData, oppData, myEl, oppEl, myFc, oppFc, action, msgs, state);
+  }
+
+  // Remove card from hand, ensure min hand size
+  myData.hand = myHand; // already spliced
+  while(myData.hand.length < 3 && deck.length){
+    myData.hand.push(deck.shift());
+  }
+
+  const newRound = (state.round||1)+1;
+  const updates = {};
+  updates[myKey]   = myData;
+  updates[oppKey]  = oppData;
+  updates['deck']  = deck;
+  updates['turn']  = oppKey;
+  updates['round'] = newRound;
+  updates['lastSuit'] = card.suit;
+  updates['comboCount'] = comboCount;
+  updates['queenBuff'] = queenBuff;
+  updates['mirrorActive'] = mirrorActive;
+  updates['lastAction'] = action;
+
+  if(myData.hp<=0 || oppData.hp<=0){
+    updates['status']='gameover';
+    updates['winner']= oppData.hp<=0 ? myKey : oppKey;
+  }
+
+  log(msgs.join('  |  '));
+  updateBars();
+  updateStats();
+
+  await update(ref(db,'rooms/'+roomId), updates);
+  busy=false;
+}
+
+function resolveNormal(su, pow, roll, myData, oppData, myEl, oppEl, myFc, oppFc, action, msgs, state){
+  if(su.base==='strike'){
+    let dmg=Mf(pow*0.9+myData.atk*0.5+R()*5);
+    if(roll<0.12){dmg=Mf(dmg*0.35);msgs.push('GLANCED -'+dmg);}
+    else if(roll>0.88){dmg=Mf(dmg*1.65);msgs.push('CRUSHING -'+dmg);}
+    else msgs.push('STRIKE -'+dmg);
+    dmg=Math.max(1,dmg-Mf(oppData.def*0.4+R()*2));
+    if(queenBuff){dmg=Mf(dmg*1.5);queenBuff=false;msgs.push('QUEEN EMPOWERED');}
+    if(state.mirrorActive&&state.turn!==myRole){
+      // Mirror from opponent — only if opponent set it
+    } else {
+      oppData.hp=Math.max(0,oppData.hp-dmg);
+      action.dmgToMe=dmg;
+      animCardFly(myEl,oppEl,'&#9828;',()=>{
+        spawnSlash(oppEl,'left');spawnImpactRing(oppEl);
+        spawnParticles(oppEl,'strike',15);shake(oppFc);
+        floatAt(oppEl,'-'+dmg);
+      });
+    }
+  } else if(su.base==='mend'){
+    let heal=Mf(pow*0.7+myData.def*0.3+R()*5);
+    if(roll<0.10){heal=Mf(heal*0.3);msgs.push('WEAK MEND +'+heal);}
+    else if(roll>0.85){heal=Mf(heal*1.5);msgs.push('SURGE MEND +'+heal);}
+    else msgs.push('MEND +'+heal);
+    myData.hp=Math.min(100,myData.hp+heal);
+    action.healOpp=heal;
+    spawnRipple(myEl,'#8b6914');spawnParticles(myEl,'heal',12);anim(myFc,'healed');
+    floatAt(myEl,'+'+heal+' HP');
+    if(roll>0.6){myData.def=Math.min(20,myData.def+1);msgs.push('+1 DEF');}
+  } else if(su.base==='brace'){
+    const bl=Mf(pow*0.5+myData.def*0.4+R()*3);
+    const dDef=Mf(bl*0.15);const dHp=Mf(bl*0.3);
+    myData.def=Math.min(20,myData.def+dDef);myData.hp=Math.min(100,myData.hp+dHp);
+    msgs.push('BRACE +'+dDef+' DEF +'+dHp+' HP');
+    spawnImpactRing(myEl);spawnParticles(myEl,'mirror',10);anim(myFc,'shielded');
+    floatAt(myEl,'BRACED');
+    if(roll>0.75){myData.spd=Math.min(20,myData.spd+1);msgs.push('+1 SPD');}
+  } else if(su.base==='curse'){
+    const cp=Mf(pow*0.6+myData.spd*0.3+R()*4);
+    oppData.curse=Math.min((oppData.curse||0)+Mf(cp*0.25+1),8);
+    const dmg=Mf(cp*0.4);oppData.hp=Math.max(0,oppData.hp-dmg);
+    action.dmgToMe=dmg;
+    animCardFly(myEl,oppEl,'&#9830;',()=>{
+      spawnSpiralCurse(oppEl);spawnParticles(oppEl,'curse',12);anim(oppFc,'cursed-anim');
+      floatAt(oppEl,'CURSED -'+dmg);
+    });
+    msgs.push('CURSE -'+dmg+' CURSE+');
+    if(roll<0.2){oppData.atk=Math.max(1,oppData.atk-2);msgs.push('FOE -2 ATK');}
+  } else if(su.base==='drain'){
+    const dp=Mf(pow*0.8+myData.atk*0.3+R()*4);
+    const stolen=Mf(dp*0.4);
+    oppData.hp=Math.max(0,oppData.hp-dp);myData.hp=Math.min(100,myData.hp+stolen);
+    action.dmgToMe=dp;
+    animCardFly(myEl,oppEl,'&#9670;',()=>{
+      spawnParticles(oppEl,'drain',12);spawnParticles(myEl,'heal',8);
+      anim(oppFc,'drained');anim(myFc,'healed');
+      floatAt(oppEl,'-'+dp+' DRAINED');floatAt(myEl,'+'+stolen+' LIFE');
+    });
+    msgs.push('DRAIN -'+dp+' +'+stolen+' LIFE STEAL');
+    myData.atk=Math.min(25,myData.atk+1);
+  } else if(su.base==='wound'){
+    const wp=Mf(pow*0.5+myData.atk*0.4+R()*4);
+    const bleedAmt=Mf(wp*0.3+1);
+    oppData.hp=Math.max(0,oppData.hp-wp);oppData.bleed=Math.min((oppData.bleed||0)+bleedAmt,10);
+    action.dmgToMe=wp;
+    animCardFly(myEl,oppEl,'&#10016;',()=>{
+      spawnParticles(oppEl,'bleed',14);spawnSlash(oppEl,'left');
+      shake(oppFc);floatAt(oppEl,'-'+wp+' BLEED x'+bleedAmt);
+    });
+    msgs.push('WOUND -'+wp+' BLEED x'+bleedAmt);
+  } else if(su.base==='void'){
+    oppData.curse=0;oppData.bleed=0;
+    let statRob=0;
+    if(oppData.atk>11){statRob=Mf((oppData.atk-11)*0.5+1);oppData.atk=Math.max(1,oppData.atk-statRob);}
+    const vdmg=Mf(pow*0.7+R()*5);oppData.hp=Math.max(0,oppData.hp-vdmg);
+    action.dmgToMe=vdmg;
+    animCardFly(myEl,oppEl,'&#9671;',()=>{
+      spawnParticles(oppEl,'void',16);spawnRipple(oppEl,'#2a2020');
+      anim(oppFc,'drained');floatAt(oppEl,'NULLIFIED -'+vdmg);
+    });
+    msgs.push('VOID -'+vdmg+(statRob?' -'+statRob+' ATK':''));
+  } else if(su.base==='mirror'){
+    mirrorActive=true;
+    spawnRipple(myEl,'#a09070');spawnParticles(myEl,'mirror',14);anim(myFc,'statboost');
+    floatAt(myEl,'MIRROR ACTIVE');msgs.push('MIRROR SHIELD');
+  }
+}
+
+function resolveSpecial(card, pow, roll, myData, oppData, myEl, oppEl, myFc, oppFc, action, msgs, state){
+  if(card.val==='J'){
+    const st=Mf(2+roll*4);
+    oppData.atk=Math.max(1,oppData.atk-st);myData.atk=Math.min(25,myData.atk+st);
+    animCardFly(myEl,oppEl,'J',()=>{
+      spawnLightning(myEl,oppEl);anim(oppFc,'stolen');anim(myFc,'statboost');
+      floatAt(myEl,'+'+st+' ATK');floatAt(oppEl,'-'+st+' ATK');
+    });
+    msgs.push('KNAVE STEALS '+st+' ATK');
+    if(roll>0.5){const xd=Mf(myData.atk*0.4);oppData.hp=Math.max(0,oppData.hp-xd);action.dmgToMe=xd;setTimeout(()=>{shake(oppFc);floatAt(oppEl,'-'+xd)},320);msgs.push('CUTS '+xd);}
+  } else if(card.val==='Q'){
+    const h=Mf(10+roll*12);myData.hp=Math.min(100,myData.hp+h);queenBuff=true;
+    oppData.curse=Math.min((oppData.curse||0)+2,8);
+    spawnRipple(myEl,'#8b6914');spawnParticles(myEl,'heal',16);
+    spawnSpiralCurse(oppEl);anim(myFc,'healed');
+    floatAt(myEl,'+'+h+' QUEEN');floatAt(oppEl,'CURSED x2');
+    action.healOpp=h;
+    msgs.push('QUEEN +'+h+' HP EMPOWER CURSE x2');
+  } else if(card.val==='K'){
+    myData.atk=Math.min(25,myData.atk+2);myData.def=Math.min(20,myData.def+2);myData.spd=Math.min(20,myData.spd+2);
+    spawnParticles(myEl,'combo',20);spawnImpactRing(myEl);anim(myFc,'statboost');
+    floatAt(myEl,'KING +2 ALL');msgs.push('KING ALL STATS +2');
+    if(roll>0.45){const d=Mf(myData.atk*0.7);oppData.hp=Math.max(0,oppData.hp-d);action.dmgToMe=d;setTimeout(()=>{spawnSlash(oppEl,'left');shake(oppFc);floatAt(oppEl,'-'+d+' ROYAL')},400);msgs.push('ROYAL DECREE -'+d);}
+  } else { // ACE
+    let dmg=Mf((pow+myData.atk)*1.4+R()*8);
+    if(roll<0.15){dmg=Mf(dmg*0.35);msgs.push('ACE MISFIRED -'+dmg);}
+    else{dmg=Math.max(2,dmg-Mf(oppData.def*0.3));msgs.push('ACE DOUBLE STRIKE -'+dmg);}
+    oppData.hp=Math.max(0,oppData.hp-dmg);
+    action.dmgToMe=dmg;
+    animCardFly(myEl,oppEl,'A',()=>{
+      spawnSlash(oppEl,'left');spawnImpactRing(oppEl);spawnParticles(oppEl,'strike',20);
+      shake(oppFc);floatAt(oppEl,'-'+dmg+' ACE');
+    });
+    if(roll>0.8){
+      const ed=Mf(dmg*0.45);oppData.hp=Math.max(0,oppData.hp-ed);action.dmgToMe+=ed;
+      setTimeout(()=>{spawnSlash(oppEl,'right');floatAt(oppEl,'-'+ed+' ECHO');shake(oppFc)},350);
+      msgs.push('ECHO -'+ed);
+    }
+  }
+}
+
+/* ── GAME OVER ── */
+function handleGameOver(winner){
+  clearInterval(timerInt);
+  gameOver=true;busy=false;
+  const iWon = winner===myRole;
+  const msg  = iWon ? 'K.O.  —  YOU WIN!' : 'K.O.  —  YOU LOSE';
+  showBnr(msg);log(msg);
+  setNetStatus('connected','● GAME OVER');
+  setTimeout(()=>{
+    const ov=document.getElementById('ov');ov.style.display='flex';
+    document.getElementById('ov-title').textContent=msg;
+    const state=gameState;
+    const myHp=state?Math.max(0,state[myRole].hp):0;
+    const oppHp=state?Math.max(0,state[myRole==='p1'?'p2':'p1'].hp):0;
+    document.getElementById('ov-sub').textContent=
+      'YOUR HP: '+myHp+'   FOE HP: '+oppHp+'\nROOM: '+roomId;
+    document.getElementById('lobby-panel').innerHTML=`
+      <button class="lobby-btn" onclick="location.reload()">[ PLAY AGAIN ]</button>
+    `;
+  },2200);
+}
+
+/* ── UI HELPERS ── */
+function updateBars(){
+  if(!gameState) return;
+  const myHp  = gameState[myRole]?  gameState[myRole].hp  : 100;
+  const oppHp = gameState[myRole==='p1'?'p2':'p1']? gameState[myRole==='p1'?'p2':'p1'].hp : 100;
+  document.getElementById('p1h').style.width = Math.max(0,myRole==='p1'?myHp:oppHp)+'%';
+  document.getElementById('p2h').style.width = Math.max(0,myRole==='p2'?myHp:oppHp)+'%';
+}
+
+function updateStats(){
+  if(!gameState) return;
+  const me = gameState[myRole];
+  if(!me) return;
+  document.getElementById('s-atk').textContent=me.atk||10;
+  document.getElementById('s-def').textContent=me.def||5;
+  document.getElementById('s-spd').textContent=me.spd||5;
+  document.getElementById('s-bld').textContent=me.bleed||0;
+  document.getElementById('s-crs').textContent=me.curse||0;
+  document.getElementById('s-cmb').textContent=comboCount||0;
+}
+
 function renderHand(){
   const ha=document.getElementById('hand');ha.innerHTML='';
-  hand.forEach((c,i)=>{
+  const isMyTurn = !busy && !gameOver;
+  myHand.forEach((c,i)=>{
     const su=getSuit(c.suit);
     const isSp=!!SPECIALS[c.val];
     const spNames={J:'Knave',Q:'Queen',K:'King',A:'Ace'};
     const d=document.createElement('div');
-    d.className='hc'+(sel===i?' sel':'')+(su.red?' suit-red':'');
+    d.className='hc'+(sel===i?' sel':'')+(su.red?' suit-red':'')+(isMyTurn?'':' disabled-card');
     d.innerHTML=
       `<div class="hctop">${c.val}</div>`+
       `<div class="hcs">${su.g}</div>`+
@@ -373,42 +943,25 @@ function renderHand(){
       `<div class="hct">${su.desc}</div>`+
       (isSp?`<div class="hck">${spNames[c.val]}</div>`:'')+
       `<div class="hcbot">${c.val}</div>`;
-    d.onclick=()=>{if(busy||over)return;sel=(sel===i)?null:i;renderHand();updatePlayBtn()};
+    if(isMyTurn) d.onclick=()=>{sel=(sel===i)?null:i;renderHand();updatePlayBtn()};
     ha.appendChild(d);
   });
-  document.getElementById('s-cmb').textContent=comboCount;
   updatePlayBtn();
 }
 
 function updatePlayBtn(){
   const btn=document.getElementById('playbtn');
   const hint=document.getElementById('hint');
-  if(sel!==null&&!busy&&!over){
+  if(sel!==null&&!busy&&!gameOver){
     btn.classList.remove('disabled');
-    const c=hand[sel];const su=getSuit(c.suit);
-    hint.textContent='SELECTED: '+c.val+' OF '+c.suit.toUpperCase()+' — '+su.desc+(SPECIALS[c.val]?' [SPECIAL]':'');
-  } else {
+    const c=myHand[sel];const su=getSuit(c.suit);
+    hint.textContent='SELECTED: '+c.val+' OF '+c.suit.toUpperCase()+(SPECIALS[c.val]?' [SPECIAL]':'');
+  } else if(!busy&&!gameOver){
     btn.classList.add('disabled');
-    hint.textContent='-- CLICK A CARD TO SELECT IT --';
-  }
-}
-
-function updateBars(){
-  document.getElementById('p1h').style.width=Math.max(0,p1.hp)+'%';
-  document.getElementById('p2h').style.width=Math.max(0,p2.hp)+'%';
-}
-
-function updateStats(changed){
-  const ids={atk:'s-atk',def:'s-def',spd:'s-spd',bleed:'s-bld',curse:'s-crs',combo:'s-cmb'};
-  document.getElementById('s-atk').textContent=p1.atk;
-  document.getElementById('s-def').textContent=p1.def;
-  document.getElementById('s-spd').textContent=p1.spd;
-  document.getElementById('s-bld').textContent=p1bleed;
-  document.getElementById('s-crs').textContent=p1curse;
-  document.getElementById('s-cmb').textContent=comboCount;
-  if(changed){
-    const el=document.getElementById(ids[changed.stat]);
-    if(el){el.classList.remove('stat-up','stat-dn');void el.offsetWidth;el.classList.add(changed.dir==='up'?'stat-up':'stat-dn');}
+    hint.textContent='-- CLICK A CARD TO SELECT --';
+  } else if(!gameOver){
+    btn.classList.add('disabled');
+    hint.textContent='-- OPPONENT IS PLAYING --';
   }
 }
 
@@ -416,7 +969,7 @@ function log(t){document.getElementById('log').textContent=t}
 function showBnr(t){const b=document.getElementById('bnr');b.textContent=t;b.style.display='block';setTimeout(()=>b.style.display='none',1700)}
 function showCombo(t){const c=document.getElementById('combo-flash');c.textContent=t;c.style.display='block';setTimeout(()=>c.style.display='none',1400)}
 
-/* ── FLOATING TEXT ── */
+/* ── FLOAT TEXT ── */
 function floatAt(el,txt,color){
   const arena=document.getElementById('arena');
   const ar=arena.getBoundingClientRect();const er=el.getBoundingClientRect();
@@ -438,12 +991,10 @@ function animCardFly(fromEl,toEl,glyph,cb){
   const tr=toEl.getBoundingClientRect();
   const p=document.createElement('div');
   p.className='projectile';p.innerHTML=glyph;
-  const sx=fr.left-ar.left+fr.width/2;
-  const sy=fr.top-ar.top+fr.height/2;
+  const sx=fr.left-ar.left+fr.width/2;const sy=fr.top-ar.top+fr.height/2;
   p.style.left=sx+'px';p.style.top=sy+'px';p.style.color='#c49a35';
   arena.appendChild(p);
-  const tx=tr.left-ar.left+tr.width/2;
-  const ty=tr.top-ar.top+tr.height/2;
+  const tx=tr.left-ar.left+tr.width/2;const ty=tr.top-ar.top+tr.height/2;
   const dur=320;const start=performance.now();
   function step(now){
     const t=Math.min((now-start)/dur,1);
@@ -462,8 +1013,9 @@ function animCardFly(fromEl,toEl,glyph,cb){
 function shake(id){const el=document.getElementById(id);el.classList.add('hit');setTimeout(()=>el.classList.remove('hit'),250)}
 function anim(id,cls){const el=document.getElementById(id);el.classList.add(cls);setTimeout(()=>el.classList.remove(cls),520)}
 
-/* ── PARTICLE SYSTEM ── */
+/* ── PARTICLES ── */
 function spawnParticles(el,type,count){
+  if(!canvas) return;
   const arena=document.getElementById('arena');
   const ar=arena.getBoundingClientRect();const er=el.getBoundingClientRect();
   const cx=er.left-ar.left+er.width/2;const cy=er.top-ar.top+er.height/2;
@@ -471,7 +1023,7 @@ function spawnParticles(el,type,count){
     let p={x:cx,y:cy,life:1,color:'#c49a35'};
     if(type==='strike'){p.vx=(R()-0.5)*5;p.vy=(R()-1)*4;p.color=`hsl(${20+Mf(R()*30)},60%,${40+Mf(R()*20)}%)`;p.size=2+R()*3;}
     else if(type==='heal'){p.vx=(R()-0.5)*2;p.vy=-R()*3-0.5;p.color=`hsl(${40+Mf(R()*20)},50%,${50+Mf(R()*20)}%)`;p.size=1.5+R()*2;p.rise=true;}
-    else if(type==='curse'){p.vx=(R()-0.5)*3;p.vy=(R()-0.5)*3;p.color=`hsl(${260+Mf(R()*40)},40%,${30+Mf(R()*20)}%)`;p.size=2+R()*2;p.spin=true;}
+    else if(type==='curse'){p.vx=(R()-0.5)*3;p.vy=(R()-0.5)*3;p.color=`hsl(${260+Mf(R()*40)},40%,${30+Mf(R()*20)}%)`;p.size=2+R()*2;}
     else if(type==='bleed'){p.vx=(R()-0.5)*3;p.vy=R()*2+0.5;p.color=`hsl(0,60%,${25+Mf(R()*20)}%)`;p.size=1.5+R()*2;}
     else if(type==='drain'){p.vx=(R()-0.5)*2;p.vy=-R()*2-1;p.color=`hsl(${280+Mf(R()*30)},50%,${30+Mf(R()*15)}%)`;p.size=1.5+R()*2;}
     else if(type==='void'){p.vx=(R()-0.5)*4;p.vy=(R()-0.5)*4;p.color='#3a3020';p.size=2+R()*3;}
@@ -483,118 +1035,59 @@ function spawnParticles(el,type,count){
 }
 
 function spawnImpactRing(el){
-  /* draw expanding ring on canvas */
+  if(!ctx) return;
   const arena=document.getElementById('arena');
   const ar=arena.getBoundingClientRect();const er=el.getBoundingClientRect();
   const cx=er.left-ar.left+er.width/2;const cy=er.top-ar.top+er.height/2;
   let r=5,life=1;
-  function drawRing(){
-    if(life<=0)return;
-    ctx.save();ctx.globalAlpha=life*0.6;
-    ctx.strokeStyle='#8b6914';ctx.lineWidth=1.5;
-    ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();
-    ctx.restore();
-    r+=4;life-=0.08;
-    requestAnimationFrame(drawRing);
-  }
+  function drawRing(){if(life<=0)return;ctx.save();ctx.globalAlpha=life*0.6;ctx.strokeStyle='#8b6914';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();ctx.restore();r+=4;life-=0.08;requestAnimationFrame(drawRing);}
   drawRing();
 }
 
 function spawnLightning(el1,el2){
-  const arena=document.getElementById('arena');
-  const ar=arena.getBoundingClientRect();
+  if(!ctx) return;
+  const arena=document.getElementById('arena');const ar=arena.getBoundingClientRect();
   const r1=el1.getBoundingClientRect();const r2=el2.getBoundingClientRect();
   const sx=r1.left-ar.left+r1.width/2;const sy=r1.top-ar.top+r1.height/2;
   const ex=r2.left-ar.left+r2.width/2;const ey=r2.top-ar.top+r2.height/2;
   let life=1;
-  function draw(){
-    if(life<=0)return;
-    ctx.save();ctx.globalAlpha=life*0.7;
-    ctx.strokeStyle='#8b6914';ctx.lineWidth=1;
-    ctx.beginPath();ctx.moveTo(sx,sy);
-    let cx=sx,cy=sy;
-    const steps=8;
-    for(let i=1;i<=steps;i++){
-      const t=i/steps;
-      const nx=sx+(ex-sx)*t+(R()-0.5)*18*(1-t);
-      const ny=sy+(ey-sy)*t+(R()-0.5)*14*(1-t);
-      ctx.lineTo(nx,ny);cx=nx;cy=ny;
-    }
-    ctx.stroke();ctx.restore();
-    life-=0.15;
-    requestAnimationFrame(draw);
-  }
+  function draw(){if(life<=0)return;ctx.save();ctx.globalAlpha=life*0.7;ctx.strokeStyle='#8b6914';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(sx,sy);for(let i=1;i<=8;i++){const t=i/8;const nx=sx+(ex-sx)*t+(R()-0.5)*18*(1-t);const ny=sy+(ey-sy)*t+(R()-0.5)*14*(1-t);ctx.lineTo(nx,ny);}ctx.stroke();ctx.restore();life-=0.15;requestAnimationFrame(draw);}
   draw();
 }
 
 function spawnSlash(el,dir){
-  const arena=document.getElementById('arena');
-  const ar=arena.getBoundingClientRect();const er=el.getBoundingClientRect();
+  if(!ctx) return;
+  const arena=document.getElementById('arena');const ar=arena.getBoundingClientRect();const er=el.getBoundingClientRect();
   const cx=er.left-ar.left+er.width/2;const cy=er.top-ar.top+er.height/2;
-  let life=1,prog=0;
-  const len=38;
-  function draw(){
-    if(prog>1)return;
-    ctx.save();ctx.globalAlpha=life*0.8;
-    ctx.strokeStyle='#c49a35';ctx.lineWidth=2;
-    ctx.lineCap='round';
-    ctx.beginPath();
-    const sx=cx+(dir==='right'?-len/2:len/2);
-    const sy=cy-len/3;
-    const ex=cx+(dir==='right'?len/2:-len/2);
-    const ey=cy+len/3;
-    const dp=Math.min(prog,1);
-    ctx.moveTo(sx,sy);ctx.lineTo(sx+(ex-sx)*dp,sy+(ey-sy)*dp);ctx.stroke();
-    ctx.restore();
-    prog+=0.12;life-=0.08;
-    requestAnimationFrame(draw);
-  }
+  let life=1,prog=0;const len=38;
+  function draw(){if(prog>1)return;ctx.save();ctx.globalAlpha=life*0.8;ctx.strokeStyle='#c49a35';ctx.lineWidth=2;ctx.lineCap='round';ctx.beginPath();const sx=cx+(dir==='right'?-len/2:len/2);const sy=cy-len/3;const ex=cx+(dir==='right'?len/2:-len/2);const ey=cy+len/3;const dp=Math.min(prog,1);ctx.moveTo(sx,sy);ctx.lineTo(sx+(ex-sx)*dp,sy+(ey-sy)*dp);ctx.stroke();ctx.restore();prog+=0.12;life-=0.08;requestAnimationFrame(draw);}
   draw();
 }
 
 function spawnSpiralCurse(el){
-  const arena=document.getElementById('arena');
-  const ar=arena.getBoundingClientRect();const er=el.getBoundingClientRect();
+  if(!ctx) return;
+  const arena=document.getElementById('arena');const ar=arena.getBoundingClientRect();const er=el.getBoundingClientRect();
   const cx=er.left-ar.left+er.width/2;const cy=er.top-ar.top+er.height/2;
   let angle=0,life=1,r=4;
-  function draw(){
-    if(life<=0)return;
-    ctx.save();ctx.globalAlpha=life*0.6;
-    ctx.fillStyle='#5a3a8a';
-    ctx.beginPath();ctx.arc(cx+Math.cos(angle)*r,cy+Math.sin(angle)*r,2,0,Math.PI*2);ctx.fill();
-    ctx.restore();
-    angle+=0.5;r+=2;life-=0.04;
-    requestAnimationFrame(draw);
-  }
+  function draw(){if(life<=0)return;ctx.save();ctx.globalAlpha=life*0.6;ctx.fillStyle='#5a3a8a';ctx.beginPath();ctx.arc(cx+Math.cos(angle)*r,cy+Math.sin(angle)*r,2,0,Math.PI*2);ctx.fill();ctx.restore();angle+=0.5;r+=2;life-=0.04;requestAnimationFrame(draw);}
   draw();
 }
 
 function spawnRipple(el,color){
-  const arena=document.getElementById('arena');
-  const ar=arena.getBoundingClientRect();const er=el.getBoundingClientRect();
+  if(!ctx) return;
+  const arena=document.getElementById('arena');const ar=arena.getBoundingClientRect();const er=el.getBoundingClientRect();
   const cx=er.left-ar.left+er.width/2;const cy=er.top-ar.top+er.height/2;
   let r=0,life=1;
-  function draw(){
-    if(life<=0)return;
-    ctx.save();ctx.globalAlpha=life*0.5;
-    ctx.fillStyle=color||'#8b6914';
-    ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fill();
-    ctx.restore();
-    r+=5;life-=0.07;
-    requestAnimationFrame(draw);
-  }
+  function draw(){if(life<=0)return;ctx.save();ctx.globalAlpha=life*0.5;ctx.fillStyle=color||'#8b6914';ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fill();ctx.restore();r+=5;life-=0.07;requestAnimationFrame(draw);}
   draw();
 }
 
 function animLoop(){
-  if(!ctx)return;
+  if(!ctx){requestAnimationFrame(animLoop);return;}
   ctx.clearRect(0,0,canvas.width,canvas.height);
   particles=particles.filter(p=>p.life>0);
   for(const p of particles){
-    ctx.save();ctx.globalAlpha=p.life*0.85;
-    ctx.fillStyle=p.color;
-    ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill();
-    ctx.restore();
+    ctx.save();ctx.globalAlpha=p.life*0.85;ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill();ctx.restore();
     p.x+=p.vx;p.y+=p.vy;
     if(p.rise)p.vy*=0.96;
     p.vx*=0.93;p.vy*=0.93;
@@ -603,330 +1096,8 @@ function animLoop(){
   requestAnimationFrame(animLoop);
 }
 
-/* ── PLAY ── */
-function playSelected(){
-  if(busy||over)return;
-  if(sel===null){log('SELECT A CARD FIRST.');return;}
-  const card=hand.splice(sel,1)[0];
-  sel=null;busy=true;
-  pauseTimer();
-  renderHand();updatePlayBtn();
-  resolvePlayerCard(card);
-}
-
-function drawOne(){
-  if(busy||over)return;
-  if(hand.length>=7){log('HAND FULL. PLAY A CARD FIRST.');return;}
-  dealCard();renderHand();log('CARD DRAWN FROM THE DECK.');
-}
-
-function resolvePlayerCard(card){
-  const su=getSuit(card.suit);
-  const pw=card.pw;
-  let msgs=[];
-  let comboBonus=0;
-
-  if(lastSuit&&lastSuit===card.suit){
-    comboCount++;comboBonus=comboCount*4;
-    showCombo('COMBO  x'+comboCount+'  +'+comboBonus+' POWER');
-    spawnParticles(document.getElementById('fc1'),'combo',14);
-    msgs.push('COMBO x'+comboCount);
-  } else comboCount=0;
-  lastSuit=card.suit;
-
-  if(p1bleed>0){
-    const bd=Mf(p1bleed*3+R()*3);p1.hp=Math.max(0,p1.hp-bd);p1bleed=Math.max(0,p1bleed-1);
-    msgs.push('BLEED -'+bd+' HP');
-    floatAt(document.getElementById('fc1'),'-'+bd+' BLEED','#7a1a0a');
-    spawnParticles(document.getElementById('fc1'),'bleed',8);
-  }
-  if(p1curse>0){
-    const cd=Mf(p1curse*2+R()*3);p1.hp=Math.max(0,p1.hp-cd);p1curse--;
-    msgs.push('CURSE -'+cd+' HP');
-    floatAt(document.getElementById('fc1'),'-'+cd+' CRS');
-    spawnSpiralCurse(document.getElementById('fc1'));
-  }
-
-  if(SPECIALS[card.val])applyPlayerSpecial(card,pw+comboBonus,msgs);
-  else applyPlayerNormal(su,pw+comboBonus,msgs);
-
-  updateBars();updateStats();log(msgs.join('  |  '));
-  if(hand.length<3)dealCard();
-  renderHand();
-  if(!checkKO())setTimeout(()=>enemyTurn(),900);
-}
-
-function applyPlayerNormal(su,pow,msgs){
-  const roll=R();
-  const fc1=document.getElementById('fc1');
-  const fc2=document.getElementById('fc2');
-
-  if(su.base==='strike'){
-    let dmg=Mf(pow*0.9+p1.atk*0.5+R()*5);
-    if(roll<0.12){dmg=Mf(dmg*0.35);msgs.push('GLANCED -- '+dmg+' DMG');}
-    else if(roll>0.88){dmg=Mf(dmg*1.65);msgs.push('CRUSHING BLOW -- '+dmg+' DMG');}
-    else msgs.push('STRIKE -- '+dmg+' DMG');
-    dmg=Math.max(1,dmg-Mf(p2.def*0.4+R()*2));
-    if(queenBuff){dmg=Mf(dmg*1.5);queenBuff=false;msgs.push('QUEEN EMPOWERED');}
-    p2.hp=Math.max(0,p2.hp-dmg);
-    animCardFly(fc1,fc2,'&#9828;',()=>{
-      spawnSlash(fc2,'left');spawnImpactRing(fc2);
-      spawnParticles(fc2,'strike',15);shake('fc2');
-      floatAt(fc2,'-'+dmg);
-    });
-  } else if(su.base==='mend'){
-    let heal=Mf(pow*0.7+p1.def*0.3+R()*5);
-    if(roll<0.10){heal=Mf(heal*0.3);msgs.push('WEAK MEND +'+heal);}
-    else if(roll>0.85){heal=Mf(heal*1.5);msgs.push('SURGE MEND +'+heal);}
-    else msgs.push('MEND +'+heal+' HP');
-    p1.hp=Math.min(100,p1.hp+heal);
-    spawnRipple(fc1,'#8b6914');spawnParticles(fc1,'heal',12);anim('fc1','healed');
-    floatAt(fc1,'+'+heal+' HP');
-    if(roll>0.6){p1.def=Math.min(20,p1.def+1);msgs.push('+1 DEF');updateStats({stat:'def',dir:'up'});}
-  } else if(su.base==='brace'){
-    const bl=Mf(pow*0.5+p1.def*0.4+R()*3);
-    const dDef=Mf(bl*0.15);const dHp=Mf(bl*0.3);
-    p1.def=Math.min(20,p1.def+dDef);p1.hp=Math.min(100,p1.hp+dHp);
-    msgs.push('BRACE +'+dDef+' DEF  +'+dHp+' HP');
-    spawnImpactRing(fc1);spawnParticles(fc1,'mirror',10);anim('fc1','shielded');
-    floatAt(fc1,'BRACED');
-    if(roll>0.75){p1.spd=Math.min(20,p1.spd+1);msgs.push('+1 SPD');updateStats({stat:'spd',dir:'up'});}
-  } else if(su.base==='curse'){
-    const cp=Mf(pow*0.6+p1.spd*0.3+R()*4);
-    p2curse=Math.min(p2curse+Mf(cp*0.25+1),8);
-    const dmg=Mf(cp*0.4);p2.hp=Math.max(0,p2.hp-dmg);
-    animCardFly(fc1,fc2,'&#9830;',()=>{
-      spawnSpiralCurse(fc2);spawnParticles(fc2,'curse',12);anim('fc2','cursed-anim');
-      floatAt(fc2,'CURSED -'+dmg);
-    });
-    msgs.push('CURSE -'+dmg+' DMG  CURSE+');
-    if(roll<0.2){p2.atk=Math.max(1,p2.atk-2);msgs.push('FOE -2 ATK');}
-  } else if(su.base==='drain'){
-    const dp=Mf(pow*0.8+p1.atk*0.3+R()*4);
-    const stolen=Mf(dp*0.4);
-    p2.hp=Math.max(0,p2.hp-dp);p1.hp=Math.min(100,p1.hp+stolen);
-    animCardFly(fc1,fc2,'&#9670;',()=>{
-      spawnParticles(fc2,'drain',12);spawnParticles(fc1,'heal',8);
-      anim('fc2','drained');anim('fc1','healed');
-      floatAt(fc2,'-'+dp+' DRAINED');floatAt(fc1,'+'+stolen+' LIFE');
-    });
-    msgs.push('DRAIN -'+dp+' LIFE STEAL +'+stolen);
-    p1.atk=Math.min(25,p1.atk+1);updateStats({stat:'atk',dir:'up'});
-  } else if(su.base==='wound'){
-    const wp=Mf(pow*0.5+p1.atk*0.4+R()*4);
-    const bleedAmt=Mf(wp*0.3+1);
-    p2.hp=Math.max(0,p2.hp-wp);p2bleed=Math.min(p2bleed+bleedAmt,10);
-    animCardFly(fc1,fc2,'&#10016;',()=>{
-      spawnParticles(fc2,'bleed',14);spawnSlash(fc2,'left');
-      shake('fc2');floatAt(fc2,'-'+wp+' BLEED '+bleedAmt+'x');
-    });
-    msgs.push('WOUND -'+wp+' DMG  BLEED x'+bleedAmt);
-  } else if(su.base==='void'){
-    p2curse=0;p2bleed=0;let statRob=0;
-    if(p2.atk>11){statRob=Mf((p2.atk-11)*0.5+1);p2.atk=Math.max(1,p2.atk-statRob);}
-    const vdmg=Mf(pow*0.7+R()*5);p2.hp=Math.max(0,p2.hp-vdmg);
-    animCardFly(fc1,fc2,'&#9671;',()=>{
-      spawnParticles(fc2,'void',16);spawnRipple(fc2,'#2a2020');
-      anim('fc2','drained');floatAt(fc2,'NULLIFIED -'+vdmg);
-    });
-    msgs.push('VOID NULLIFIES FOE BUFFS -'+vdmg+(statRob?' -'+statRob+' ATK':''));
-  } else if(su.base==='mirror'){
-    mirrorActive=true;
-    spawnRipple(fc1,'#a09070');spawnParticles(fc1,'mirror',14);anim('fc1','statboost');
-    floatAt(fc1,'MIRROR ACTIVE');
-    msgs.push('MIRROR SHIELD ACTIVATED -- NEXT HIT REFLECTS');
-  }
-}
-
-function applyPlayerSpecial(card,pow,msgs){
-  const roll=R();
-  const fc1=document.getElementById('fc1');
-  const fc2=document.getElementById('fc2');
-  if(card.val==='J'){
-    const st=Mf(2+roll*4);
-    p2.atk=Math.max(1,p2.atk-st);p1.atk=Math.min(25,p1.atk+st);
-    animCardFly(fc1,fc2,'J',()=>{
-      spawnLightning(fc1,fc2);anim('fc2','stolen');anim('fc1','statboost');
-      floatAt(fc1,'+'+st+' ATK');floatAt(fc2,'-'+st+' ATK');
-    });
-    msgs.push('KNAVE STEALS '+st+' ATK');
-    updateStats({stat:'atk',dir:'up'});
-    if(roll>0.5){const xd=Mf(p1.atk*0.4);p2.hp=Math.max(0,p2.hp-xd);setTimeout(()=>{shake('fc2');floatAt(fc2,'-'+xd)},320);msgs.push('CUTS '+xd);}
-  } else if(card.val==='Q'){
-    const h=Mf(10+roll*12);p1.hp=Math.min(100,p1.hp+h);queenBuff=true;
-    p2curse=Math.min(p2curse+2,8);
-    spawnRipple(fc1,'#8b6914');spawnParticles(fc1,'heal',16);
-    spawnSpiralCurse(fc2);anim('fc1','healed');
-    floatAt(fc1,'+'+h+' QUEEN');floatAt(fc2,'CURSED x2');
-    msgs.push('QUEEN +'+h+' HP  EMPOWER  CURSE x2');
-  } else if(card.val==='K'){
-    p1.atk=Math.min(25,p1.atk+2);p1.def=Math.min(20,p1.def+2);p1.spd=Math.min(20,p1.spd+2);
-    spawnParticles(fc1,'combo',20);spawnImpactRing(fc1);anim('fc1','statboost');
-    floatAt(fc1,'KING +2 ALL');
-    msgs.push('KING -- ALL STATS +2');
-    updateStats({stat:'atk',dir:'up'});
-    if(roll>0.45){const d=Mf(p1.atk*0.7);p2.hp=Math.max(0,p2.hp-d);setTimeout(()=>{spawnSlash(fc2,'left');shake('fc2');floatAt(fc2,'-'+d+' ROYAL')},400);msgs.push('ROYAL DECREE -'+d);}
-  } else {
-    let dmg=Mf((pow+p1.atk)*1.4+R()*8);
-    if(roll<0.15){dmg=Mf(dmg*0.35);msgs.push('ACE MISFIRED -- '+dmg);}
-    else{dmg=Math.max(2,dmg-Mf(p2.def*0.3));msgs.push('ACE DOUBLE STRIKE -- '+dmg);}
-    p2.hp=Math.max(0,p2.hp-dmg);
-    animCardFly(fc1,fc2,'A',()=>{
-      spawnSlash(fc2,'left');spawnImpactRing(fc2);spawnParticles(fc2,'strike',20);
-      shake('fc2');floatAt(fc2,'-'+dmg+' ACE');
-    });
-    if(roll>0.8){
-      const ed=Mf(dmg*0.45);p2.hp=Math.max(0,p2.hp-ed);
-      setTimeout(()=>{spawnSlash(fc2,'right');floatAt(fc2,'-'+ed+' ECHO');shake('fc2')},350);
-      msgs.push('ECHO -'+ed);
-    }
-  }
-}
-
-/* ── ENEMY TURN ── */
-function enemyTurn(){
-  if(over)return;
-  document.getElementById('enemy-indicator').style.display='block';
-  document.getElementById('tmr-label').textContent='...';
-  document.getElementById('tmr').textContent='--';
-  document.getElementById('tmr').classList.remove('urgent');
-
-  busy=true;
-  // slight AI thinking delay
-  setTimeout(()=>doEnemyTurn(),600);
-}
-
-function doEnemyTurn(){
-  if(over)return;
-  const roll=R();let msgs=[];
-  const fc1=document.getElementById('fc1');
-  const fc2=document.getElementById('fc2');
-
-  if(p2bleed>0){
-    const bd=Mf(p2bleed*3+R()*3);p2.hp=Math.max(0,p2.hp-bd);p2bleed=Math.max(0,p2bleed-1);
-    msgs.push('SHADE BLEEDS -'+bd);spawnParticles(fc2,'bleed',8);floatAt(fc2,'-'+bd+' BLD','#7a1a0a');
-  }
-  if(p2curse>0){
-    const cd=Mf(p2curse*2+R()*3);p2.hp=Math.max(0,p2.hp-cd);p2curse--;
-    msgs.push('SHADE CURSE -'+cd);spawnSpiralCurse(fc2);floatAt(fc2,'-'+cd+' CRS');
-  }
-
-  if(!deck.length)deck=mkDeck();
-  const aiCard=deck[Mf(R()*Math.min(deck.length,8))];
-  const su=getSuit(aiCard.suit);const pw=aiCard.pw;
-
-  /* AI picks strategy */
-  const healBias=p2.hp<50&&su.base==='mend';
-  const aggro=roll>0.3;
-
-  if(SPECIALS[aiCard.val]){
-    const v=aiCard.val;
-    if(v==='J'){
-      const st=Mf(1+roll*3);p1.atk=Math.max(1,p1.atk-st);p2.atk=Math.min(25,p2.atk+st);
-      animCardFly(fc2,fc1,'J',()=>{spawnLightning(fc2,fc1);anim('fc1','stolen');floatAt(fc1,'-'+st+' ATK')});
-      msgs.push('SHADE KNAVE -'+st+' ATK');updateStats({stat:'atk',dir:'dn'});
-    } else if(v==='Q'){
-      const h=Mf(7+roll*10);p2.hp=Math.min(100,p2.hp+h);
-      spawnRipple(fc2,'#8b6914');spawnParticles(fc2,'heal',14);anim('fc2','healed');
-      floatAt(fc2,'+'+h+' QUEEN');msgs.push('SHADE QUEEN +'+h+' HP');
-    } else if(v==='K'){
-      p2.atk=Math.min(25,p2.atk+2);p2.def=Math.min(20,p2.def+2);
-      spawnParticles(fc2,'combo',16);anim('fc2','statboost');
-      msgs.push('SHADE KING +2 ALL');
-    } else {
-      const d=Math.max(1,Mf((pw+p2.atk)*1.2+R()*7)-Mf(p1.def*0.3));
-      p1.hp=Math.max(0,p1.hp-d);
-      animCardFly(fc2,fc1,'A',()=>{
-        spawnSlash(fc1,'right');spawnImpactRing(fc1);spawnParticles(fc1,'strike',18);
-        shake('fc1');floatAt(fc1,'-'+d+' ACE');
-      });
-      msgs.push('SHADE ACE -'+d);
-    }
-  } else if(su.base==='strike'||aggro){
-    let d=Mf(pw*0.8+p2.atk*0.5+R()*5);
-    if(roll<0.15)d=Mf(d*0.3);else if(roll>0.85)d=Mf(d*1.5);
-    d=Math.max(1,d-Mf(p1.def*0.4+R()*2));
-    if(mirrorActive){
-      mirrorActive=false;
-      p2.hp=Math.max(0,p2.hp-d);
-      spawnParticles(fc1,'mirror',14);spawnImpactRing(fc1);
-      floatAt(fc1,'REFLECTED!');floatAt(fc2,'-'+d+' REFLECT');shake('fc2');
-      msgs.push('MIRROR REFLECTS -'+d+' BACK!');
-    } else {
-      p1.hp=Math.max(0,p1.hp-d);
-      animCardFly(fc2,fc1,'&#9828;',()=>{
-        spawnSlash(fc1,'right');spawnImpactRing(fc1);spawnParticles(fc1,'strike',14);
-        shake('fc1');floatAt(fc1,'-'+d);
-      });
-      msgs.push('SHADE STRIKES -'+d);
-    }
-  } else if(su.base==='mend'&&p2.hp<75){
-    const h=Mf(pw*0.7+R()*5);p2.hp=Math.min(100,p2.hp+h);
-    spawnRipple(fc2,'#8b6914');spawnParticles(fc2,'heal',12);anim('fc2','healed');
-    floatAt(fc2,'+'+h);msgs.push('SHADE MENDS +'+h);
-  } else if(su.base==='drain'){
-    const dp=Mf(pw*0.7+R()*4);const stl=Mf(dp*0.35);
-    p1.hp=Math.max(0,p1.hp-dp);p2.hp=Math.min(100,p2.hp+stl);
-    animCardFly(fc2,fc1,'&#9670;',()=>{
-      spawnParticles(fc1,'drain',10);anim('fc1','drained');
-      floatAt(fc1,'-'+dp+' DRAIN');floatAt(fc2,'+'+stl);
-    });
-    msgs.push('SHADE DRAINS -'+dp+' +'+stl);
-  } else if(su.base==='wound'){
-    const wp=Mf(pw*0.5+p2.atk*0.3+R()*3);const ba=Mf(wp*0.3+1);
-    p1.hp=Math.max(0,p1.hp-wp);p1bleed=Math.min(p1bleed+ba,10);
-    animCardFly(fc2,fc1,'&#10016;',()=>{spawnParticles(fc1,'bleed',12);shake('fc1');floatAt(fc1,'-'+wp+' BLD x'+ba)});
-    msgs.push('SHADE WOUNDS -'+wp+' BLEED x'+ba);
-  } else if(su.base==='curse'){
-    const cp=Mf(pw*0.5+R()*4);p1curse=Math.min(p1curse+2,8);
-    const d=Mf(cp*0.4);p1.hp=Math.max(0,p1.hp-d);
-    animCardFly(fc2,fc1,'&#9830;',()=>{spawnSpiralCurse(fc1);anim('fc1','cursed-anim');floatAt(fc1,'CURSED -'+d)});
-    msgs.push('SHADE CURSES -'+d+' +STACK');
-  } else {
-    const d=Mf(pw*0.7+p2.atk*0.35+R()*4);
-    const bl=Mf(p1.def*0.35);const dmg=Math.max(1,d-bl);
-    p1.hp=Math.max(0,p1.hp-dmg);
-    animCardFly(fc2,fc1,su.g,()=>{spawnParticles(fc1,'strike',10);shake('fc1');floatAt(fc1,'-'+dmg)});
-    msgs.push('SHADE '+su.desc+' -'+dmg);
-  }
-
-  round++;
-  setTimeout(()=>{
-    updateBars();updateStats();log(msgs.join('  |  '));
-    if(!checkKO()){
-      busy=false;
-      document.getElementById('enemy-indicator').style.display='none';
-      resumeTimer();
-    }
-  },700);
-}
-
-function checkKO(){
-  if(p1.hp<=0){showWin('K.O.  --  SHADE WINS');return true;}
-  if(p2.hp<=0){showWin('K.O.  --  VAGRANT WINS');return true;}
-  return false;
-}
-
-function showWin(msg){
-  clearInterval(timerInt);over=true;busy=false;
-  showBnr(msg);log(msg);
-  setTimeout(()=>{
-    const ov=document.getElementById('ov');ov.style.display='flex';
-    document.getElementById('ov-title').textContent=msg;
-    document.getElementById('ov-sub').textContent='VAGRANT  '+Math.max(0,p1.hp)+'HP   vs   SHADE  '+Math.max(0,p2.hp)+'HP\n\nATK:'+p1.atk+'  DEF:'+p1.def+'  SPD:'+p1.spd+'\nROUND '+round;
-    document.getElementById('ov-deco').textContent='\u2666 \u2660 \u2665 \u2663';
-    const sb=document.getElementById('startbtn');sb.textContent='\u25BA PLAY AGAIN';sb.onclick=startGame;
-  },2000);
-}
-
-function showRulesScreen(){
-  const ov=document.getElementById('ov');ov.style.display='flex';
-  document.getElementById('ov-title').textContent='RULES OF COMBAT';
-  document.getElementById('ov-sub').textContent='SELECT A CARD THEN PRESS PLAY\n15 SECONDS PER TURN -- OR LOSE HP\nSAME SUIT COMBOS STACK BONUS\nCURSE & BLEED TICK EACH TURN';
-  const sb=document.getElementById('startbtn');
-  sb.textContent='\u25BA BACK';
-  sb.onclick=()=>{if(!over)ov.style.display='none';};
-}
+// Start canvas loop immediately so it's ready
+requestAnimationFrame(animLoop);
 </script>
 </body>
 </html>
