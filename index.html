@@ -1537,11 +1537,19 @@ async function applyOnlineAction(actionType){
   let result;
   try {
     result=await runTransaction(roomRef, cur=>{
-      // In Firebase RTDB, returning the current value (cur) aborts without writing.
-      // Returning undefined throws — always return cur to abort cleanly.
-      if(!cur || cur.status!=='playing') return cur;
-      if(cur.turn!==myRole) return cur;
-      if(!cur[myRole]) return cur;
+      console.log('[TX] cur:', cur ? 'exists' : 'NULL', 'status:', cur?.status, 'turn:', cur?.turn, 'myRole:', myRole);
+      if(!cur || cur.status!=='playing'){
+        console.log('[TX] abort: no cur or not playing');
+        return cur;
+      }
+      if(cur.turn!==myRole){
+        console.log('[TX] abort: not my turn. cur.turn='+cur.turn+' myRole='+myRole);
+        return cur;
+      }
+      if(!cur[myRole]){
+        console.log('[TX] abort: no player data for', myRole);
+        return cur;
+      }
 
       const state=deepClone(cur);
       // Rehydrate pw/cost on all cards — Firebase strips non-primitive fields
@@ -1556,13 +1564,14 @@ async function applyOnlineAction(actionType){
         const passed=drawCardAndEndTurn(state,myRole);
         log=[`${state[myRole].name} draws.`,...passed].filter(Boolean).join(' | ');
       } else if(actionType==='discard'){
-        if(actionIndex===null) return cur;
+        if(actionIndex===null){ console.log('[TX] abort: discard but no index'); return cur; }
         discardCardForEnergy(state,myRole,actionIndex);
         log=`${state[myRole].name} discards for +2 energy.`;
       } else if(actionType==='play'){
-        if(actionIndex===null) return cur;
+        if(actionIndex===null){ console.log('[TX] abort: play but no index'); return cur; }
         const card=state[myRole].hand[actionIndex];
-        if(!card||!canPlayCard(state[myRole],card)) return cur;
+        console.log('[TX] card:', card, 'energy:', state[myRole].energy, 'cost:', card?.cost);
+        if(!card||!canPlayCard(state[myRole],card)){ console.log('[TX] abort: cant play card'); return cur; }
         const res=resolveCardPlay(state,myRole,actionIndex,localHist);
         log=[res.text,...(res.passed||[])].filter(Boolean).join(' | ');
         committedRitualHist=localHist;
@@ -1573,11 +1582,13 @@ async function applyOnlineAction(actionType){
       checkForWinner(state);
       state.lastLog=log;
       committedLog=log;
+      console.log('[TX] committing, log:', log);
       return state;
     });
+    console.log('[TX] result:', result?.committed, result?.snapshot?.exists());
   } catch(err) {
-    console.error('Transaction error:', err);
-    logText('Action failed — please try again.');
+    console.error('Transaction error full:', err, err?.code, err?.message, err?.stack);
+    logText('Action failed: ' + (err?.message||err?.code||String(err)));
     renderGame();
     return;
   }
