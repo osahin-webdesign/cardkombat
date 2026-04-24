@@ -498,13 +498,15 @@ const CARD_LIBRARY=[
 ];
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-const LS={deck:'ck_deck_secure',seatToken:'ck_seat_token',session:'ck_session_token'};
+const LS={deck:'ck_deck_secure',session:'ck_session_token'};
 const $=s=>document.querySelector(s), mf=Math.floor, rr=()=>Math.random();
 
-let seatToken = localStorage.getItem(LS.seatToken) || crypto.randomUUID();
-localStorage.setItem(LS.seatToken, seatToken);
-let sessionToken = localStorage.getItem(LS.session) || crypto.randomUUID();
-localStorage.setItem(LS.session, sessionToken);
+// seatToken is tab-specific (sessionStorage) so two browser tabs = two distinct players.
+// This allows playing vs yourself on one machine by opening a second tab.
+let seatToken = sessionStorage.getItem('ck_seat_token') || crypto.randomUUID();
+sessionStorage.setItem('ck_seat_token', seatToken);
+let sessionToken = sessionStorage.getItem('ck_session_token') || crypto.randomUUID();
+sessionStorage.setItem('ck_session_token', sessionToken);
 
 // ── App state ─────────────────────────────────────────────────────────────────
 let mode='menu', onlineType=null, roomId=null, myRole='p1';
@@ -1297,14 +1299,14 @@ async function joinRoom(code){
   const cur=snap.val();
   if(cur.status!=='waiting'){ msg('That room has already started or finished.'); mode='menu'; myRole='p1'; return }
   if(cur.p2!==null&&cur.p2?.seatToken){ msg('Room is already full.'); mode='menu'; myRole='p1'; return }
-  if(cur.p1?.seatToken===seatToken){ msg('You cannot join your own room.'); mode='menu'; myRole='p1'; return }
+  // Note: seatToken is tab-specific so the same browser in two tabs can play each other
   if(!currentProfile.name||currentProfile.name.trim().length<2){ msg('Invalid profile — cannot join.'); mode='menu'; myRole='p1'; return }
 
   const res=await runTransaction(roomRef, state=>{
     if(!state) return state;
     if(state.status!=='waiting') return;
     if(state.p2!==null&&state.p2?.seatToken) return;
-    if(state.p1?.seatToken===seatToken) return;
+    // seatToken is tab-specific — no self-join block needed
 
     const p2Fighter=newFighter(currentProfile.name, getDeck(), currentProfile.elo, seatToken);
 
