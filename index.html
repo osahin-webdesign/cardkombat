@@ -564,6 +564,27 @@ function makeDeckFromList(list){
 }
 function deepClone(v){ return JSON.parse(JSON.stringify(v)) }
 
+// Firebase converts arrays to {0:x,1:y} objects. This restores them.
+function fixPlayerArrays(pl){
+  if(!pl) return;
+  ['hand','deck','discard'].forEach(k=>{
+    if(pl[k] && !Array.isArray(pl[k]))
+      pl[k]=Object.values(pl[k]);
+    if(!pl[k]) pl[k]=[];
+  });
+  // Also fix suitMastery if it somehow broke
+  if(!pl.suitMastery) pl.suitMastery={spade:0,heart:0,club:0,diamond:0,drain:0,wound:0,void:0,mirror:0};
+  // Rehydrate pw/cost on all cards
+  const fix=c=>{if(c){if(c.pw==null)c.pw=VAL_POWER[c.val]??5;if(c.cost==null)c.cost=RARITY_RULES[c.rarity]?.cost??1;}};
+  pl.hand.forEach(fix); pl.deck.forEach(fix); pl.discard.forEach(fix);
+}
+function fixStateArrays(state){
+  if(!state) return state;
+  fixPlayerArrays(state.p1);
+  fixPlayerArrays(state.p2);
+  return state;
+}
+
 // ── Profile ───────────────────────────────────────────────────────────────────
 async function ensureProfile(name){
   const key=profileKey(name);
@@ -964,9 +985,9 @@ function rehydrateCards(player){
 
 function renderGame(){
   if(!gameState) return;
-  // Rehydrate card fields that Firebase strips (pw, cost) before any rendering or logic
-  rehydrateCards(gameState.p1);
-  rehydrateCards(gameState.p2);
+  // Fix Firebase array→object corruption on every render
+  fixPlayerArrays(gameState.p1);
+  fixPlayerArrays(gameState.p2);
   const me=currentPlayer();
   $('#p1label').textContent=gameState.p1.name;
   $('#p2label').textContent=gameState.p2?.name||'OPEN';
@@ -1215,6 +1236,7 @@ function listenToRoom(rid){
       gameState=data;
 
       const gameScreenHidden = document.getElementById('screen-game').classList.contains('hidden');
+      fixStateArrays(data);
       if(gameScreenHidden){
         // P1 path: on lobby screen — show P2 arrived then enter game
         $('#lobby-name-p2').textContent=data.p2?.name||'—';
@@ -1241,8 +1263,8 @@ function listenToRoom(rid){
       gameState=data; renderGame(); finishGame(data.winner); return;
     }
     if(data.status==='playing' && enteredGame){
-      // Always update gameState from the server — this is the canonical truth
-      gameState=data;
+      // Always update gameState from the server — fix Firebase array corruption first
+      gameState=fixStateArrays(data);
       // FX for opponent's actions (only show once, before re-render clears _seen)
       if(data.lastAction && data.lastAction.by!==myRole){
         const a=data.lastAction;
@@ -1360,7 +1382,7 @@ async function joinRoom(code){
   }
 
   roomId=cleanCode;
-  gameState=joined;
+  gameState=fixStateArrays(joined);
   enterGame();
   renderGame();
   logText(`You joined ${joined.p1.name}'s room. Duel begins!`);
@@ -1552,11 +1574,8 @@ async function applyOnlineAction(actionType){
       }
 
       const state=deepClone(cur);
-      // Rehydrate pw/cost on all cards — Firebase strips non-primitive fields
-      [state.p1, state.p2].forEach(pl=>{ if(!pl) return;
-        const fix=c=>{if(c){if(c.pw==null)c.pw=VAL_POWER[c.val]??5;if(c.cost==null)c.cost=RARITY_RULES[c.rarity]?.cost??1;}};
-        (pl.hand||[]).forEach(fix);(pl.deck||[]).forEach(fix);(pl.discard||[]).forEach(fix);
-      });
+      // Fix Firebase array→object corruption and rehydrate pw/cost
+      fixStateArrays(state);
       const localHist=[...localRitualSnap];
       let log='';
 
@@ -1597,7 +1616,7 @@ async function applyOnlineAction(actionType){
     // Sync ritual history only if a play was committed
     if(actionType==='play' && committedRitualHist) ritualHistory=committedRitualHist;
     selectedIndex=null;
-    gameState=result.snapshot.val();
+    gameState=fixStateArrays(result.snapshot.val());
     if(committedLog) logText(committedLog);
     const la=gameState?.lastAction;
     if(la?.val==='A') duelMoment('ACE STRIKE',1.8);
