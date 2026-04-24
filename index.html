@@ -785,11 +785,14 @@ function discardCardForEnergy(state, role, handIndex){
   state.lastAction={by:role,type:'discard',card:card?.id,_seen:false}
   // Note: turn does NOT change — player keeps their turn after discarding
 }
-function canPlayCard(player, card){ return !!card && player.energy>=(card.cost||1) }
+function canPlayCard(player, card){ if(!card) return false; const cost=card.cost??RARITY_RULES[card.rarity]?.cost??1; return player.energy>=cost; }
 
 function resolveCardPlay(state, role, handIndex, localRitualHistory){
   const me=state[role], oppRole=role==='p1'?'p2':'p1', foe=state[oppRole], card=me.hand[handIndex];
   if(!card||!canPlayCard(me,card)) return {text:'Cannot play that card.',passed:[],comboTurn:false};
+  // Rehydrate pw and cost in case they were lost in Firebase JSON round-trip
+  if(card.pw===undefined||card.pw===null) card.pw = VAL_POWER[card.val] ?? 5;
+  if(card.cost===undefined||card.cost===null) card.cost = RARITY_RULES[card.rarity]?.cost ?? 1;
   me.hand.splice(handIndex,1); me.discard.push(card); me.energy-=(card.cost||1);
   applySuitMastery(me, card.suit);
   const ritual=detectRitual(card, localRitualHistory);
@@ -819,7 +822,9 @@ function resolveCardPlay(state, role, handIndex, localRitualHistory){
     state[role+'_comboTurn']=false;
   }
   if(ritual?.bonus?.damage) comboBonus += ritual.bonus.damage/2;
-  const suit=gSuit(card.suit), basePow=card.pw+comboBonus+(me.focus||0); let text=[];
+  // card.pw may be absent after Firebase round-trip — always recompute from val
+  const cardPw = card.pw ?? VAL_POWER[card.val] ?? 5;
+  const suit=gSuit(card.suit), basePow=cardPw+comboBonus+(me.focus||0); let text=[];
   applyArchetypePassive(me, foe, text);
 
   if(card.val==='J'){
@@ -948,8 +953,20 @@ function renderEnergy(el, current, max){
 }
 function currentPlayer(){ return gameState ? gameState[myRole] : null }
 
+function rehydrateCards(player){
+  // Restore pw and cost fields lost in Firebase JSON serialization
+  if(!player) return;
+  const fix=c=>{ if(c){ if(c.pw==null) c.pw=VAL_POWER[c.val]??5; if(c.cost==null) c.cost=RARITY_RULES[c.rarity]?.cost??1; } };
+  (player.hand||[]).forEach(fix);
+  (player.deck||[]).forEach(fix);
+  (player.discard||[]).forEach(fix);
+}
+
 function renderGame(){
   if(!gameState) return;
+  // Rehydrate card fields that Firebase strips (pw, cost) before any rendering or logic
+  rehydrateCards(gameState.p1);
+  rehydrateCards(gameState.p2);
   const me=currentPlayer();
   $('#p1label').textContent=gameState.p1.name;
   $('#p2label').textContent=gameState.p2?.name||'OPEN';
@@ -1527,6 +1544,11 @@ async function applyOnlineAction(actionType){
       if(!cur[myRole]) return cur;
 
       const state=deepClone(cur);
+      // Rehydrate pw/cost on all cards — Firebase strips non-primitive fields
+      [state.p1, state.p2].forEach(pl=>{ if(!pl) return;
+        const fix=c=>{if(c){if(c.pw==null)c.pw=VAL_POWER[c.val]??5;if(c.cost==null)c.cost=RARITY_RULES[c.rarity]?.cost??1;}};
+        (pl.hand||[]).forEach(fix);(pl.deck||[]).forEach(fix);(pl.discard||[]).forEach(fix);
+      });
       const localHist=[...localRitualSnap];
       let log='';
 
@@ -1590,7 +1612,7 @@ async function applyOnlineAction(actionType){
 function scoreAICard(state, card){
   const ai=state.p2, me=state.p1;
   // Energy cost is more punishing now — weight it heavier
-  const energyEfficiency = card.pw / (card.cost||1);
+  const energyEfficiency = (card.pw ?? VAL_POWER[card.val] ?? 5) / (card.cost||1);
   let score=energyEfficiency*1.4-(card.cost||1)*0.8; const base=gSuit(card.suit).base;
   if(base==='strike') score+=(100-me.hp)*0.06+ai.atk*0.4;
   if(base==='mend') score+=(100-ai.hp)*0.18;
