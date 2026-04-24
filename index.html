@@ -1304,8 +1304,8 @@ async function joinRoom(code){
 
   const res=await runTransaction(roomRef, state=>{
     if(!state) return state;
-    if(state.status!=='waiting') return;
-    if(state.p2!==null&&state.p2?.seatToken) return;
+    if(state.status!=='waiting') return state;
+    if(state.p2!==null&&state.p2?.seatToken) return state;
     // seatToken is tab-specific — no self-join block needed
 
     const p2Fighter=newFighter(currentProfile.name, getDeck(), currentProfile.elo, seatToken);
@@ -1520,14 +1520,13 @@ async function applyOnlineAction(actionType){
   let result;
   try {
     result=await runTransaction(roomRef, cur=>{
-      // Firebase passes null on first call if no cached value — return undefined to abort cleanly
-      if(cur===null||cur===undefined) return; // undefined = abort without writing
-      if(cur.status!=='playing') return; // abort
-      if(cur.turn!==myRole) return; // abort — not our turn in canonical state
-      if(!cur[myRole]) return; // abort
+      // In Firebase RTDB, returning the current value (cur) aborts without writing.
+      // Returning undefined throws — always return cur to abort cleanly.
+      if(!cur || cur.status!=='playing') return cur;
+      if(cur.turn!==myRole) return cur;
+      if(!cur[myRole]) return cur;
 
       const state=deepClone(cur);
-      // Fresh ritual history copy for each retry
       const localHist=[...localRitualSnap];
       let log='';
 
@@ -1535,30 +1534,29 @@ async function applyOnlineAction(actionType){
         const passed=drawCardAndEndTurn(state,myRole);
         log=[`${state[myRole].name} draws.`,...passed].filter(Boolean).join(' | ');
       } else if(actionType==='discard'){
-        if(actionIndex===null) return; // abort
+        if(actionIndex===null) return cur;
         discardCardForEnergy(state,myRole,actionIndex);
         log=`${state[myRole].name} discards for +2 energy.`;
       } else if(actionType==='play'){
-        if(actionIndex===null) return; // abort
+        if(actionIndex===null) return cur;
         const card=state[myRole].hand[actionIndex];
-        if(!card||!canPlayCard(state[myRole],card)) return; // abort
+        if(!card||!canPlayCard(state[myRole],card)) return cur;
         const res=resolveCardPlay(state,myRole,actionIndex,localHist);
         log=[res.text,...(res.passed||[])].filter(Boolean).join(' | ');
-        // Store the ritual hist that would result from this committed play
         committedRitualHist=localHist;
       } else {
-        return; // abort unknown action
+        return cur;
       }
 
       checkForWinner(state);
       state.lastLog=log;
-      committedLog=log; // set for use after transaction (last retry wins, which is correct)
+      committedLog=log;
       return state;
     });
   } catch(err) {
     console.error('Transaction error:', err);
-    logText('Connection error — please try again.');
-    renderGame(); // re-enable buttons via renderGame→updateButtons
+    logText('Action failed — please try again.');
+    renderGame();
     return;
   }
 
